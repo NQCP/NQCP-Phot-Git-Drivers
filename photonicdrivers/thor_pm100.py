@@ -12,7 +12,7 @@ class PM100(VisaInstrument):
 
     # all instrument constructors should accept **kwargs and pass them on to
     # super().__init__
-    def __init__(self, name, address, **kwargs):
+    def __init__(self, name, address, **kwargs) -> None :
         # supplying the terminator means you don't need to remove it from every response
         super().__init__(name, address, timeout=10, terminator="\n", **kwargs)
         self.add_parameter(
