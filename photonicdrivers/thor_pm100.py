@@ -1,7 +1,7 @@
 from qcodes import validators as vals
 from qcodes.instrument import VisaInstrument
 from qcodes.logger import start_all_logging
-
+from typing import Any
 
 class PM100(VisaInstrument):
     """
@@ -12,7 +12,7 @@ class PM100(VisaInstrument):
 
     # all instrument constructors should accept **kwargs and pass them on to
     # super().__init__
-    def __init__(self, name, address, **kwargs) -> None :
+    def __init__(self, name: str, address: str, **kwargs: Any) -> None:
         # supplying the terminator means you don't need to remove it from every response
         super().__init__(name, address, timeout=10, terminator="\n", **kwargs)
         self.add_parameter(
