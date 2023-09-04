@@ -1,6 +1,7 @@
 # photonicdrivers
 
 # Description
+[Examples](https://nqcp.github.io/PhotonicDrivers/example_notebooks/index.html)
 
 # Installation
 
