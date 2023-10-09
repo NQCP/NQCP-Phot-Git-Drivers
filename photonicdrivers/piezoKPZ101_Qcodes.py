@@ -1,52 +1,43 @@
-import ctypes  # only for DLL-based instrument
-from time import sleep, time
-
-import numpy as np
-
-import qcodes as qc
-from qcodes import validators as vals
-from qcodes.instrument import (
-    Instrument,
-    InstrumentChannel,
-    InstrumentModule,
-    VisaInstrument,
-)
-from qcodes.parameters import ManualParameter, MultiParameter
-#from qcodes.logger import start_all_logging
-
-############################################################################
-
 import os
-import time
-import sys
-import clr
+from qcodes.instrument import Instrument
+from zmq import device
+import qcodes.validators as vals
+
+
+try:
+    import clr  # pyright: ignore[reportMissingTypeStubs,reportMissingImports]
+except ImportError as exc:
+    raise ImportError(
+        "Module clr not found. Please obtain it by running 'pip install pythonnet' in a qcodes environment terminal"
+    ) from exc
 
 # get these files by downloading the kinesis software from
 # https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=Motion_Control
 
-clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.DeviceManagerCLI.dll")
-clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.GenericMotorCLI.dll")
-clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\ThorLabs.MotionControl.KCube.PiezoCLI.dll")
-from Thorlabs.MotionControl.DeviceManagerCLI import *
-from Thorlabs.MotionControl.GenericMotorCLI import *
-from Thorlabs.MotionControl.KCube.PiezoCLI import *
-from System import Decimal  # necessary for real world units
-
 
 class PiezoKPZ101(Instrument):
-    def __init__(self, _serialNo, **kwargs):
+    def __init__(self, serialno:str, path:str="C:\\Program Files\\Thorlabs\\Kinesis\\", **kwargs):
         print("Initialising instance of thorlabs piezo class")
+        if os.name != "nt":
+            raise ImportError("""This driver only works in Windows.""")
         super().__init__(**kwargs)
-
-
-        DeviceManagerCLI.BuildDeviceList()
-        self.serialNo = _serialNo
-        # print(self.serialNo)
-        print(DeviceManagerCLI.BuildDeviceList())
-        serialNumbers = DeviceManagerCLI.GetDeviceList(KCubePiezo.DevicePrefix)
+        self.add_thorlabs_dlls(path)
+        self.serial_no = serialno
+        print(self.devicemanagercli.BuildDeviceList())
+        serialNumbers = self.devicemanagercli.GetDeviceList(self.kcube_piezo.DevicePrefix)
         print(serialNumbers)
-        self.device = KCubePiezo.CreateKCubePiezo(self.serialNo)
-        self.device.Connect(self.serialNo)
+        self.device = self.kcube_piezo.CreateKCubePiezo(self.serial_no)
+        self.device.Connect(self.serial_no)
+        
+        self.add_parameter(
+            "MaxVoltage",
+            label="Max Voltage",
+            get_cmd=self.device.GetMaxOutputVoltage,
+            set_cmd=self.device.SetMaxOutputVoltage,
+            unit="V",
+            vals=vals.Enum(75,150)
+            
+        )
 
     def enable(self):
         try:
@@ -55,18 +46,26 @@ class PiezoKPZ101(Instrument):
             print("enable failed")
             return 1
         return 0
-    
+
     def getConfig(self):
-        device_config = self.device.GetPiezoConfiguration(self.serialNo)
+        device_config = self.device.GetPiezoConfiguration(self.serial_no)
         # print(device_config)
         return device_config
 
-    def getMaxVoltage(self):
-        max_voltage = self.device.GetMaxOutputVoltage()
-        return max_voltage
-        
 
-    def __del__(self):
-        # this is the destructor
-        print('destructing')
-        self.device.Disconnect()
+    def add_thorlabs_dlls(
+        self, path: str 
+    ) -> None:
+        try:
+            clr.AddReference(f"{path}Thorlabs.MotionControl.DeviceManagerCLI.dll")
+            clr.AddReference(f"{path}Thorlabs.MotionControl.GenericMotorCLI.dll")
+            clr.AddReference(f"{path}ThorLabs.MotionControl.KCube.PiezoCLI.dll")
+            from Thorlabs.MotionControl.DeviceManagerCLI import DeviceManagerCLI
+            from Thorlabs.MotionControl.GenericMotorCLI import GenericMotorCLI
+            from Thorlabs.MotionControl.KCube.PiezoCLI import KCubePiezo
+            
+            self.device_manager = DeviceManagerCLI
+            self.genericmotorcli = GenericMotorCLI
+            self.kcube_piezo = KCubePiezo   
+
+
