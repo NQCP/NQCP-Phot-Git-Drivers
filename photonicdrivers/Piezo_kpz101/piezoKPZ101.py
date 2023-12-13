@@ -1,10 +1,13 @@
 import os
 import time
 import sys
-import clr
+import clr # is in the 'pythonnet' package
 
 # get these files by downloading the kinesis software from
 # https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=Motion_Control
+
+# once the files are downloaded, the communication protocol can be found in
+# C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.DotNet_API.chm
 
 clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.DeviceManagerCLI.dll")
 clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.GenericMotorCLI.dll")
@@ -43,7 +46,25 @@ class PiezoKPZ101:
     def getMaxVoltage(self):
         max_voltage = self.device.GetMaxOutputVoltage()
         return max_voltage
+    
+    def setOutputVoltage(self, voltage):
+        self.device.SetOutputVoltage(voltage)
+
+    def getOutputVoltage(self):
+        output_voltage = self.device.GetOutputVoltage()
+        return output_voltage
         
+    def getSerialNumber(self):
+        deviceInfo = self._getDeviceInfo()
+        print(deviceInfo.Serialnumber)
+        return deviceInfo.Serialnumber
+
+    def _getDeviceInfo(self):
+        # this function is private. Call get serialnumber instead
+        DeviceInfo = self.GetDeviceInfo()
+        print(DeviceInfo)
+        return DeviceInfo
+
 
     def __del__(self):
         # this is the destructor
