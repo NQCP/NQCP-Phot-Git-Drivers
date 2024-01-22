@@ -1,13 +1,14 @@
 # code for communicating with the PicoMotor from NewFocus model 8742 via USB
 
-# https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
-
-
 import usb.core 
-# documentation:
+# 'usb' is part of the pyusb package (which has dependencies in the libusb package).
+# Neither package is included in the .toml file, because installing the packages with pip does not work.
+# Instead the packages should be installed with conda using:
+# conda install conda-forge::pyusb
+# installing pyusb like this will also install its dependencies (libusb) and add the .dll files from libusb to the PATH environment
+# Documentation:
 # https://docs.circuitpython.org/en/latest/shared-bindings/usb/core/index.html#usb.core.Device
-
-
+# https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 
 class PicoMotor:
@@ -17,8 +18,9 @@ class PicoMotor:
         self.endpointOut = 0x81
         self.timeOut = 1000 # ms
         self.termChar = '/r' # the termination character
+        print("2")
         self.dev = usb.core.find(idVendor=vendorIDHex, idProduct=productIDHex)
-        
+        print("3")
         # print(self.dev)
     
     def printEPO(self):
@@ -35,17 +37,9 @@ class PicoMotor:
         # print(response)
         return response
     
-    def __del__(self):
+    def closeConnection(self):
         usb.util.dispose_resources(self.dev)
         print("connection closed")
-
-
-
-####### MAIN FUNCTION HERE #######
-
-# pico = PicoMotor(0x104d, 0x4000)
-# print(pico.getProductID())
-# pico.closeConnection()
 
 
 
