@@ -36,7 +36,8 @@ EPI = 0x2  # EndPoint In
 EPO = 0x81 # EndPoint Out
 TO = 1000  # TimeOut in ms
 
-cmd = '*IDN?\r'
+# cmd = '*IDN?\r'
+cmd = 'MACADDR?\r'
 print(cmd)
 print(pico.write(EPI,cmd,TO)) # take care to use the right termination character (see manual)
 response_raw = pico.read(EPO,100000,TO) # in decimal ASCII characters
