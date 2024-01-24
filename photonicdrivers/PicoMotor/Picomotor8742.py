@@ -66,17 +66,8 @@ class PicoMotor:
         self.__writeCommand('MACADDR?')
         response = self.__readCommand() # returns decimal string. For example: 5827809, 292293
         # The first number is the NewFocus specific identifier. The second is device specific
-
-        # Converting the decimal numbers to HEX
-        MAC1, MAC2 = response.split(', ')
-        MAC1_dec = int(MAC1) # cast to int decimal
-        MAC1_hex = format(MAC1_dec, '06X') # format to 6 digit hex
-        MAC2_dec = int(MAC2)
-        MAC2_hex = format(MAC2_dec, '06X')
-        MAC_joinedStr = MAC1_hex + MAC2_hex # joining the two numbers into a 12 digit hex, which is the MAC address
-        # print(MAC_joinedStr)
-
-        return MAC_joinedStr
+        MAC = self.__convertToMACAddress(response)
+        return MAC
     
     def moveTargetPosition(self, axisNumberStr):
         self.__writeCommand(axisNumberStr + 'PA')
@@ -95,8 +86,17 @@ class PicoMotor:
         return response
         
     def closeConnection(self):
-        usb.util.dispose_resources(self.dev)
-        print("connection closed")
+        if self.connectionType == 'USB':
+            usb.util.dispose_resources(self.dev)
+            print("connection closed")
+
+        elif self.connectionType == 'Ethernet':
+            self.sock.close()
+
+        else:
+            print('ERROR in PicoMotorClass - connection has not been initialised properly')
+
+        
 
 ##################### PRIVATE METHODS ###########################
 
@@ -130,18 +130,16 @@ class PicoMotor:
         else:
             print('ERROR in PicoMotorClass - connection has not been initialised properly')
 
+    def __convertToMACAddress(self,MAC_string):
+        # Converting the decimal numbers to HEX
+        MAC1, MAC2 = MAC_string.split(', ')
+        MAC1_dec = int(MAC1) # cast to int decimal
+        MAC1_hex = format(MAC1_dec, '06X') # format to 6 digit hex
+        MAC2_dec = int(MAC2)
+        MAC2_hex = format(MAC2_dec, '06X')
+        MAC_joinedStr = MAC1_hex + MAC2_hex # joining the two numbers into a 12 digit hex, which is the MAC address
+        # print(MAC_joinedStr)
 
+        return MAC_joinedStr
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
