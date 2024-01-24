@@ -4,6 +4,7 @@
 
 
 import usb.core 
+import usb.util
 # documentation:
 # https://docs.circuitpython.org/en/latest/shared-bindings/usb/core/index.html#usb.core.Device
 
