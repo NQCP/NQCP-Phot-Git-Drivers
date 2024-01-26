@@ -1,8 +1,8 @@
 import os
-from re import A
+from typing import Any
 from qcodes.instrument import Instrument
 import qcodes.validators as vals
-from typing import Any
+
 
 try:
     import clr  # pyright: ignore[reportMissingTypeStubs,reportMissingImports]
