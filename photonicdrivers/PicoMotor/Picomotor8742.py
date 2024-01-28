@@ -11,34 +11,44 @@ import usb.core
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 import socket
+import time
 
 
 class PicoMotor:
     def __init__(self, vendorIDHex = None, productIDHex = None, IPAddress = None, Port = None):
         print("Initialising instance of PicoMotor class")
 
+        self.termChar = '\r' # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
+
         self.connectionType = None
         if vendorIDHex != None and productIDHex != None:
             # open a usb connection
             print('Connecting via USB')
+            self.connectionType = 'USB'
+
             self.endpointIn = 0x2
             self.endpointOut = 0x81
             self.timeOut = 1000 # ms
-            self.termChar = '\r' # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
+            
             self.dev = usb.core.find(idVendor=vendorIDHex, idProduct=productIDHex)
-            self.connectionType = 'USB'
+            
 
         elif IPAddress != None and Port != None:
             # open an ethernet connection
             print('Connecting via ethernet')
+            self.connectionType = 'Ethernet'
             
             # Create a TCP/IP socket
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.settimeout(5) # sets the timeout of the receive command. 
             self.server_address = (IPAddress, Port) #IP address, port
             self.sock.connect(self.server_address)
+
+            # For some reason, there is some output ready immediately after connection has been created. 
+            # The format might be a telnet command?
+            print('Immediate output from device:')
+            print(self.sock.recv(1024))
             
-            self.connectionType = 'Ethernet'
 
         else:
             print("Insufficient arguments for initialising the PicoMotor class")
@@ -47,13 +57,11 @@ class PicoMotor:
             
     def getProductID(self):
         self.__writeCommand('*IDN?')
-        # print('wrote command') 
         response = self.__readCommand()
-        # print(response)
         return response
     
     def getIPAddress(self):
-        self.__writeCommand('IPADDR?')
+        self.__writeCommand('IPADDR?')   
         response = self.__readCommand()
         return response
     
@@ -66,8 +74,10 @@ class PicoMotor:
         self.__writeCommand('MACADDR?')
         response = self.__readCommand() # returns decimal string. For example: 5827809, 292293
         # The first number is the NewFocus specific identifier. The second is device specific
-        MAC = self.__convertToMACAddress(response)
-        return MAC
+        if self.connectionType == 'USB':
+            response = self.__convertToMACAddress(response)
+
+        return response
     
     def moveTargetPosition(self, axisNumberStr):
         self.__writeCommand(axisNumberStr + 'PA')
@@ -102,21 +112,20 @@ class PicoMotor:
 
     def __writeCommand(self, command):
         if self.connectionType == 'USB':
-            # print('sending usb command')
             commandString = command + self.termChar
             self.dev.write(self.endpointIn,commandString,self.timeOut)
 
         elif self.connectionType == 'Ethernet':
-            self.sock.sendall(command)
+            commandString = command + self.termChar
+            self.sock.sendall(commandString.encode())
 
         else:
             print('ERROR in PicoMotorClass - connection has not been initialised properly')
 
     
-    def __readCommand(self, bitsToRead=100000):
+    def __readCommand(self, bitsToRead=4096):
         if self.connectionType == 'USB':
             response_ASCII = self.dev.read(self.endpointOut,bitsToRead,self.timeOut)
-            # print(response_ASCII)
 
             # Convert response from ASCII to string 
             # using method 2 from https://www.geeksforgeeks.org/python-ways-to-convert-list-of-ascii-value-to-string/
@@ -124,7 +133,14 @@ class PicoMotor:
             return response
         
         elif self.connectionType == 'Ethernet':
-            response = self.sock.recv(1024)
+            response = self.sock.recv(bitsToRead)
+
+            # remove the newline characters if present
+            if b"\r\n" in response:
+                response, dummy  = response.split(b'\r\n')
+
+            # convert from byte string to string
+            response = response.decode('utf-8')
             return response
 
         else:
