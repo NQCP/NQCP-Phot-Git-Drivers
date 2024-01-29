@@ -357,7 +357,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "py": ("https://pylib.readthedocs.io/en/stable/", None),
     "pyvisa": ("https://pyvisa.readthedocs.io/en/stable/", None),
-    "qcodes": ("https://qcodes.github.io/Qcodes/", None),
+    "qcodes": ("https://microsoft.github.io/Qcodes/", None),
     "IPython": ("https://ipython.readthedocs.io/en/stable/", None),
 }
 
