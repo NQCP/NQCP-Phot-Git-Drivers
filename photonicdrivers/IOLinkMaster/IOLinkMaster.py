@@ -1,5 +1,4 @@
 import socket
-
 from FlowMeterPF3W720 import FlowMeterPF3W720
 
 class IOLinkMaster:
@@ -12,14 +11,16 @@ class IOLinkMaster:
 
         # For some reason, there is some output ready immediately after connection has been created. 
         # The format might be a telnet command?
-        print('Immediate output from device:')
-        print(self.socket.recv(1024))
+        #print('Immediate output from device:')
+        #print(self.socket.recv(1024))
 
     def getFlowAndTemp(self, pinNumber):
-        command = FlowMeterPF3W720.pdin(pinNumber)
+        command = FlowMeterPF3W720.pdin(self, pinNumber)
+        # dummy = '{"code":"request","cid":1,"adr":"/iolinkmaster/port[2]/iolinkdevice/pdin/getdata"}'
         self.__writeCommand(command)
         response = self.__readCommand()
         print(response)
+        print('end of getflowandtemp')
 
     def closeConnection(self):
         self.socket.close()
@@ -28,10 +29,11 @@ class IOLinkMaster:
 
     def __writeCommand(self, command):
         # commandString = command + self.termChar
-        self.sock.sendall(command.encode('utf-8'))
+        print(command)
+        self.socket.sendall(command.encode('utf-8'))
     
     def __readCommand(self, bitsToRead=4096*16):
-        response = self.sock.recv(bitsToRead)
+        response = self.socket.recv(bitsToRead)
         # print(response)
 
         # remove the newline characters if present
@@ -41,5 +43,3 @@ class IOLinkMaster:
         # convert from byte string to string
         # response = response.decode('utf-8')
         return response
-
-
