@@ -5,8 +5,9 @@
 
 import usb.core 
 import usb.util
+# part of the "pyusb" package, which should be installed using "pip install"
 # documentation:
-# https://docs.circuitpython.org/en/latest/shared-bindings/usb/core/index.html#usb.core.Device
+# https://docs.circuitpython.org/en/latest/sharpiped-bindings/usb/core/index.html#usb.core.Device
 
 
 ####### find all USB devices connected to the PC #######
