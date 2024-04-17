@@ -1,0 +1,1 @@
+{"exposure_time_us": 40001, "gain": 50}

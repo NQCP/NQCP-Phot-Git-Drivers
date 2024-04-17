@@ -1,0 +1,1 @@
+{"id": "toptica_dlcpro01", "wavelength_nm_set": 910, "power_mW_set": 10, "wavelength_nm": 910.0003410876001, "power_mW": 10.004764213840955, "power_stabilization": true}
