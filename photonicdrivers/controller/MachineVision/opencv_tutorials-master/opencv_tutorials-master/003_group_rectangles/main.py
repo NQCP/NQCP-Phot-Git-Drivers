@@ -85,7 +85,7 @@ def findClickPositions(needle_img_path, haystack_img_path, threshold=0.5, debug_
 
 points = findClickPositions('albion_cabbage.jpg', 'albion_farm.jpg', debug_mode='points')
 print(points)
-points = findClickPositions('albion_turnip.jpg', 'albion_farm.jpg', 
+points = findClickPositions('albion_turnip.jpg', 'albion_farm.jpg',
                             threshold=0.70, debug_mode='rectangles')
 print(points)
 print('Done.')
