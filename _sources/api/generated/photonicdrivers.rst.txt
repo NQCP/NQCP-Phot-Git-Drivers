@@ -1,0 +1,30 @@
+photonicdrivers package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 10
+
+   photonicdrivers.conf
+   photonicdrivers.tests
+
+Submodules
+----------
+
+photonicdrivers.hello\_world module
+-----------------------------------
+
+.. automodule:: photonicdrivers.hello_world
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: photonicdrivers
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,21 @@
+photonicdrivers.tests package
+=============================
+
+Submodules
+----------
+
+photonicdrivers.tests.test\_installation module
+-----------------------------------------------
+
+.. automodule:: photonicdrivers.tests.test_installation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: photonicdrivers.tests
+   :members:
+   :undoc-members:
+   :show-inheritance:
