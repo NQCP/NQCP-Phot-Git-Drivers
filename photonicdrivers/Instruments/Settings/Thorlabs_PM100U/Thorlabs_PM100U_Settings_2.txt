@@ -1,1 +1,0 @@
-{"wavelength": 800.0, "units": "W", "averaging": 10}

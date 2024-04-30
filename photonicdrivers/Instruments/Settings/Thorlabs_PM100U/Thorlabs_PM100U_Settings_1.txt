@@ -1,1 +1,0 @@
-{"id": "thorlabs_pm100uUSB0::0x1313::0x8078::P0041989::0::INSTR", "wavelength": 980.0, "units": "W", "averaging": 10}
