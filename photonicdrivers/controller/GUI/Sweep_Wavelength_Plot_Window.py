@@ -10,8 +10,6 @@ from matplotlib.figure import Figure
 import h5py
 import datetime
 
-from GUI.functions import *
-
 
 # Simon Test
 

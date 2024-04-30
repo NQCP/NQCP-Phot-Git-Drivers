@@ -3,14 +3,15 @@ from tkinter import Tk
 import json
 from tkinter import *
 
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
+from photonicdrivers.controller.Instruments.Implementations.Cameras.CameraAcquisitionThread import NoneThread, \
+    CameraAcquisitionThread
+from photonicdrivers.controller.Instruments.Implementations.Cameras.CameraWindow import CameraWindow
+from photonicdrivers.controller.Instruments.Implementations.Cameras.Thorlabs_Camera import Thorlabs_Camera
+from photonicdrivers.controller.Instruments.Implementations.Cameras.Thorlabs_Camera_Stub import Thorlabs_Camera_Stub
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Instruments.Settings.Settings_Controller import Settings_Controller
+from photonicdrivers.controller.Packages.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
-from Instruments.Camera.CameraAcquisitionThread import CameraAcquisitionThread, NoneThread
-from Instruments.Camera.CameraWindow import CameraWindow
-from Instruments.Camera.Thorlabs_Camera import Thorlabs_Camera
-from Instruments.Camera.Thorlabs_Camera_Stub import Thorlabs_Camera_Stub
-from Instruments.Settings.Console_Controller import Console_Controller
-from Instruments.Settings.Settings_Controller import Settings_Controller
 
 class Camera_Application:
 

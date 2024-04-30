@@ -1,6 +1,8 @@
-from Code.Instruments.Abstract.Abstract import Instrument
-from Code.Instruments.Settings.Console_Controller import Console_Controller
+
 from pyAndorSpectrograph.spectrograph import ATSpectrograph
+
+from photonicdrivers.controller.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Andor(Instrument):

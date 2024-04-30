@@ -2,7 +2,7 @@ import json
 import tkinter as tk
 from tkinter import ttk
 
-from GUI.functions import get_float_from_string, power_W_to_dBm
+from photonicdrivers.controller.GUI.functions import get_float_from_string
 
 
 class Sweep_Wavelength_Menu_Window:

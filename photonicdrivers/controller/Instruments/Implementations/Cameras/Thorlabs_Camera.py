@@ -1,7 +1,4 @@
-from Code.Packages.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-
-from Code.Instruments.Settings.Console_Controller import Console_Controller
-from Code.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Thorlabs_Camera(Instrument):  # Developer: Magnus Linnet Madsen

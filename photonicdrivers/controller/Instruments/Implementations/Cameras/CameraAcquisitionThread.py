@@ -11,11 +11,10 @@ import queue
 import threading
 
 from PIL import Image
-from thorlabs_tsi_sdk.tl_camera import TLCamera
-from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
-from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
 
-from Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Packages.thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
+from photonicdrivers.controller.Packages.thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
 
 
 class NoneThread(threading.Thread):

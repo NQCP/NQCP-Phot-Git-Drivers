@@ -13,7 +13,7 @@ import usb.core
 import socket
 import time
 
-from Code.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.controller.Instruments.Abstract.Abstract import Instrument
 
 
 class PicoMotor(Instrument):

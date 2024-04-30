@@ -8,8 +8,8 @@ import pyvisa
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from Code.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
-from Code.Instruments.Implementations.Power_Meters.Thorlabs_PM100.Thorlabs_PM100U import Thorlabs_PM100U
+from photonicdrivers.controller.Instruments.Implementations.Power_Meters.Thorlabs_PM100.Thorlabs_PM100U import \
+    Thorlabs_PM100U
 
 
 def add_dict_to_h5(dict, group):

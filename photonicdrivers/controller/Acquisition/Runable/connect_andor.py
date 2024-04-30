@@ -1,6 +1,4 @@
-
-
-from Code.Instruments.Implementations.Spectrographs.Andor import Andor
+from photonicdrivers.controller.Instruments.Implementations.Spectrographs.Andor import Andor
 
 andor = Andor()
 andor.connect()

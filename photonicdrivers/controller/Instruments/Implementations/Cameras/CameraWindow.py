@@ -1,5 +1,4 @@
-from Code.Instruments.Implementations.Cameras.CameraAcquisitionThread import CameraAcquisitionThread
-from Code.Instruments.Implementations.Cameras.examples.windows_setup import configure_path
+from photonicdrivers.controller.Instruments.Implementations.Cameras.examples.windows_setup import configure_path
 
 configure_path()
 import tkinter as tk

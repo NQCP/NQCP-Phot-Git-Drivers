@@ -3,8 +3,7 @@ import threading
 
 from tkinter import *
 
-from Code.GUI.Camera_Application import Camera_Application
-from Code.Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class KK4_Application:

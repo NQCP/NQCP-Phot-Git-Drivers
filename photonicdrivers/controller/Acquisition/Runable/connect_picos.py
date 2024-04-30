@@ -4,7 +4,7 @@ import pyvisa as visa
 import pyvisa
 from matplotlib import pyplot as plt
 
-from Code.Instruments.Implementations.Lasers.Picos.Picos_Q_OEM import Picos_Q_OEM
+from photonicdrivers.controller.Instruments.Implementations.Lasers.Picos.Picos_Q_OEM import Picos_Q_OEM
 
 rm = pyvisa.ResourceManager()
 print(rm.list_resources())

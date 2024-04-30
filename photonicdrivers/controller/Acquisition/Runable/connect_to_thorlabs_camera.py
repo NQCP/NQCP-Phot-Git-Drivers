@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
-from Instruments.Camera.CameraAcquisitionThread import CameraAcquisitionThread
-from Instruments.Camera.CameraWindow import CameraWindow
-from Instruments.Camera.Thorlabs_Camera import Thorlabs_Camera
-
-from Instruments.Camera.examples.windows_setup import configure_path
 import tkinter as tk
 
-from Instruments.Settings.Console_Controller import Console_Controller
-from Instruments.Settings.Settings_Controller import Settings_Controller
+from photonicdrivers.controller.Instruments.Implementations.Cameras.CameraAcquisitionThread import \
+    CameraAcquisitionThread
+from photonicdrivers.controller.Instruments.Implementations.Cameras.CameraWindow import CameraWindow
+from photonicdrivers.controller.Instruments.Implementations.Cameras.Thorlabs_Camera import Thorlabs_Camera
+from photonicdrivers.controller.Instruments.Implementations.Cameras.examples.windows_setup import configure_path
+from photonicdrivers.controller.Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Instruments.Settings.Settings_Controller import Settings_Controller
 
 configure_path()
 

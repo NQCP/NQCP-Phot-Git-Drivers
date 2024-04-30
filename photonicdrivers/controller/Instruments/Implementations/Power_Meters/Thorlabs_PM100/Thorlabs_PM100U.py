@@ -4,8 +4,7 @@ import json
 import numpy as np
 from matplotlib import pyplot as plt
 
-from Code.Instruments.Abstract.Abstract import Instrument
-from Code.Instruments.Settings.Console_Controller import Console_Controller
+from photonicdrivers.controller.Instruments.Abstract.Abstract import Instrument
 
 
 class Thorlabs_PM100U(Instrument):

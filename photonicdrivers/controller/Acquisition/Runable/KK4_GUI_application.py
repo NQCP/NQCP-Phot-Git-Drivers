@@ -5,8 +5,8 @@ from matplotlib import pyplot as plt
 # these two imports are important
 import threading
 
-from Code.GUI.Sweep_Wavelength_Menu_Window import Sweep_Wavelength_Menu_Window
-from Code.GUI.Sweep_Wavelength_Plot_Window import Sweep_Wavelength_Plot_Window
+from photonicdrivers.controller.GUI.Sweep_Wavelength_Menu_Window import Sweep_Wavelength_Menu_Window
+from photonicdrivers.controller.GUI.Sweep_Wavelength_Plot_Window import Sweep_Wavelength_Plot_Window
 
 
 class GUI_Controller:
@@ -29,8 +29,6 @@ class GUI_Controller:
         self.is_acquisition_on = False
 
         self.sweep_pause_time = 1
-
-        self.instrument_controller = Instrument_Controller()
 
         self.sweep_wavelength_menu_window = Sweep_Wavelength_Menu_Window(self.instrument_controller, self)
         self.sweep_wavelength_plot_window = Sweep_Wavelength_Plot_Window(self.instrument_controller, self)

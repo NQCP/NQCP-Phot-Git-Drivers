@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyvisa as visa
 
+from photonicdrivers.controller.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
+
 resource_manager = visa.ResourceManager()
 print(resource_manager.list_resources())
-
-from Code.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
 
 toptica_laser = Toptica_CTL950(IP_address='10.209.67.103')
 toptica_laser.connect()

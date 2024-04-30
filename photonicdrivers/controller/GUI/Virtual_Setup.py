@@ -1,4 +1,4 @@
-from Code.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.controller.Instruments.Abstract.Abstract import Instrument
 
 
 class Virtual_Setup:

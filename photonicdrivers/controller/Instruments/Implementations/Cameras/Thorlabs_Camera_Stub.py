@@ -1,4 +1,3 @@
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
 
 class Thorlabs_Camera_Stub: # Developer: Magnus Linnet Madsen
