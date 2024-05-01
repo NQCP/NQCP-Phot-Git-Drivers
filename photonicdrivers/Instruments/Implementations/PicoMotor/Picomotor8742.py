@@ -18,7 +18,7 @@ from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 
 class PicoMotor(Instrument):
 
-    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None):
+    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress="10.209.67.98", port=1):
         print("Initialising instance of PicoMotor class")
 
         self.termChar = '\r'  # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
