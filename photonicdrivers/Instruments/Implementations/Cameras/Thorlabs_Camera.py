@@ -1,5 +1,5 @@
 from photonicdrivers.Controller.Packages.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-from photonicdrivers.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 

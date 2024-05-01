@@ -1,4 +1,4 @@
-from photonicdrivers.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 
 
 class Picos_Q_OEM(Instrument):

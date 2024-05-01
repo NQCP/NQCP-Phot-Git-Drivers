@@ -1,6 +1,6 @@
 import time
 
-from piezoKPZ101 import PiezoKPZ101
+from PiezoKPZ101 import PiezoKPZ101
 
 piezo = PiezoKPZ101("29252886")
 piezo.enable()

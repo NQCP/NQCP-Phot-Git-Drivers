@@ -2,7 +2,7 @@
 import json
 
 import numpy as np
-from photonicdrivers.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 
 
 class Thorlabs_PM100U(Instrument):

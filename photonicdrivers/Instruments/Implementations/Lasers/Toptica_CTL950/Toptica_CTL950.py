@@ -1,7 +1,7 @@
 import json
 
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
-from photonicdrivers.Instruments.Abstract.Abstract import Instrument
+from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 
 
 class Toptica_CTL950(Instrument):  # Developer: Magnus Linnet Madsen

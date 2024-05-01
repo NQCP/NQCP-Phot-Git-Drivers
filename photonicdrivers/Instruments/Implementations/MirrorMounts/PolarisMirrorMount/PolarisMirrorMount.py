@@ -2,20 +2,20 @@
 
 import math
 
-from build.lib.Code.Instruments.Implementations.Piezo_kpz101.piezoKPZ101 import PiezoKPZ101
+from photonicdrivers.Instruments.Implementations.Piezo_KPZ101.PiezoKPZ101 import PiezoKPZ101
 
 
 # script_dir = os.path.dirname(os.path.realpath(__file__))
 # project_root = os.path.abspath(os.path.join(script_dir, '..'))
 # sys.path.append(project_root)
-# sys.path.append("../Piezo_kpz101")  # Add the parent directory to the Python path
-# from Piezo_kpz101.piezoKPZ101 import PiezoKPZ101
+# sys.path.append("../Piezo_KPZ101")  # Add the parent directory to the Python path
+# from Piezo_KPZ101.piezoKPZ101 import PiezoKPZ101
 # sys.path.append(r'C:\Users\psj335\OneDrive - University of Copenhagen\PhotonicDrivers\Instruments\Piezo_KPZ101')
 # from piezoKPZ101 import PiezoKPZ101
 
 # SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # sys.path.append(os.path.dirname(SCRIPT_DIR))
-# from Piezo_kpz101.piezoKPZ101 import PiezoKPZ101
+# from Piezo_KPZ101.piezoKPZ101 import PiezoKPZ101
 
 class Polaris:
     def __init__(self, _kpz101SerialNoX, _kpz101SerialNoY, _dist = 0):
