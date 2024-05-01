@@ -5,9 +5,6 @@ import pygame
 # Initialize Pygame
 pygame.init()
 
-# Set up the display (not necessary for Controller input, but pygame needs it)
-pygame.display.set_mode((100, 100))
-
 # Initialize the joystick module
 pygame.joystick.init()
 
