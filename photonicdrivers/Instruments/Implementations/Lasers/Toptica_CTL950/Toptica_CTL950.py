@@ -2,6 +2,7 @@ import json
 
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 from photonicdrivers.Instruments.Abstract.Instrument import Instrument
+from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Toptica_CTL950(Instrument):  # Developer: Magnus Linnet Madsen
@@ -223,3 +224,10 @@ class Toptica_CTL950(Instrument):  # Developer: Magnus Linnet Madsen
             self.set_power(settings_dict["power_mW_set"])
             self.set_power_stabilization(settings_dict["power_stabilization"])
 
+if __name__ == "__main__":
+    laser = Toptica_CTL950()
+    laser.connect()
+    laser.set_wavelength(940)
+    laser.enable_emission()
+    laser.set_power_stabilization(True)
+    laser.set_power(1)
