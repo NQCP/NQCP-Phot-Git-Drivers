@@ -1,4 +1,5 @@
 from photonicdrivers.Instruments.Abstract.Instrument import Instrument
+from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Picos_Q_OEM(Instrument):

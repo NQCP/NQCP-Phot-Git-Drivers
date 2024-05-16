@@ -144,7 +144,6 @@ class PicoMotorController(Instrument):
 
     def _write_command(self, command):
         if self.connectionType == 'USB':
-            print(command)
             commandString = command + self.termChar
             self.dev.write(self.endpointIn, commandString, self.timeOut)
 
@@ -218,7 +217,6 @@ class PicoMotor:
         @return: None
         """
         try:
-            print(distance)
             self.controller.move_relative_position(self.axis_number, distance)
         except Exception as exception:
             print(exception)

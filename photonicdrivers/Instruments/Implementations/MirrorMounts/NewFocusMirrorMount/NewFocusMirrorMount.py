@@ -18,14 +18,22 @@ class NewFocusMirrorMount:
 
         pico_motor_controller = PicoMotorController()
         pico_motor_controller.connect()
-        self.pico_motor_x = PicoMotor(pico_motor_controller, 1)
-        self.pico_motor_y = PicoMotor(pico_motor_controller, 2)
+        self.pico_motor_x = PicoMotor(pico_motor_controller, 3)
+        self.pico_motor_y = PicoMotor(pico_motor_controller, 4)
+        self.pico_motor_x2 = PicoMotor(pico_motor_controller, 1)
+        self.pico_motor_y2 = PicoMotor(pico_motor_controller, 2)
 
     def move_distance_x(self, distance):
         self.pico_motor_x.move_relative_position(distance)
 
     def move_distance_y(self, distance):
         self.pico_motor_y.move_relative_position(distance)
+
+    def move_distance_x2(self, distance):
+        self.pico_motor_x2.move_relative_position(distance)
+
+    def move_distance_y2(self, distance):
+        self.pico_motor_y2.move_relative_position(distance)
 
     def update(self):
         # Read button input
@@ -47,8 +55,28 @@ class NewFocusMirrorMount:
             # Check for button hold
             if button_state:
 
-                self.joystick.start_rumble()
+                #self.joystick.start_rumble()
                 Console_Controller.print_message("Button {} held".format(i), print_bool = False)
+
+                speed = 2000
+
+                if i == 3:
+                    self.move_distance_x2(-speed)
+                if i == 0:
+                    self.move_distance_y2(-speed)
+                if i == 2:
+                    self.move_distance_x2(speed)
+                if i == 1:
+                    self.move_distance_y2(speed)
+                if i == 14:
+                    self.move_distance_x(-speed)
+                if i == 11:
+                    self.move_distance_y(-speed)
+                if i == 13:
+                    self.move_distance_x(speed)
+                if i == 12:
+                    self.move_distance_y(speed)
+
 
             # Check for button release
             if not button_state and self.button_states[i]:
@@ -56,6 +84,8 @@ class NewFocusMirrorMount:
 
             # Update button state in the dictionary
             self.button_states[i] = button_state
+
+
 
             # Read axis input
         for i in range(self.joystick.get_num_axes()):
@@ -72,9 +102,15 @@ class NewFocusMirrorMount:
 
             if np.abs(axis_value) > 0.1:
                 if i == 0:
-                    self.move_distance_x(int(10*axis_value))
+                    self.move_distance_x(-int(10*axis_value))
                 if i == 1:
                     self.move_distance_y(int(10*axis_value))
+                if i == 2:
+                    self.move_distance_x2(-int(10*axis_value))
+                if i == 3:
+                    self.move_distance_y2(int(10*axis_value))
+
+
 
             # Update axis state in the dictionary
             self.axis_states[i] = axis_value
