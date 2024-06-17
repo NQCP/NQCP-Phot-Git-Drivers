@@ -2,8 +2,8 @@
 #include <Ethernet.h>
 #include <SPI.h>
 
-byte ip[] = { 10, 209, 67, 135 }; 
-byte mac[] = {0xFD, 0xBC, 0x51, 0xF2, 0x21, 0xCD};
+byte ip[] = {10,209,67,165}; 
+byte mac[] = {0xA8, 0x61, 0x0A, 0xAE, 0xDF, 0x93};
 EthernetServer server(8082);
 
 void setup() {
@@ -12,7 +12,8 @@ void setup() {
   //while (!Serial) continue;
 
   // Initialize Ethernet libary
-  Ethernet.begin(mac, ip); 
+  Serial.print(F("Hi!"));
+  Ethernet.begin(mac); 
   // Start to listenz
   server.begin();
 
