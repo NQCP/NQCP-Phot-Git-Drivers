@@ -38,7 +38,7 @@ class logG:
 def main():
     print('hello')
     logger = logG()
-    print(logger.log('myVar',3.1))
+    print(logger.log('myVar',3.2))
 
 if __name__ == "__main__":
   main()
