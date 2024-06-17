@@ -11,6 +11,20 @@ from photonicdrivers.Instruments.Settings.Console_Controller import Console_Cont
 
 
 class NewFocusMirrorMount:
+<<<<<<< HEAD
+
+
+
+    def __init__(self, serial_number_x=None, serial_number_y=None, distance=0):
+        self.pico_motor_x = PicoMotor(port=0)
+        self.pico_motor_y = PicoMotor(port=1)
+        self.distance = distance
+        self.angle_per_voltage = 1
+        self.max_voltage = 0
+        self.min_voltage = 0
+        self.max_angle = 0
+        self.min_angle = 0
+=======
     def __init__(self, joystick: Joystick):
         self.joystick = joystick
         self.button_states = {}
@@ -50,6 +64,7 @@ class NewFocusMirrorMount:
             if button_state and not self.button_states[i]:
                 self.joystick.start_rumble()
                 Console_Controller.print_message("Button {} clicked".format(i))
+>>>>>>> 41aec4a98d071cff0dd3feb64acc751108f0bfa4
 
 
             # Check for button hold

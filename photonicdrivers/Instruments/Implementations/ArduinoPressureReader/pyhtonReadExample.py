@@ -10,7 +10,7 @@ import json
 import time
 from urllib.request import urlopen
 
-url = "http://10.209.67.135/"
+url = "http://10.209.67.165:8082/"
 while 1:
     data = json.loads(urlopen(url).read())
     print (data["channel"][0])
