@@ -224,3 +224,10 @@ class Toptica_CTL950(Instrument):  # Developer: Magnus Linnet Madsen
             self.set_power(settings_dict["power_mW_set"])
             self.set_power_stabilization(settings_dict["power_stabilization"])
 
+if __name__ == "__main__":
+    laser = Toptica_CTL950()
+    laser.connect()
+    laser.set_wavelength(940)
+    laser.enable_emission()
+    laser.set_power_stabilization(True)
+    laser.set_power(1)

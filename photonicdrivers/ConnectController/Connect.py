@@ -46,7 +46,7 @@ while running:
     print("Hats:", hats)
 
     # Add some delay to avoid excessive printing
-    pygame.time.delay(10)
+    pygame.time.delay(100)
 
 
 

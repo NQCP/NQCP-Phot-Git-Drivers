@@ -3,6 +3,8 @@
 import socket
 
 import usb.core
+from matplotlib import pyplot as plt
+
 from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 
 
@@ -16,45 +18,18 @@ from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 
-class PicoMotor(Instrument):
+class PicoMotorController(Instrument):
 
-    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress="10.209.67.98", port=1):
+    def __init__(self, vendor_ID_Hex=0x104d, product_ID_Hex=0x4000, IP_adress="10.209.67.98", port=1):
         print("Initialising instance of PicoMotor class")
 
         self.termChar = '\r'  # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
 
         self.connectionType = None
-        if vendor_ID_Hex is not None and product_ID_Hex is not None:
-            # open a usb connection
-            print('Connecting via USB')
-            self.connectionType = 'USB'
-
-            self.endpointIn = 0x2
-            self.endpointOut = 0x81
-            self.timeOut = 1000  # ms
-
-            self.dev = usb.core.find(idVendor=vendor_ID_Hex, idProduct=product_ID_Hex)
-
-
-        elif IP_adress is not None and port is not None:
-            # open an ethernet connection
-            print('Connecting via ethernet')
-            self.connectionType = 'Ethernet'
-
-            # Create a TCP/IP socket
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.settimeout(5)  # sets the timeout of the receive command.
-            self.server_address = (IP_adress, port)  # IP address, port
-            self.sock.connect(self.server_address)
-
-            # For some reason, there is some output ready immediately after connection has been created. 
-            # The format might be a telnet command?
-            print('Immediate output from device:')
-            print(self.sock.recv(1024))
-
-
-        else:
-            print("Insufficient arguments for initialising the PicoMotor class")
+        self.vendor_ID_Hex = vendor_ID_Hex
+        self.product_ID_Hex = product_ID_Hex
+        self.IP_adress = IP_adress
+        self.port = port
 
     def get_product_ID(self):
         self._write_command('*IDN?')
@@ -86,7 +61,7 @@ class PicoMotor(Instrument):
 
         @param axis_number_str: {0,1,2,3}
         """
-        self._write_command(axis_number_str + 'PA')
+        self._write_command(str(axis_number_str) + 'PA')
 
     def move_relative_position(self, axis_number_str, distance_str):
         """
@@ -96,6 +71,10 @@ class PicoMotor(Instrument):
         @param distance_str: The distance to moved: int32
         @return: None
         """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 41aec4a98d071cff0dd3feb64acc751108f0bfa4
         self._write_command(str(axis_number_str) + 'PR' + str(distance_str))
 
     def get_target_position(self, axis_number_str):
@@ -131,7 +110,35 @@ class PicoMotor(Instrument):
         return self.get_product_ID()
 
     def connect(self) -> None:
-        pass
+        if self.vendor_ID_Hex is not None and self.product_ID_Hex is not None:
+            # open a usb connection
+            print('Connecting via USB')
+            self.connectionType = 'USB'
+
+            self.endpointIn = 0x2
+            self.endpointOut = 0x81
+            self.timeOut = 1000  # ms
+
+            self.dev = usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex)
+
+
+        elif self.IP_adress is not None and self.port is not None:
+            # open an ethernet connection
+            print('Connecting via ethernet')
+            self.connectionType = 'Ethernet'
+
+            # Create a TCP/IP socket
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.settimeout(5)  # sets the timeout of the receive command.
+            self.server_address = (self.IP_adress, self.port)  # IP address, port
+            self.sock.connect(self.server_address)
+
+            # For some reason, there is some output ready immediately after connection has been created.
+            # The format might be a telnet command?
+            print('Immediate output from device:')
+            print(self.sock.recv(1024))
+        else:
+            print("Insufficient arguments for initialising the PicoMotor class")
 
     def load_settings(self) -> dict:
         pass
@@ -184,3 +191,52 @@ class PicoMotor(Instrument):
         # print(MAC_joinedStr)
 
         return MAC_joinedStr
+
+
+class PicoMotor:
+
+    def __init__(self, controller: PicoMotorController, axis_number: int):
+        self.controller = controller
+        self.axis_number = axis_number
+
+    def move_target_position(self):
+        """
+        Moves a given axis of the Picomotor to a specified target position.
+
+        @param axis_number_str: {1,2,3,4}
+        """
+
+        try:
+            self.controller.move_target_position(self.axis_number)
+        except Exception as exception:
+            print(exception)
+
+    def move_relative_position(self, distance: int):
+        """
+        Moves a given axis of the Picomotor a relative position given by the distance parameter.
+
+        @param axis_number: Parameter to identify the axis to be moved: {1,2,3,4}
+        @param distance: The distance to moved: int32
+        @return: None
+        """
+        try:
+            self.controller.move_relative_position(self.axis_number, distance)
+        except Exception as exception:
+            print(exception)
+
+
+if __name__ == "__main__":
+    # Create JoystickHandler instance
+
+    pico_motor_controller = PicoMotorController()
+    pico_motor_controller.connect()
+    pico_motor_x = PicoMotor(pico_motor_controller, 1)
+    pico_motor_y = PicoMotor(pico_motor_controller, 2)
+
+    while True:
+        plt.pause(0.01)
+        pico_motor_x.move_relative_position(1)
+        plt.pause(0.01)
+        pico_motor_y.move_relative_position(1)
+
+

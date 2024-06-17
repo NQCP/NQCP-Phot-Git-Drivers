@@ -22,8 +22,8 @@ class Console_Controller:
         return cls.__instance
 
     @classmethod
-    def print_message(cls, message):
-        if cls.__print_bool:
+    def print_message(cls, message, print_bool = True):
+        if cls.__print_bool and print_bool == True:
             print(message)
 
     @classmethod

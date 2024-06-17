@@ -23,17 +23,24 @@ print('\n\n')
 # Find vendor and product ID (in hex) in: Device Manager -> Properties -> Events -> Information
 # Or perhaps the IDs are given in the manual of the device
 # Hopefully IDs are present in the list printed with the code above
-pico = usb.core.find(idVendor=0x104d, idProduct=0x4000)
+pico = usb.core.find(idVendor=0x403, idProduct=0x6014)
 if pico is None:
     raise ValueError("device not found")
 else:
     print(pico)
+####
+
+
+
+#Decimal VendorID = 1027 & ProductID = 24596
+#Hexadecimal VendorID = 0x403 & ProductID = 0x6014
+
 
 
 ####### Execute commands #######
 # Get the IN and OUT Endpoint from the info printed about
-EPI = 0x2  # EndPoint In
-EPO = 0x81 # EndPoint Out
+EPI = 0x81  # EndPoint In
+EPO = 0x2 # EndPoint Out
 TO = 1000  # TimeOut in ms
 
 # cmd = '*IDN?\r'
@@ -42,7 +49,7 @@ print(cmd)
 print(pico.write(EPI,cmd,TO)) # take care to use the right termination character (see manual)
 response_raw = pico.read(EPO,100000,TO) # in decimal ASCII characters
 response = ''.join(map(chr, response_raw)) # using method 2 from https://www.geeksforgeeks.org/python-ways-to-convert-list-of-ascii-value-to-string/
-print(response) 
+print(response)
 
 # print(pico.write(0x2,'ST\r',1000))
 # print(pico.write(0x2,'1PR-200000\r'))
