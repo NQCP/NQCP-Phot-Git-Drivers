@@ -1,6 +1,6 @@
 import pyvisa as visa
 
-from photonicdrivers.Controller.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
+from photonicdrivers.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
 
 resource_manager = visa.ResourceManager()
 print(resource_manager.list_resources())

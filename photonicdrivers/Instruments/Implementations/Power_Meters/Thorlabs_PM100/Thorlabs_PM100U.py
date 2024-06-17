@@ -3,6 +3,7 @@ import json
 
 import numpy as np
 from photonicdrivers.Instruments.Abstract.Instrument import Instrument
+from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Thorlabs_PM100U(Instrument):
@@ -74,8 +75,9 @@ class Thorlabs_PM100U(Instrument):
         msg = ':SENS:CORR:BEAM %s' % (str(beam))
         self.meter.write(msg)
 
-    def set_detector_wavelength(self):
+    def set_detector_wavelength(self, wavelength_nm):
         """Set the wavelength in nm"""
+        self.set_detector_wavelength_set(wavelength_nm)
         msg = ':SENS:CORR:WAV %s' % (str(self.detector_wavelength_set))
         self.meter.write(msg)
 
