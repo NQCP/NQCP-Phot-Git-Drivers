@@ -118,5 +118,6 @@ with h5py.File("N:/SCI-NBI-NQCP/Phot/rawData/transmission/" + filename + ".hdf5"
     data_wavelength = data_group.create_dataset('wavelength', data=wavelength_list)
     data_wavelength.attrs['units'] = "nm"
 
+
 for instrument in instrument_list:
     instrument.disconnect()
