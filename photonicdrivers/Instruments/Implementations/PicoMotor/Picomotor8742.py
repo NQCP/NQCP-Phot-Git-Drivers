@@ -93,10 +93,10 @@ class PicoMotor(Instrument):
         Moves a given axis of the Picomotor a relative position given by the distance parameter.
 
         @param axis_number_str: Parameter to identify the axis to be moved: {0,1,2,3}
-        @param distance_str: The distance to moved: float32
+        @param distance_str: The distance to moved: int32
         @return: None
         """
-        self._write_command(axis_number_str + 'PR' + distance_str)
+        self._write_command(str(axis_number_str) + 'PR' + str(distance_str))
 
     def get_target_position(self, axis_number_str):
         """
@@ -104,7 +104,7 @@ class PicoMotor(Instrument):
         @param axis_number_str:
         @return: The distance of the target axis
         """
-        self._write_command(axis_number_str + 'PR?')
+        self._write_command(str(axis_number_str) + 'PR?')
         response = self._read_command()
         return response
 

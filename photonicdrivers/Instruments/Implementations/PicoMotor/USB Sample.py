@@ -27,7 +27,7 @@ from System.Collections import Hashtable
 from System.Collections import IDictionaryEnumerator
 
 # Call the class constructor to create an object
-oUSB = USB (True)
+oUSB = USB(True)
 
 # Discover all connected devices
 bStatus = oUSB.OpenDevices (0, True)

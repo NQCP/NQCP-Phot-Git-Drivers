@@ -5,11 +5,18 @@ from photonicdrivers.Instruments.Implementations.PicoMotor.Picomotor8742 import 
 
 
 class NewFocusMirrorMount:
+
+
+
     def __init__(self, serial_number_x=None, serial_number_y=None, distance=0):
         self.pico_motor_x = PicoMotor(port=0)
         self.pico_motor_y = PicoMotor(port=1)
         self.distance = distance
         self.angle_per_voltage = 1
+        self.max_voltage = 0
+        self.min_voltage = 0
+        self.max_angle = 0
+        self.min_angle = 0
 
 
     def move_angle(self, angle_x, angle_y):
