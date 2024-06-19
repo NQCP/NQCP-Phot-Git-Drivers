@@ -37,8 +37,8 @@ class GrafanaLogger:
 
 # def main():
 #     print('hello')
-#     logger = logG()
-#     print(logger.log('myVar',2.40))
+#     logger = GrafanaLogger()
+#     print(logger.log('myVar',2.2))
 
 # if __name__ == "__main__":
 #   main()

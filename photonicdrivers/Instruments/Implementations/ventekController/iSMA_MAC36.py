@@ -65,11 +65,11 @@ class iSMA_MAC36:
 
             # Unpack the byte string as a single float32 value
             # >f specifies a float with big-endian (most to least significant bit) byte order
-            float_value = struct.unpack('>f', byte_string)[0]
+            float_string = struct.unpack('>f', byte_string)[0]
 
             # Round the number to just two decimals
-            float_rounded = "{:.2f}".format(float_value)
-
+            float_string_rounded = "{:.2f}".format(float_string)
+            float_rounded = float(float_string_rounded)
             float_array.append(float_rounded)
 
         return float_array    
@@ -78,7 +78,7 @@ class iSMA_MAC36:
 class KK4Info:
     # a class to make it easy to identify which values correspond to which variables
     def __init__(self, floatArray):
-        print(floatArray)
+        # print(floatArray)
         # blank = floatArray[0]
         self.IBI01_ACT_SP = floatArray[1]
         self.IBI01_TT001 = floatArray[2]

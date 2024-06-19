@@ -14,7 +14,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 USER_ID = 1545635
 API_KEY = "glc_eyJvIjoiMTEwODkyOCIsIm4iOiJzdGFjay05MTU0MjEtaW50ZWdyYXRpb24tbnFjcHBob3QiLCJrIjoiaDg5NnJiMTlQZTI2NzhWQmxVZDJ3SXlNIiwibSI6eyJyIjoicHJvZC1ldS1ub3J0aC0wIn19"
 
-LOGGING_INTERVAL = 1 # IN SECONDS
+LOGGING_INTERVAL = 1 # in seconds
+PLOT_TIME_PERIOD = 100 # in seconds
 
 class RandomNumberLogger:
     def __init__(self, root):
@@ -24,13 +25,7 @@ class RandomNumberLogger:
 
         self.create_widgets()
 
-        self.data = []
-
-        # self.stop_button = ttk.Button(root, text="Stop", command=self.stop_generating, state=tk.NORMAL)
-        # self.stop_button.pack(pady=10)
-
-        # self.log_box = tk.Text(root, height=10, width=50)
-        # self.log_box.pack(pady=10)
+        self.data = [] # container for data to display
 
         self.logger = GrafanaLogger(USER_ID,API_KEY)
 
@@ -43,6 +38,7 @@ class RandomNumberLogger:
 
         
     def create_widgets(self):
+        # Creating the widget elements on the GUI
 
         self.stop_button = ttk.Button(self.root, text="Stop", command=self.stopRunning)
         self.stop_button.grid(row=0, column=0, pady=10, padx=5)
@@ -66,6 +62,9 @@ class RandomNumberLogger:
 
     def stopRunning(self):
         print("stopping")
+        # Closing hardware connections
+        
+        # Stopping the program
         self.running = False
         self.stop_button.config(state=tk.DISABLED)
         self.root.quit() # quit
@@ -78,6 +77,7 @@ class RandomNumberLogger:
             random_number = random.randint(0, 100)
             current_time = datetime.now()
 
+            # Update the indicator fields
             self.variable_entry.delete(0, tk.END) # clear the field
             self.variable_entry.insert(0, random_number) # enter new value
 
@@ -89,20 +89,21 @@ class RandomNumberLogger:
             self.update_plot()
 
             # Remove data points older than 5 minutes
-            self.data = [(time, value) for time, value in self.data if time >= datetime.now() - timedelta(seconds=5)]
+            self.data = [(time, value) for time, value in self.data if time >= datetime.now() - timedelta(seconds=PLOT_TIME_PERIOD)]
 
             # Log the data to Grafana
-            self.logger.log('myVarRand',random_number)
-
+            self.logger.log('myVarRand2',random_number)
+            
+            # Wait
             time.sleep(LOGGING_INTERVAL)
 
     def update_plot(self):
-        times = [point[0] for point in self.data]
+        times = [point[0].timestamp() for point in self.data]
         values = [point[1] for point in self.data]
 
         self.ax.clear()
         self.ax.plot(times, values, marker='o')
-        self.ax.set_title('Random Numbers in the Last 5 Minutes')
+        self.ax.set_title('Random Numbers in the Last 100 seconds')
         self.ax.set_xlabel('Time')
         self.ax.set_ylabel('Value')
         self.ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: datetime.fromtimestamp(x).strftime('%H:%M:%S')))
@@ -114,6 +115,4 @@ class RandomNumberLogger:
 if __name__ == "__main__":
     root = tk.Tk()
     app = RandomNumberLogger(root)
-    print("1")
     root.mainloop()
-    print("2")
