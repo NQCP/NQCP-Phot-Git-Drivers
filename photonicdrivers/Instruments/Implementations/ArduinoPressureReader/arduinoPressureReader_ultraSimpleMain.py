@@ -18,3 +18,6 @@ while 1:
     print (data["channel"][2])
     print (data["channel"][3])
     time.sleep(1)
+
+
+
