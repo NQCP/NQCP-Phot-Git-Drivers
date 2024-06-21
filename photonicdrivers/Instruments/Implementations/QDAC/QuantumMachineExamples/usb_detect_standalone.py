@@ -179,6 +179,7 @@ def report_device_info():
         print('')
         #setIP(connection)
         #setStaticIP(connection)
+        # setDHCP_on(connection)
 
 def setIP(connection):
     raw = bytes('SYST:COMM:LAN:IPAD "10.209.67.125"\n', 'utf8')
@@ -186,6 +187,16 @@ def setIP(connection):
     data = connection.read(60)
     answer = data.decode('utf-8')
     print(answer)
+
+def setDHCP_on(connection):
+    raw = bytes('SYST:COMM:LAN:DHCP ON\n', 'utf8')
+    connection.write(raw)
+
+    raw = bytes('SYST:COMM:LAN:UPD\n', 'utf8')
+    connection.write(raw)
+
+    raw = bytes('SYST:REST\n', 'utf8')
+    connection.write(raw)
 
 def setStaticIP(connection):
     #raw = bytes('SYST:COMM:LAN:DHCP OFF\n', 'utf8')

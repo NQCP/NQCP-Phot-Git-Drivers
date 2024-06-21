@@ -23,3 +23,4 @@ sock.connect(server_address)
 commandString = "*IDN?\n"
 sock.sendall(commandString.encode())
 response = sock.recv(100)
+print(response)
