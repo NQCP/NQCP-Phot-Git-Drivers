@@ -18,9 +18,6 @@ class QDAC2():
 
         self.terminationChar = "\n"
 
-    
-    
-    
     # High level methods are methods that consist of multiple low level methods
     # A low level method sends a single (or very few) command string
 
@@ -35,7 +32,7 @@ class QDAC2():
         print(self.getIPAddress())
         print("Subnet mask:")
         print(self.getSubnetMask())
-        print("Gatewat:")
+        print("Gateway:")
         print(self.getGetway())
         print("Hostname:")
         print(self.getHostName())
@@ -72,29 +69,36 @@ class QDAC2():
         response = self._query("syst:comm:lan:dhcp?")
         return response
     
-    def openEthernetConnection(self):
-        print('Connecting to QDAC via ethernet')
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
-        self.server_address = (self.ipAddress, self.port)
-        self.sock.connect(self.server_address) 
+    def getErrorAll(self):
+        response = self._query("syst:err:all?")
+        return response
+    
+    def getErrorCount(self):
+        response = self._query("syst:err:coun?")
+        return response
 
     def restartSystem(self):
-        self._write("syst:comm:lan:rest")
+        command = "syst:comm:lan:rest"
+        self._write(command)        
+        self._checkForErrors(command)
 
     def setDCHP(self, DHCPStatusString):
         if DHCPStatusString == "ON" or DHCPStatusString == "OFF":
-            self._write("SYST:COMM:LAN:DHCP " + DHCPStatusString)
+            command = "SYST:COMM:LAN:DHCP " + DHCPStatusString
+            self._write(command)            
+            self._checkForErrors(command)
             self.updateMemory()
             self.restartSystem()
         else:
             print("The DHCPStatusString provided is not valid. It must be either ON of OFF.")
 
     def setIPAddress(self):
-        print("Setting the IP address much be done via USB, which has not been implemented yet.")
+        print("Setting the IP address must be done via USB communication, which has not been implemented yet.")
 
     def updateMemory(self):
-        self._write("syst:comm:lan:upd")
+        command = "syst:comm:lan:upd"
+        self._write(command)
+        self._checkForErrors(command)
 
     ##################### LOW LEVEL SOURCE METHODS ###########################
 
@@ -119,6 +123,7 @@ class QDAC2():
         if rangeString == "HIGH" or rangeString == "LOW":
             command = "sour" + chNumberString + ":rang " + rangeString
             self._write(command) # returns LOW for 2 V, HIGH for 10 V
+            self._checkForErrors(command)
         else:
             print("The rangeString must be either HIGH or LOW")
 
@@ -127,17 +132,38 @@ class QDAC2():
             command = "sour" + chNumberString + ":mode " + modeString
             # print(command)
             self._write(command)
+            self._checkForErrors(command)
         else:
             print("The modeString must be either FIX, SWE, or LIST")
 
     def setVoltage(self,chNumberString,voltageString):
-        self._write("sour" + chNumberString + ":volt " + voltageString) # returns the current output voltage
+        command = "sour" + chNumberString + ":volt " + voltageString
+        self._write(command) # returns the current output voltage
+        self._checkForErrors(command)
 
+    ##################### OTHER METHODS ###########################
+    
+    def closeEthernetConnection(self):
+        print('Closing QDAC ethernet connection')
+        self.sock.close()
+
+    def openEthernetConnection(self):
+        print('Connecting to QDAC via ethernet')
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
+        self.server_address = (self.ipAddress, self.port)
+        self.sock.connect(self.server_address) 
+    
     ##################### PRIVATE METHODS ###########################
 
     def _query(self,commandString):
         self._write(commandString)
-        return self._read()    
+        response = self._read()    
+
+        # check is the system responded with an error:     
+        self._checkForErrors(commandString)
+
+        return response
 
     def _write(self, commandString):
         command = commandString + self.terminationChar
@@ -145,8 +171,16 @@ class QDAC2():
         # command = bytes(commandString + self.terminationChar, "utf-8")
         # self.sock.sendall(command)
 
-    def _read(self):
-        bytesToReceive = 1024
+    def _read(self, bytesToReceive = 1024):
         byteString = self.sock.recv(bytesToReceive)
         response = byteString.decode("utf-8")
         return response
+
+    def _checkForErrors(self, commandString: str) -> None: 
+        # To avoid recursion, the commands are typed in directly rather than calling the class methods
+        self._write("syst:err:coun?")
+        errorCount = self._read()
+        if float(errorCount) > 0:            
+            self._write("syst:err:all?")
+            errors = self._read()
+            print("The QDAC returned the error(s): " + errors + "when executing the command: " + commandString)
