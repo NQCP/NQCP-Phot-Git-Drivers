@@ -93,10 +93,7 @@ class VentekLogger:
         # self.root.destroy()  # Close the Tkinter window and end the program
 
     def readAndLogData(self):
-        while self.running:
-
-            # Generate a random number to simulate data acquisition
-            
+        while self.running:            
             self.KK4Info = self.controller.queryKK4Info()
             
             self.current_time = datetime.now()
@@ -166,4 +163,4 @@ class VentekLogger:
 if __name__ == "__main__":
     root = tk.Tk()
     app = VentekLogger(root)
-    root.mainloop()
+    app.mainloop()
