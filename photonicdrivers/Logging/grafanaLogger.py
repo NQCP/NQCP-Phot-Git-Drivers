@@ -33,12 +33,3 @@ class GrafanaLogger:
     # print(status_code)
 
     return status_code     
-    
-
-# def main():
-#     print('hello')
-#     logger = GrafanaLogger()
-#     print(logger.log('myVar',2.2))
-
-# if __name__ == "__main__":
-#   main()
