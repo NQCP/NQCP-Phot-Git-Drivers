@@ -28,23 +28,25 @@ class Powermeter(object):
             instr.timeout = 2
 
             try:
-
+                
                 mn = instr.model_name
                 sn = instr.serial_number
-
                 instrs.append({'port': serial_name, 'model': mn, 'num': sn})
+
+                if mn == model and (sn == serial or serial is None):
+                    pm_serial = serial_name
+                    break
+
             except: 
                 print('One non-usb serial was discarded, might have been a powermeter')
 
             instr.close()
 
-            if mn == model and (sn == serial or serial is None):
-                pm_serial = serial_name
-                break
+
 
         # If we didn't find any matchin instrument, raise an error
         if pm_serial is None:
-            raise ValueError('Unable to find device {0} {1}. Found devices {2}'.format(model, serial, instrs))
+            raise ValueError('Unable to find device '+str(model)+ str(serial) + '. Found devices' + str(instrs))
 
         self.instr = rm.open_resource(pm_serial)
         self.model = self.instr.model_name
@@ -57,11 +59,12 @@ class Powermeter(object):
         if unit is not None:
             self.unit = unit
 
-    # def close(self):
-    #     self.instr.close()
+    def close(self):
+        print("closing device")
+        self.instr.close()
 
-    # def __del__(self):
-    #     self.close()
+    def __del__(self):
+        self.close()
 
     def measure(self, channel=1):
 
