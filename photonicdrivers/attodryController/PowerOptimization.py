@@ -52,7 +52,7 @@ def find_coupling_spiral(stages_device, powermeter, max_dist_nm = 10000, step_si
         real_x = all_pos[0]
         real_y = all_pos[1]
         xy_pos_list_real.append([real_x, real_y])
-        pow = powermeter.measure()
+        pow = powermeter.measure_average()
         # print('  ', pow)
         all_powers.append(pow)
 
@@ -74,7 +74,7 @@ def find_coupling_spiral(stages_device, powermeter, max_dist_nm = 10000, step_si
         move_stage(stages_device, best_x, best_y, z0, enable_Z_move = False, wait_while_moving=True)
         sleep(1)
 
-    pow = powermeter.measure()
+    pow = powermeter.measure_average()
     # print(pow, best_pow)
 
     # powermeter.close()
@@ -107,14 +107,14 @@ def fine_opt_function(stages_device, powermeter, fine_step_nm = 200, max_num_ste
 
     sleep(0.1)
 
-    pow = powermeter.measure()
+    pow = powermeter.measure_average()
     best_pow = pow
 
     xy_list = [[x0, y0]]
     all_powers = [pow]
 
     x = x0
-    y = x0
+    y = y0
 
     while not converged and step_ix < max_num_steps:
         axis_to_move = np.random.choice([0, 1])
@@ -130,7 +130,7 @@ def fine_opt_function(stages_device, powermeter, fine_step_nm = 200, max_num_ste
         all_pos = stages_device.control.getPositionsAndVoltages()
         real_x = all_pos[0]
         real_y = all_pos[1]
-        pow = powermeter.measure()
+        pow = powermeter.measure_average()
         print('  ', pow)
         xy_list.append([real_x, real_y])
         all_powers.append(pow)
@@ -165,7 +165,7 @@ def fine_opt_function(stages_device, powermeter, fine_step_nm = 200, max_num_ste
 
     move_stage(stages_device, best_x, best_y, z0, enable_Z_move = False)
     sleep(1)
-    pow = powermeter.measure()
+    pow = powermeter.measure_average()
     print(pow, best_pow)
 
     # powermeter.close()
@@ -206,7 +206,7 @@ def optimize_z_coupling(stages_device, powermeter, max_dist_nm = 5000, step_size
         real_y = all_pos[1]
         real_z = all_pos[1]
         z_pos_list_real.append(real_z)
-        pow = powermeter.measure()
+        pow = powermeter.measure_average()
         print('  ', pow)
         all_powers.append(pow)
 
@@ -232,7 +232,7 @@ def optimize_z_coupling(stages_device, powermeter, max_dist_nm = 5000, step_size
 
     print(best_pow, best_z)
 
-    pow = powermeter.measure()
+    pow = powermeter.measure_average()
     print(pow, best_pow)
 
     # powermeter.close()
@@ -264,7 +264,7 @@ def full_find_waveguide_coupling(stages_device, powermeter, max_dist_rough_nm = 
     final_x = all_pos[0]
     final_y = all_pos[1]
     final_z = all_pos[2]
-    final_pow = powermeter.measure()
+    final_pow = powermeter.measure_average()
 
     return final_x, final_y, final_z, final_pow, all_x, all_y, all_pow
 

@@ -77,20 +77,20 @@ if  __name__ == "__main__":
     # ############################
 
     # random
-    num_points = 40
-    points = np.random.rand(num_points, 2)
+    # num_points = 40
+    # points = np.random.rand(num_points, 2)
 
     # # on a grid
     # points = np.array([list(x) for x in product(range(10), repeat = 2)])
 
     # # on two grid2
-    # # points0 = np.array([list(x) for x in product(range(20), repeat = 2)])
-    # # points1 = points0 + np.array([40., 40.])
-    # # points = np.concatenate([points0, points1])
+    points0 = np.array([list(x) for x in product(range(20), repeat = 2)])
+    points1 = points0 + np.array([40., 40.])
+    points = np.concatenate([points0, points1])
 
     # ############################
 
-    start_point_ix = 23
+    start_point_ix = 0
 
     dist_type = 'Euclidean'
 

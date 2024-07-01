@@ -117,7 +117,7 @@ if  __name__ == "__main__":
 
         move_stage(stages_device, new_x, new_y, z0, enable_Z_move = False, wait_while_moving=True)
 
-        sleep(2)
+        # sleep(2)
 
         ####### power optimization goes here
         final_x, final_y, final_z, final_pow, all_x, all_y, all_pow = full_find_waveguide_coupling(stages_device, powermeter, 
@@ -136,9 +136,9 @@ if  __name__ == "__main__":
         found_devices_positions.append([current_x, current_y, current_z])
 
 
-        sleep(1)
+        # sleep(1)
 
-        pow = powermeter.measure()
+        pow = powermeter.measure_average()
         found_devices_powers.append(pow)
         print('   measured power (mW):', pow)
 
@@ -147,7 +147,6 @@ if  __name__ == "__main__":
     found_devices_positions = np.array(found_devices_positions)
     found_devices_powers = np.array(found_devices_powers)
     ############################  Go back to original position
-
 
 
     sleep(2)

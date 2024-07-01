@@ -15,7 +15,7 @@ if  __name__ == "__main__":
     sleep(0.1)
 
 
-    pow = powermeter.measure()
+    pow = powermeter.measure_average()
     print(pow)
 
     powermeter.close()
