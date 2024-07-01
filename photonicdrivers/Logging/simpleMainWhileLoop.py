@@ -8,7 +8,7 @@ import time
 USER_ID = 1545635
 API_KEY = "glc_eyJvIjoiMTEwODkyOCIsIm4iOiJzdGFjay05MTU0MjEtaW50ZWdyYXRpb24tbnFjcHBob3QiLCJrIjoiaDg5NnJiMTlQZTI2NzhWQmxVZDJ3SXlNIiwibSI6eyJyIjoicHJvZC1ldS1ub3J0aC0wIn19"
 
-LOGGING_INTERVAL = 5 # in seconds
+LOGGING_INTERVAL = 1 # in seconds
 
 logger = GrafanaLogger(USER_ID,API_KEY)
 
