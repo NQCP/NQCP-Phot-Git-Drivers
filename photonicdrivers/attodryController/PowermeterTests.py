@@ -17,3 +17,5 @@ if  __name__ == "__main__":
 
     pow = powermeter.measure()
     print(pow)
+
+    powermeter.close()
