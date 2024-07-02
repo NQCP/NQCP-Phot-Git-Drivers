@@ -1,12 +1,13 @@
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 
-class Toptica_CTL950(Instrment):  # Developer: Magnus Linnet Madsen
+class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
     def get_id(self):
         return "toptica_dlcpro01"
 
     def __init__(self):
         print("initalising laser")
+        self.laser = None
 
     def __del__(self):
         self.disconnect()

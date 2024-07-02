@@ -2,32 +2,20 @@
 
 
 import numpy as np
-from photonicdrivers.Instruments.Abstract.Instrument import Instrument
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
-
+import pyvisa
 
 class Thorlabs_PM100U():
 
-    def connect(self) -> None:
-        self.meter = self.resource_manager.open_resource(self.port)
-        self.is_alive()
-        self.set_beam()
-        self.set_auto_range()
-        self.meter.write(':CONF:POW')  # configure for power
-        self.load_settings()
-
-    def __init__(self, resource_manager, port, settings_path):
+    def __init__(self, resource_manager, port):
         """Connect to and reset Thorlabs PM101USB"""
 
         self.meter = None
         self.detector_power_get = None
         self.detector_wavelength_set = None
         self.averaging_set = None
-
-        self.port = port
-        self.id = "thorlabs_pm100u" + port
-        self.settings_path = settings_path
         self.resource_manager = resource_manager
+        self.port = port
+        
 
     def is_alive(self):
         is_alive = self.meter.write('*IDN?')
@@ -50,7 +38,9 @@ class Thorlabs_PM100U():
         """Get the averaging"""
         msg = ':SENS:AVER?'
         self.meter.write(msg)
-        return int(self.meter.read().replace('\n', '').replace('\r', ''))
+        message = self.meter.read()
+        print(int(message.replace('\n', '').replace('\r', '')))
+        return int(message.replace('\n', '').replace('\r', ''))
 
     def set_averaging(self, average):
         """Get the averaging"""
@@ -119,12 +109,30 @@ class Thorlabs_PM100U():
         self.meter.write('*RST')
         self.meter.write('*CLS')
 
+    def connect(self) -> None:
+        self.meter = self.resource_manager.open_resource(self.port)
+        self.is_alive()
+        self.set_beam()
+        self.set_auto_range()
+        self.meter.write(':CONF:POW')  # configure for power
+
     def disconnect(self):
         """End communication"""
 
         try:
             self.meter.close()
-            Console_Controller.print_message("Disconnected " + self.get_id())
         except Exception as error:
-            Console_Controller.print_message("Could not disconnect  " + self.get_id())
-            Console_Controller.print_message(error)
+            print(error)
+
+if __name__ == "__main__":
+    resource_manager = pyvisa.ResourceManager()
+    print(resource_manager.list_resources())
+    power_meter = Thorlabs_PM100U(resource_manager, 'USB0::0x1313::0x8078::P0045344::0::INSTR')
+    power_meter.connect()
+    print(power_meter.get_detector_power())
+    print(power_meter.get_detector_wavelength())
+    print(power_meter.get_units())
+    print(power_meter.get_averaging())
+    power_meter.disconnect()
+
+
