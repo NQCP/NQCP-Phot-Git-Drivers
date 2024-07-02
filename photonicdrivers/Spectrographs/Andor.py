@@ -1,10 +1,9 @@
 
-from photonicdrivers.Controller.Instruments.Abstract.Abstract import Instrument
 from photonicdrivers.Controller.Instruments.Settings.Console_Controller import Console_Controller
 from pyAndorSpectrograph.spectrograph import ATSpectrograph
 
 
-class Andor(Instrument):
+class Andor():
 
     def __init__(self):
         Console_Controller.print_message("Initialising Spectrograph")

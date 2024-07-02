@@ -1,5 +1,3 @@
-
-
 class Thorlabs_Camera_Stub: # Developer: Magnus Linnet Madsen
 
     def __init__(self, camera_driver, serial_number):

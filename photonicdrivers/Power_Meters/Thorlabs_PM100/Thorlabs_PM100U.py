@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 import json
-
 import numpy as np
-from photonicdrivers.Instruments.Abstract.Instrument import Instrument
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
-
-class Thorlabs_PM100U(Instrument):
+class Thorlabs_PM100U():
 
     def connect(self) -> None:
         self.meter = self.resource_manager.open_resource(self.port)
@@ -158,20 +154,20 @@ class Thorlabs_PM100U(Instrument):
     def save_settings(self):
         try:
             dictionary = self.get_settings()
-            Console_Controller.print_message(dictionary)
+            print(dictionary)
             with open(self.settings_path, "w") as text_file:
                 json.dump(dictionary, text_file)
-            Console_Controller.print_message("Saved " + self.get_id() + " settings")
+            print("Saved " + self.get_id() + " settings")
         except Exception as error:
-            Console_Controller.print_message("Could not save " + self.get_id() + " settings")
-            Console_Controller.print_message(error)
+            print("Could not save " + self.get_id() + " settings")
+            print(error)
 
     def disconnect(self):
         """End communication"""
 
         try:
             self.meter.close()
-            Console_Controller.print_message("Disconnected " + self.get_id())
+            print("Disconnected " + self.get_id())
         except Exception as error:
-            Console_Controller.print_message("Could not disconnect  " + self.get_id())
-            Console_Controller.print_message(error)
+            print("Could not disconnect  " + self.get_id())
+            print(error)

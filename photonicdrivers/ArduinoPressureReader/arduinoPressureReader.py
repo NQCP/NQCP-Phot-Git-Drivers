@@ -5,7 +5,6 @@
 
 
 import json
-import time
 from urllib.request import urlopen
 import numpy as np 
 

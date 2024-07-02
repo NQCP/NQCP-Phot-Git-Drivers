@@ -1,30 +1,11 @@
 # this is a class for the polaris mirror mount
-
-import math
-
 import numpy as np
 from matplotlib import pyplot as plt
 
-from photonicdrivers.Instruments.Implementations.Joystick.Joystick import Joystick
-from photonicdrivers.Instruments.Implementations.PicoMotor.Picomotor8742 import PicoMotorController, PicoMotor
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
-
+from photonicdrivers.Joystick.Joystick import Joystick
+from photonicdrivers.PicoMotor.Picomotor8742 import PicoMotorController, PicoMotor
 
 class NewFocusMirrorMount:
-<<<<<<< HEAD
-
-
-
-    def __init__(self, serial_number_x=None, serial_number_y=None, distance=0):
-        self.pico_motor_x = PicoMotor(port=0)
-        self.pico_motor_y = PicoMotor(port=1)
-        self.distance = distance
-        self.angle_per_voltage = 1
-        self.max_voltage = 0
-        self.min_voltage = 0
-        self.max_angle = 0
-        self.min_angle = 0
-=======
     def __init__(self, joystick: Joystick):
         self.joystick = joystick
         self.button_states = {}
@@ -63,15 +44,14 @@ class NewFocusMirrorMount:
             # Check for button click
             if button_state and not self.button_states[i]:
                 self.joystick.start_rumble()
-                Console_Controller.print_message("Button {} clicked".format(i))
->>>>>>> 41aec4a98d071cff0dd3feb64acc751108f0bfa4
+                print("Button {} clicked".format(i))
 
 
             # Check for button hold
             if button_state:
 
                 #self.joystick.start_rumble()
-                Console_Controller.print_message("Button {} held".format(i), print_bool = False)
+                print("Button {} held".format(i), print_bool = False)
 
                 speed = 2000
 
@@ -95,7 +75,7 @@ class NewFocusMirrorMount:
 
             # Check for button release
             if not button_state and self.button_states[i]:
-                Console_Controller.print_message("Button {} released".format(i), print_bool = False)
+                print("Button {} released".format(i), print_bool = False)
 
             # Update button state in the dictionary
             self.button_states[i] = button_state
@@ -113,7 +93,7 @@ class NewFocusMirrorMount:
 
             # Check for axis movement
             if axis_value != self.axis_states[i]:
-                Console_Controller.print_message("Axis {} moved to {:.2f}".format(i, axis_value), print_bool = False)
+                print("Axis {} moved to {:.2f}".format(i, axis_value), print_bool = False)
 
             if np.abs(axis_value) > 0.1:
                 if i == 0:
