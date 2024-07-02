@@ -1,4 +1,4 @@
-from photonicdrivers.Controller.Instruments.Implementations.Cameras.examples.windows_setup import configure_path
+from examples.windows_setup import configure_path
 
 configure_path()
 import tkinter as tk

@@ -5,9 +5,6 @@ import socket
 import usb.core
 from matplotlib import pyplot as plt
 
-from photonicdrivers.Instruments.Abstract.Instrument import Instrument
-
-
 # 'usb' is part of the pyusb package (which has dependencies in the libusb package).
 # Neither package is included in the .toml file, because installing the packages with pip does not work.
 # Instead the packages should be installed with conda using:
@@ -18,7 +15,7 @@ from photonicdrivers.Instruments.Abstract.Instrument import Instrument
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 
-class PicoMotorController(Instrument):
+class PicoMotorController():
 
     def __init__(self, vendor_ID_Hex=0x104d, product_ID_Hex=0x4000, IP_adress="10.209.67.98", port=1):
         print("Initialising instance of PicoMotor class")

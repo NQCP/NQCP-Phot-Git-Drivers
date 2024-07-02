@@ -13,8 +13,8 @@ import threading
 from PIL import Image
 from photonicdrivers.Controller.Instruments.Settings.Console_Controller import Console_Controller
 
-from photonicdrivers.Controller.Packages.thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
-from photonicdrivers.Controller.Packages.thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
+from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
+from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
 
 
 class NoneThread(threading.Thread):

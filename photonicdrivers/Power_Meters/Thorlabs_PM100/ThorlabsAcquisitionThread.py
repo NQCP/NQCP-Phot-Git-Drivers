@@ -1,9 +1,6 @@
 import queue
 import threading
 
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
-
-
 class CameraAcquisitionThread(threading.Thread):
     def __init__(self, power_meter):
         super(CameraAcquisitionThread, self).__init__()
@@ -37,7 +34,7 @@ class CameraAcquisitionThread(threading.Thread):
             self.stop()
 
     def _stop(self):
-        Console_Controller.print_message("Image acquisition has stopped")
+        print("Image acquisition has stopped")
         self.is_alive = False
 
     def get_is_alive(self):

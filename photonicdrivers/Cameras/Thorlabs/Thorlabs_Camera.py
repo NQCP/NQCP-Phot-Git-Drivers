@@ -1,9 +1,8 @@
-from photonicdrivers.Controller.Packages.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-from photonicdrivers.Instruments.Abstract.Instrument import Instrument
+from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 
-class Thorlabs_Camera(Instrument):  # Developer: Magnus Linnet Madsen
+class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
 
     def __init__(self, resource_manager: TLCameraSDK, serial_number: str):
         """

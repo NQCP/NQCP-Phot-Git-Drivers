@@ -1,5 +1,4 @@
 import socket
-
 from FlowMeterPF3W720 import FlowMeterPF3W720
 
 
