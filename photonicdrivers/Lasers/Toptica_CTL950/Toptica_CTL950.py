@@ -2,9 +2,6 @@ import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 
 class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
-    def get_id(self):
-        return "toptica_dlcpro01"
-
     def __init__(self):
         print("initalising laser")
         self.laser = None
@@ -14,14 +11,6 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
     def connect(self, IP_address='10.209.67.103'):
         self.laser = toptica.DLCpro(toptica.NetworkConnection(IP_address))
-
-    def set_diode(self, enable_bool):
-        self.laser.laser1.dl.cc.enabled.set(enable_bool)
-
-    def connect(self):
-        """
-        Opens the connections to the Toptica laser
-        """
         self.laser.open()
 
     def disconnect(self):
@@ -29,6 +18,12 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         Closes the connections to the Toptica laser
         """
         self.laser.close()
+
+    def set_diode(self, enable_bool):
+        self.laser.laser1.dl.cc.enabled.set(enable_bool)
+
+    def get_id(self):
+        return "toptica_dlcpro01"
 
     def get_wavelength(self):
         """
@@ -99,6 +94,9 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         return None
 
     def play_welcome(self):
+        """
+        Playes a small bib bib bib song from the CTL
+        """
         self.laser.buzzer.play_welcome()
 
 
@@ -155,9 +153,13 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
 
 if __name__ == "__main__":
+
     laser = Toptica_CTL950()
     laser.connect()
+    laser.play_welcome()
     laser.set_wavelength(940)
-    laser.enable_emission()
+    laser.set_diode(True)
     laser.set_power_stabilization(True)
     laser.set_power(1)
+    laser.set_diode(False)
+    laser.disconnect()
