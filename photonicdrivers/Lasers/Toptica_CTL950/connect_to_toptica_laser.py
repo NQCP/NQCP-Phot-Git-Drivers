@@ -1,6 +1,8 @@
 import pyvisa as visa
 
-from photonicdrivers.Instruments.Implementations.Lasers.Toptica_CTL950.Toptica_CTL950 import Toptica_CTL950
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'../Topt')))
 
 resource_manager = visa.ResourceManager()
 print(resource_manager.list_resources())

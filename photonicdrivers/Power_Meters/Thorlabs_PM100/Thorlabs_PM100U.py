@@ -1,29 +1,21 @@
 #!/usr/bin/env python
-import json
+
+
 import numpy as np
+import pyvisa
 
 class Thorlabs_PM100U():
 
-    def connect(self) -> None:
-        self.meter = self.resource_manager.open_resource(self.port)
-        self.is_alive()
-        self.set_beam()
-        self.set_auto_range()
-        self.meter.write(':CONF:POW')  # configure for power
-        self.load_settings()
-
-    def __init__(self, resource_manager, port, settings_path):
+    def __init__(self, resource_manager, port):
         """Connect to and reset Thorlabs PM101USB"""
 
         self.meter = None
         self.detector_power_get = None
         self.detector_wavelength_set = None
         self.averaging_set = None
-
-        self.port = port
-        self.id = "thorlabs_pm100u" + port
-        self.settings_path = settings_path
         self.resource_manager = resource_manager
+        self.port = port
+        
 
     def is_alive(self):
         is_alive = self.meter.write('*IDN?')
@@ -42,15 +34,13 @@ class Thorlabs_PM100U():
             self.meter.write('*OPC?')
             wait = self.meter.read()
 
-    def get_averaging_set(self):
-        """Get the averaging"""
-        return self.averaging_set
-
     def get_averaging(self):
         """Get the averaging"""
         msg = ':SENS:AVER?'
         self.meter.write(msg)
-        return int(self.meter.read().replace('\n', '').replace('\r', ''))
+        message = self.meter.read()
+        print(int(message.replace('\n', '').replace('\r', '')))
+        return int(message.replace('\n', '').replace('\r', ''))
 
     def set_averaging(self, average):
         """Get the averaging"""
@@ -76,11 +66,6 @@ class Thorlabs_PM100U():
         self.set_detector_wavelength_set(wavelength_nm)
         msg = ':SENS:CORR:WAV %s' % (str(self.detector_wavelength_set))
         self.meter.write(msg)
-
-    def set_detector_wavelength_set(self, wavelength_nm):
-        """Set the wavelength in nm"""
-
-        self.detector_wavelength_set = wavelength_nm
 
     def set_units(self, unit_str):
         """Set the units to W or dBm"""
@@ -111,15 +96,6 @@ class Thorlabs_PM100U():
         self.detector_power_get = power_res
         return power_res
 
-
-    def get_detector_power_get(self):
-        """Get a power measurement"""
-        return self.detector_power_get
-
-    def get_detector_wavelength_set(self):
-        """Get the averaging"""
-        return self.detector_wavelength_set
-
     def get_detector_wavelength(self):
         msg = ':SENS:CORR:WAV?'
         self.meter.write(msg)
@@ -133,41 +109,30 @@ class Thorlabs_PM100U():
         self.meter.write('*RST')
         self.meter.write('*CLS')
 
-    def get_id(self):
-        return self.id
-
-    def load_settings(self):
-        with open(self.settings_path, "r") as text_file:
-            settings_dict = json.load(text_file)
-            self.set_detector_wavelength_set(settings_dict["wavelength"])
-            self.set_units(settings_dict["units"])
-            self.set_averaging(settings_dict["averaging"])
-
-    def get_settings(self):
-        return {
-            "id": self.get_id(),
-            "wavelength": self.get_detector_wavelength(),
-            "units": self.get_units(),
-            "averaging": self.get_averaging()
-        }
-
-    def save_settings(self):
-        try:
-            dictionary = self.get_settings()
-            print(dictionary)
-            with open(self.settings_path, "w") as text_file:
-                json.dump(dictionary, text_file)
-            print("Saved " + self.get_id() + " settings")
-        except Exception as error:
-            print("Could not save " + self.get_id() + " settings")
-            print(error)
+    def connect(self) -> None:
+        self.meter = self.resource_manager.open_resource(self.port)
+        self.is_alive()
+        self.set_beam()
+        self.set_auto_range()
+        self.meter.write(':CONF:POW')  # configure for power
 
     def disconnect(self):
         """End communication"""
 
         try:
             self.meter.close()
-            print("Disconnected " + self.get_id())
         except Exception as error:
-            print("Could not disconnect  " + self.get_id())
             print(error)
+
+if __name__ == "__main__":
+    resource_manager = pyvisa.ResourceManager()
+    print(resource_manager.list_resources())
+    power_meter = Thorlabs_PM100U(resource_manager, 'USB0::0x1313::0x8078::P0045344::0::INSTR')
+    power_meter.connect()
+    print(power_meter.get_detector_power())
+    print(power_meter.get_detector_wavelength())
+    print(power_meter.get_units())
+    print(power_meter.get_averaging())
+    power_meter.disconnect()
+
+
