@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-import json
+
+
 import numpy as np
+from photonicdrivers.Instruments.Abstract.Instrument import Instrument
+from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
+
 
 class Thorlabs_PM100U():
 
@@ -42,10 +46,6 @@ class Thorlabs_PM100U():
             self.meter.write('*OPC?')
             wait = self.meter.read()
 
-    def get_averaging_set(self):
-        """Get the averaging"""
-        return self.averaging_set
-
     def get_averaging(self):
         """Get the averaging"""
         msg = ':SENS:AVER?'
@@ -77,11 +77,6 @@ class Thorlabs_PM100U():
         msg = ':SENS:CORR:WAV %s' % (str(self.detector_wavelength_set))
         self.meter.write(msg)
 
-    def set_detector_wavelength_set(self, wavelength_nm):
-        """Set the wavelength in nm"""
-
-        self.detector_wavelength_set = wavelength_nm
-
     def set_units(self, unit_str):
         """Set the units to W or dBm"""
         msg = ':SENS:POW:UNIT %s' % (unit_str)
@@ -111,15 +106,6 @@ class Thorlabs_PM100U():
         self.detector_power_get = power_res
         return power_res
 
-
-    def get_detector_power_get(self):
-        """Get a power measurement"""
-        return self.detector_power_get
-
-    def get_detector_wavelength_set(self):
-        """Get the averaging"""
-        return self.detector_wavelength_set
-
     def get_detector_wavelength(self):
         msg = ':SENS:CORR:WAV?'
         self.meter.write(msg)
@@ -133,41 +119,12 @@ class Thorlabs_PM100U():
         self.meter.write('*RST')
         self.meter.write('*CLS')
 
-    def get_id(self):
-        return self.id
-
-    def load_settings(self):
-        with open(self.settings_path, "r") as text_file:
-            settings_dict = json.load(text_file)
-            self.set_detector_wavelength_set(settings_dict["wavelength"])
-            self.set_units(settings_dict["units"])
-            self.set_averaging(settings_dict["averaging"])
-
-    def get_settings(self):
-        return {
-            "id": self.get_id(),
-            "wavelength": self.get_detector_wavelength(),
-            "units": self.get_units(),
-            "averaging": self.get_averaging()
-        }
-
-    def save_settings(self):
-        try:
-            dictionary = self.get_settings()
-            print(dictionary)
-            with open(self.settings_path, "w") as text_file:
-                json.dump(dictionary, text_file)
-            print("Saved " + self.get_id() + " settings")
-        except Exception as error:
-            print("Could not save " + self.get_id() + " settings")
-            print(error)
-
     def disconnect(self):
         """End communication"""
 
         try:
             self.meter.close()
-            print("Disconnected " + self.get_id())
+            Console_Controller.print_message("Disconnected " + self.get_id())
         except Exception as error:
-            print("Could not disconnect  " + self.get_id())
-            print(error)
+            Console_Controller.print_message("Could not disconnect  " + self.get_id())
+            Console_Controller.print_message(error)
