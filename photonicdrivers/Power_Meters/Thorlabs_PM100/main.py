@@ -1,6 +1,7 @@
 import pyvisa
 
 def main():
+    print("hello")
     # Open a VISA resource manager
     rm = pyvisa.ResourceManager()
 
