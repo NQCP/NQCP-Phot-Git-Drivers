@@ -1,4 +1,5 @@
 import pyvisa
+import numpy as np
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -14,6 +15,25 @@ class Thorlabs_PM():
         self.port = port
         self.powerMeter = None
         
+
+#################################### HIGH LEVEL METHODS ###########################################
+
+    def get_average_power(self, n_averages: int=10) -> float:
+        # The instanteneous power measurement can be unstable, so it is better so average over multiple measurements
+        measurements = np.zeros(n_averages)
+        for j in range(n_averages):
+            measurements[j] = self.get_detector_power()
+        return np.mean(measurements)
+
+        
+#################################### LOW LEVEL METHODS ###########################################
+
+    def connect(self) -> None:
+        self.powerMeter = self.resource_manager.open_resource(self.port)
+
+    def disconnect(self) -> None:
+        """End communication"""
+        self.powerMeter.close()
 
     def is_alive(self) -> bool:
         return bool(self.get_idn())
@@ -74,14 +94,7 @@ class Thorlabs_PM():
 
     def reset(self) -> None:
         """Reset"""
-        self._write('*RST')
-        
-    def connect(self) -> None:
-        self.powerMeter = self.resource_manager.open_resource(self.port)
-
-    def disconnect(self) -> None:
-        """End communication"""
-        self.powerMeter.close()
+        self._write('*RST') 
 
 #################################### PRIVATE METHODS ###########################################
 
