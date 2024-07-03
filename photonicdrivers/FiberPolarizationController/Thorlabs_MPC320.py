@@ -52,7 +52,7 @@ class Thorlabs_MPC320():
 if __name__ == "__main__":
     serial_number = "38449564"
     polarization_controller = Thorlabs_MPC320(serial_number)
-    polarization_controller.connect()
+    polarization_controller.connect(polling_rate=polling_rate_ms)
     new_pos = Decimal(10.0)  # Must be a .NET decimal.
     polarization_controller.move_to(new_pos,new_pos, new_pos)
     polarization_controller.disconnect()

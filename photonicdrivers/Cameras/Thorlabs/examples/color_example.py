@@ -13,10 +13,10 @@ try:
 except ImportError:
     configure_path = None
 
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-from thorlabs_tsi_sdk.tl_color_enums import FORMAT
-from thorlabs_tsi_sdk.tl_mono_to_color_enums import COLOR_SPACE
-from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
+from Thorlabs.example.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
+from Thorlabs.example.thorlabs_tsi_sdk.tl_color_enums import FORMAT
+from Thorlabs.example.thorlabs_tsi_sdk.tl_mono_to_color_enums import COLOR_SPACE
+from Thorlabs.example.thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
 
 """
     The MonoToColorProcessorSDK and MonoToColorProcessor objects can be used with context managers for automatic 

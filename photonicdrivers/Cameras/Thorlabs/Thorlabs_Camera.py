@@ -1,5 +1,4 @@
 from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
 
 
 class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
@@ -47,11 +46,10 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
             self.camera_driver.issue_software_trigger()
 
             self.is_connected = True
-            Console_Controller.print_message(
-                "Connection successfully established to Thorlabs Cameras with serial number " + self.serial_number)
+            print("Connection successfully established to Thorlabs Cameras with serial number " + self.serial_number)
 
         except Exception as error:
-            Console_Controller.print_message(error)
+            print(error)
 
     def disconnect(self):
         """
@@ -74,11 +72,11 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
 
             self.camera_driver.dispose()
             self.is_connected = False
-            Console_Controller.print_message(
+            print(
                 "Disconnected successfully the Thorlabs Cameras with serial number " + self.serial_number)
 
         except Exception as error:
-            Console_Controller.print_message(error)
+            print(error)
 
     def get_is_connected(self):
         return self.is_connected
@@ -127,7 +125,7 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
         if min(gain_range) <= gain <= max(gain_range):
             self.camera_driver.gain = gain
         else:
-            Console_Controller.print_message("Gain out of range from {} to {}".format(*self.get_gain_range()))
+            print("Gain out of range from {} to {}".format(*self.get_gain_range()))
 
     def get_gain_range(self):
         """
@@ -182,4 +180,13 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
         Print the current camera settings
         :return:
         """
-        Console_Controller.print_message("Current camera settings: " + str(self.load_settings()))
+        print("Current camera settings: " + str(self.load_settings()))
+
+
+
+if __name__ == "__main__":
+    resource_manager = TLCameraSDK()
+    serial_number = "26925"
+    camera = Thorlabs_Camera(resource_manager, serial_number)
+    camera.connect()
+    camera.disconnect()
