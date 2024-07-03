@@ -1,10 +1,12 @@
-#!/usr/bin/env python
-
-
-import numpy as np
 import pyvisa
 
-class Thorlabs_PM100U():
+"""
+Class for interfacing with Thorlab powermeters.
+Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM100USB')
+Supported units: {'W', 'mW', 'dBm'}
+"""
+
+class Thorlabs_PM():
 
     def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
         """Connect to and reset Thorlabs PM101USB"""        
