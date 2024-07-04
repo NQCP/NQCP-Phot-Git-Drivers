@@ -1,20 +1,22 @@
 
-import pyvisa
+from anyvisa import AnyVisa
 import numpy as np
-
+from photonicdrivers.utils.execution_time import execution_time
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
 Supported units: {'W', 'mW', 'dBm'}
+Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl
 """
+
 
 class Thorlabs_PM103E():
 
-    def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
-        """Connect to and reset Thorlabs PM101USB"""        
-        self.resource_manager = resource_manager
-        self.port = port
-        self.powerMeter = None
+    def __init__(self, port: str = "TCPIP0::10.209.67.184::PM5020_07::INSTR") -> None:
+        """Connect to and reset Thorlabs PM101USB"""     
+        self.resource_manager = AnyVisa   
+        self.port = port 
+        self.power_meter = None
         
 
 #################################### HIGH LEVEL METHODS ###########################################
@@ -36,27 +38,54 @@ class Thorlabs_PM103E():
         
 #################################### LOW LEVEL METHODS ###########################################
 
+    @execution_time
     def connect(self) -> None:
-        self.powerMeter = self.resource_manager.open_resource(self.port)
+        """
+        Opens the connections to the Thorlabs detector
+        """
+
+        self.power_meter = self.resource_manager.TL_Open(self.port)
+        self.power_meter.open()
+        self.power_meter.write("CONF:POW")
 
     def disconnect(self) -> None:
-        """End communication"""
-        self.powerMeter.close()
+        """
+        Closes the connections to the Thorlabs detector
+        """
+        self.power_meter.close()
 
     def is_alive(self) -> bool:
+        """
+        Returns a boolean specifing wether the a connection to the device is established
+        @rtype: boolean
+        @return: is alive boolean
+        """
         return bool(self.get_idn())
 
     def get_idn(self) -> str:
-        return self._write('*IDN?')
+        """
+        Returns the response from the *IDN? command
+        @rtype: string
+        @return: response from the *IDN? command 
+        """
+        return self._query("*IDN?")
 
     def get_averaging(self) -> int:
-        """Get the averaging"""
+        """
+        Get the number of averaging of the detector
+        @rtype: integer
+        @return: the number of averaging of the detector
+        """
         msg = ':SENS:AVER?'
         self._write(msg)
         return int(self._read())
 
     def set_averaging(self, average: int) -> None:
-        """Get the averaging"""
+        """
+        Set the number of averaging of the detector 
+        @param average:
+        @return: None
+        """
         msg = ':SENS:AVER ' + str(average)
         self._write(msg)
 
@@ -86,19 +115,19 @@ class Thorlabs_PM103E():
     def get_units(self) -> str:
         """Set the units to W or dBm"""
         msg = ':SENS:POW:UNIT?'
-        self._write(msg)
-        return self._read()
-
+        return self._query(msg)
+    
+    @execution_time
     def get_detector_power(self) -> float:
         """Get a power measurement"""
-        msg = ':READ?'
-        self._write(msg)
-        return float(self._read())
+        self.power_meter.write("ABOR") #aborts any ongoing measurments
+        self.power_meter.write("INIT")
+        res = float(self.power_meter.query("FETCH?"))
+        return res
 
     def get_detector_wavelength(self) -> float:
         msg = ':SENS:CORR:WAV?'
-        self._write(msg)
-        return float(self._read())
+        return float(self._query(msg))
 
     def reset(self) -> None:
         """Reset"""
@@ -107,9 +136,21 @@ class Thorlabs_PM103E():
 #################################### PRIVATE METHODS ###########################################
 
     def _write(self,command: str) -> None:
-        self.powerMeter.write(command)
+        self.power_meter.write(command)
 
-    def _read(self) -> str:
-        response = self.powerMeter.read()
-        response = response.replace('\n', '').replace('\r', '')
-        return response
+    def _read(self) -> None:
+        return self.power_meter.read()
+    
+    def _query(self, command: str) -> None:
+        return self.power_meter.query(command)
+
+
+if __name__ == "__main__":
+
+    detector = Thorlabs_PM103E("TCPIP0::10.209.67.184::PM5020_07::INSTR")
+    detector.connect()
+    print(detector.get_idn())
+    print(detector.get_detector_power())
+    print(detector.get_detector_power())
+    print(detector.get_detector_power())
+    detector.disconnect()
