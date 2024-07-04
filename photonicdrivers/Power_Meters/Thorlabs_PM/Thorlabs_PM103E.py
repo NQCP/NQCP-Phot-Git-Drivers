@@ -4,11 +4,11 @@ import numpy as np
 
 """
 Class for interfacing with Thorlab powermeters.
-Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM100USB')
+Supported models: PM103E
 Supported units: {'W', 'mW', 'dBm'}
 """
 
-class Thorlabs_PM():
+class Thorlabs_PM103E():
 
     def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
         """Connect to and reset Thorlabs PM101USB"""        
@@ -20,14 +20,14 @@ class Thorlabs_PM():
 #################################### HIGH LEVEL METHODS ###########################################
 
     def get_median_power(self, n_median: int=10) -> float:
-        # The instanteneous power measurement can be unstable, so it is better so average over multiple measurements
+        # The instanteneous power measurement can be unstable, so it can be useful to use the median over multiple measurements if outliers is present
         measurements = np.zeros(n_median)
         for j in range(n_median):
             measurements[j] = self.get_detector_power()
         return np.median(measurements)
 
     def get_average_power(self, n_averages: int=10) -> float:
-        # The instanteneous power measurement can be unstable, so it is better so average over multiple measurements
+        # The instanteneous power measurement can be unstable, so it is better to average over multiple measurements. Conider using the median method.
         measurements = np.zeros(n_averages)
         for j in range(n_averages):
             measurements[j] = self.get_detector_power()
