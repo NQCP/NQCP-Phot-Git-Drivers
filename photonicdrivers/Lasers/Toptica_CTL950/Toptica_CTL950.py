@@ -4,23 +4,23 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
     def __init__(self):
         print("initalising laser")
-        self.laser = None
+        self.laser_controller = None
 
     def __del__(self):
         self.disconnect()
 
     def connect(self, IP_address='10.209.67.103'):
-        self.laser = toptica.DLCpro(toptica.NetworkConnection(IP_address))
-        self.laser.open()
+        self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(IP_address))
+        self.laser_controller.open()
 
     def disconnect(self):
         """
         Closes the connections to the Toptica laser
         """
-        self.laser.close()
+        self.laser_controller.close()
 
     def set_diode(self, enable_bool):
-        self.laser.laser1.dl.cc.enabled.set(enable_bool)
+        self.laser_controller.laser1.dl.cc.enabled.set(enable_bool)
 
     def get_id(self):
         return "toptica_dlcpro01"
@@ -31,7 +31,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         @rtype: float
         @return: wavelength [nm]
         """
-        return self.laser.laser1.ctl.wavelength_act.get()
+        return self.laser_controller.laser1.ctl.wavelength_act.get()
 
     def set_wavelength(self, wavelength_nm: float):
         """
@@ -45,7 +45,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
             print('ERROR in Toptica->SetWavelength: wavelength range exceeded')
             return None
 
-        self.laser.laser1.ctl.wavelength_set.set(float(wavelength_nm))
+        self.laser_controller.laser1.ctl.wavelength_set.set(float(wavelength_nm))
 
         return None
 
@@ -55,7 +55,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         @rtype: float
         @return: power of the laser [mW]
         """
-        return self.laser.laser1.ctl.power.power_act.get()
+        return self.laser_controller.laser1.ctl.power.power_act.get()
 
     def set_power(self, power_mW: float):
         """
@@ -65,7 +65,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         """
         if power_mW is not None:
             self.power_mW_set = power_mW
-            self.laser.laser1.power_stabilization.setpoint.set(power_mW)
+            self.laser_controller.laser1.power_stabilization.setpoint.set(power_mW)
         return None
 
     def get_emission_status(self) -> bool:
@@ -74,7 +74,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         @rtype: bool
         @return: emission status of type (True) if the laser is on and (False) if the laser is off.
         """
-        return self.laser.emission.get()
+        return self.laser_controller.emission.get()
 
     def get_power_stabilization(self):
         """
@@ -82,7 +82,7 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         @rtype: bool
         @return:power stabilization status of type (True) if the stabilization is on and (False) if the stabilization is off.
         """
-        return self.laser.laser1.power_stabilization.enabled.get()
+        return self.laser_controller.laser1.power_stabilization.enabled.get()
 
     def set_power_stabilization(self, power_stabilization: bool):
         """
@@ -90,14 +90,14 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         :param power_stabilization:
         :return: None
         """
-        self.laser.laser1.power_stabilization.enabled.set(power_stabilization)
+        self.laser_controller.laser1.power_stabilization.enabled.set(power_stabilization)
         return None
 
     def play_welcome(self):
         """
         Playes a small bib bib bib song from the CTL
         """
-        self.laser.buzzer.play_welcome()
+        self.laser_controller.buzzer.play_welcome()
 
 
     def get_power_stabilization_parameters(self):
@@ -106,10 +106,10 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         :param power_stabilization:
         :return: None
         """
-        gain = self.laser.laser1.power_stabilization.gain.all.get()
-        p = self.laser.laser1.power_stabilization.gain.p.get()
-        i = self.laser.laser1.power_stabilization.gain.i.get()
-        d = self.laser.laser1.power_stabilization.gain.d.get()
+        gain = self.laser_controller.laser1.power_stabilization.gain.all.get()
+        p = self.laser_controller.laser1.power_stabilization.gain.p.get()
+        i = self.laser_controller.laser1.power_stabilization.gain.i.get()
+        d = self.laser_controller.laser1.power_stabilization.gain.d.get()
         return gain, p, i, d
 
     def set_power_stabilization_parameters(self, p, i, d=0, gain=1):
@@ -117,10 +117,10 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         Set the power stabilization of the Toptica CTL950 laser
         :return: None
         """
-        self.laser.laser1.power_stabilization.gain.all.set(gain)
-        self.laser.laser1.power_stabilization.gain.p.set(p)
-        self.laser.laser1.power_stabilization.gain.i.set(i)
-        self.laser.laser1.power_stabilization.gain.d.set(d)
+        self.laser_controller.laser1.power_stabilization.gain.all.set(gain)
+        self.laser_controller.laser1.power_stabilization.gain.p.set(p)
+        self.laser_controller.laser1.power_stabilization.gain.i.set(i)
+        self.laser_controller.laser1.power_stabilization.gain.d.set(d)
         return None
 
     @staticmethod
@@ -150,16 +150,3 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         :return: Return the maximum power of the Toptica CTL950 laser of type integer (int) in units of milli watts [mW] 
         """
         return
-
-
-if __name__ == "__main__":
-
-    laser = Toptica_CTL950()
-    laser.connect()
-    laser.play_welcome()
-    laser.set_wavelength(940)
-    laser.set_diode(True)
-    laser.set_power_stabilization(True)
-    laser.set_power(1)
-    laser.set_diode(False)
-    laser.disconnect()

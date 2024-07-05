@@ -1,5 +1,3 @@
-
-
 class Toptica_CTL950_Stub:  # Developer: Magnus Linnet Madsen
 
     def __init__(self, IP_address='192.168.1.100'):
