@@ -2,15 +2,17 @@ import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 
 class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
-    def __init__(self):
+    def __init__(self, _ip_address):
+        # The IP of the Toptica CTL in KK4 is '10.209.67.103'
         print("initalising laser")
+        self.ip_address = _ip_address
         self.laser_controller = None
 
     def __del__(self):
         self.disconnect()
 
-    def connect(self, IP_address='10.209.67.103'):
-        self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(IP_address))
+    def connect(self):
+        self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(self.ip_address))
         self.laser_controller.open()
 
     def disconnect(self):
