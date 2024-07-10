@@ -2,6 +2,7 @@
 from anyvisa import AnyVisa
 import numpy as np
 from photonicdrivers.utils.execution_time import execution_time
+
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
@@ -38,7 +39,6 @@ class Thorlabs_PM103E():
         
 #################################### LOW LEVEL METHODS ###########################################
 
-    @execution_time
     def connect(self) -> None:
         """
         Opens the connections to the Thorlabs detector
@@ -117,7 +117,6 @@ class Thorlabs_PM103E():
         msg = ':SENS:POW:UNIT?'
         return self._query(msg)
     
-    @execution_time
     def get_detector_power(self) -> float:
         """Get a power measurement"""
         self.power_meter.write("ABOR") #aborts any ongoing measurments
@@ -143,14 +142,3 @@ class Thorlabs_PM103E():
     
     def _query(self, command: str) -> None:
         return self.power_meter.query(command)
-
-
-if __name__ == "__main__":
-
-    detector = Thorlabs_PM103E("TCPIP0::10.209.67.184::PM5020_07::INSTR")
-    detector.connect()
-    print(detector.get_idn())
-    print(detector.get_detector_power())
-    print(detector.get_detector_power())
-    print(detector.get_detector_power())
-    detector.disconnect()
