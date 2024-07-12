@@ -135,7 +135,6 @@ class Thorlabs_ELL14K:
         if header == 'GS': raise ValueError(RESPONSES[response])
 
 if __name__ == "__main__":
-
     free_space_polarization_controller = Free_Space_Polarization_Controller(port='COM3', quarter_waveplate_address=1, half_waveplate_address=2)
     free_space_polarization_controller.connect()
     free_space_polarization_controller.reset_polarization()

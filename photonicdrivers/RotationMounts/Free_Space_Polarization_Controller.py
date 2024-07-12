@@ -53,7 +53,7 @@ class Free_Space_Polarization_Controller(Abstract_Free_Space_Polarization_Contro
 
 class Free_Space_Polarization_Controller_Proxy(Abstract_Free_Space_Polarization_Controller):
     def __init__(self, host_ip_adress, host_port, instrument_port: str, quarter_waveplate_address: int, half_waveplate_address: int):
-        self.host_ip_adress: str = host_ip_adress
+        self.host_ip_address: str = host_ip_adress
         self.host_port: str = host_port
         self.instrument_port: str = instrument_port
         self.quarter_waveplate_address: int = quarter_waveplate_address
@@ -89,12 +89,12 @@ class Free_Space_Polarization_Controller_Proxy(Abstract_Free_Space_Polarization_
         
 class Free_Space_Polarization_Controller_Server:
     def __init__(self, host_ip='10.209.67.42', port=12345):
-        self.host_ip_adress = host_ip
+        self.host_ip_address = host_ip
         self.host_port = port
         self.host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host_socket.bind((self.host_ip_adress, self.host_port))
+        self.host_socket.bind((self.host_ip_address, self.host_port))
         self.host_socket.listen(5)
-        print(f"Server listening on {self.host_ip_adress}:{self.host_port}")
+        print(f"Server listening on {self.host_ip_address}:{self.host_port}")
 
     def handle_client(self, client_socket):
         try:
