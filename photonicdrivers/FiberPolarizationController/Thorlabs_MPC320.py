@@ -85,6 +85,9 @@ class Thorlabs_MPC320():
         self.polarization_controller.Home(self.paddle_1, self.time_out)
         self.polarization_controller.Home(self.paddle_2, self.time_out)
         self.polarization_controller.Home(self.paddle_3, self.time_out)
+
+    def get_position(self, padlet_index):
+        return self.polarization_controller.GetPosition(padlet_index, self.time_out)
         
 
     def disconnect(self):
