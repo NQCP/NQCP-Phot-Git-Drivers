@@ -70,22 +70,6 @@ class Thorlabs_ELL14K:
         assert chr(header[0]) == str(self.address)
         return header[1:].decode(), int(data.decode(), 16)
 
-
-    ##### Debug/Internal Commands ######
-    @property
-    def status(self):
-        header, response = self.query('gs')
-        assert header == 'GS'
-        return RESPONSES[response]
-
-    @property
-    def _position(self):
-        header, response = self.query('gp')
-        assert header == 'PO'
-        return from_twos_complement(response)
-
-
-    ##### Public Interface #####
     def home(self):
         """
         Return the stage to the home position.
@@ -97,46 +81,21 @@ class Thorlabs_ELL14K:
         """Mark the current position as 0° in software."""
         self._offset = -self._position
 
-    @property
-    def angle_unwrapped(self):
-        """Return the current angle (CCW), counting full turns."""
-        return -360 * (self._position + self._offset) / COUNTS_PER_REVOLUTION
-
-    @angle_unwrapped.setter
-    def angle_unwrapped(self, degrees):
-        self.move_by(degrees - self.angle_unwrapped)
-
-    @property
-    def angle(self):
+    def get_angle(self):
         """Return the current angle (CCW)."""
         return self.angle_unwrapped % 360
-
-    @angle.setter
-    def angle(self, degrees):
-        delta = degrees - self.angle
-        if delta > 180: delta -= 360
-        if delta < -180: delta += 360
-
-        self.move_by(delta)
         
     def set_angle(self, degrees):
-        delta = degrees - self.angle
+        delta = degrees - self.get_angle
         if delta > 180: delta -= 360
         if delta < -180: delta += 360
 
-        self.move_by(delta)
+        self.set_relative_angle(delta)
 
-    def move_by(self, degrees):
+    def set_relative_angle(self, degrees):
         """Move by the given number of degrees, counterclockwise."""
         delta = -round(degrees * COUNTS_PER_REVOLUTION/360)
         data = to_twos_complement(delta).to_bytes(4, 'big')
         header, response = self.query('mr', data=data)
         assert header in ['GS', 'PO']
         if header == 'GS': raise ValueError(RESPONSES[response])
-
-if __name__ == "__main__":
-    free_space_polarization_controller = Free_Space_Polarization_Controller(port='COM3', quarter_waveplate_address=1, half_waveplate_address=2)
-    free_space_polarization_controller.connect()
-    free_space_polarization_controller.reset_polarization()
-    free_space_polarization_controller.set_polarization(45,90)
-    free_space_polarization_controller.disconnect()
