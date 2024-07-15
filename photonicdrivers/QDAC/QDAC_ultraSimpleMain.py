@@ -1,6 +1,6 @@
 import socket
 
-IPAddress='10.209.67.125'
+IPAddress='10.209.67.185'
 Port=5025
 
 print('Connecting via ethernet')
