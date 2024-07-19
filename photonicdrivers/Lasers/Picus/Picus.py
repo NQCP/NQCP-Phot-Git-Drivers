@@ -1,47 +1,77 @@
-from photonicdrivers.Instruments.Abstract.Instrument import Instrument
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
+import pyvisa
+from serial import Serial
+
+class Picus():
+
+    def __init__(self, _resource_manager: pyvisa.ResourceManager=None, _port: str=None, _connectionMethod=None) -> None:
+        self.resource_manager = _resource_manager
+        self.port = _port
+        self.baud_rate = 115200
+        self.data_bits = 8
+        self.parity = "None"
+        self.stop_bits = 1
+        self.termination_character = "\n"
+
+        self.connectionType = _connectionMethod
+        self.connection = None
+        
+#################################### HIGH LEVEL METHODS ##########################################
 
 
-class Picos_Q_OEM(Instrument):
 
-    def load_settings(self) -> dict:
-        pass
-
-    def save_settings(self, settings: dict) -> None:
-        pass
-
-    def get_id(self, settings: dict) -> None:
-        pass
-
-    def __init__(self, resource_manager, port):
-        self.port = port
-        self.resource_manager = resource_manager
+#################################### LOW LEVEL METHODS ###########################################
 
     def connect(self):
-       try:
-            self.laser = self.resource_manager.open_resource(self.port)  # use the correct COM port
-            Console_Controller.print_message("Successfully connected to Picos laser")
-       except:
-            Console_Controller.print_message("Unable to connect to picos")
-
+        if self.connectionType == "pyvisa":
+            self.connection = self.resource_manager.open_resource(self.port)
+            print("Successfully connected to Picos laser")
+        elif self.connectionType == "serial":
+            self.connection = Serial(port='COM5', timeout = 3)
+        else:
+            print("No connection method defined")
 
     def disconnect(self):
-        try:
-            self.laser.close()  # use the correct COM port
-            Console_Controller.print_message("Successfully disconnected to Picos laser")
-        except:
-            Console_Controller.print_message("Unable to disconnect to picos")
+        self.connection.close()
 
-    def turn_on_emission(self):
-        try:
-            self.laser.write('Laser:Enable 1')
-            Console_Controller.print_message("Successfully turned Picos on emission")
-        except:
-            Console_Controller.print_message("Emission turn on was unsuccessful")
+    def getEnabledState(self) -> bool:
+        self._write("Laser:Enable?")
+        return bool(int(self._read()))
+    
+    def getWavelength(self) -> float:
+        self._write("Laser:Wavelength?")
+        return float(self._read())
+    
+    def setEnabledState(self, state: bool) -> None:
+        self._write("Laser:Enable" + str(int(state)))
 
-    def turn_off_emission(self):
-        try:
-            Console_Controller.print_message(self.laser.write('Laser:Enable 0'))
-            Console_Controller.print_message("Successfully turned off Picos emission")
-        except:
-            Console_Controller.print_message("Emission turn off was unsuccessful")
+    def setWavelength(self, wavelength_nm: float) -> None:
+        self._write("Laser:Wavelength" + str(wavelength_nm))
+
+
+#################################### PRIVATE METHODS ###########################################
+
+    def _write(self,command: str) -> None:
+        cmd = command + self.termination_character
+        # print(cmd)
+
+        if self.connectionType == "pyvisa":
+            self.write(cmd)
+        elif self.connectionType == "serial":
+            self.connection.write(cmd.encode())
+        else:
+            print("No connection method defined")
+        
+
+    def _read(self) -> str:
+        # response = self.powerMeter.read()
+        # response = response.replace('\n', '').replace('\r', '')
+        response = None
+
+        if self.connectionType == "pyvisa":
+            self.connection.read()
+        elif self.connectionType == "serial":
+            response = self.connection.readline().decode()
+        else:
+            print("No connection method defined")
+
+        return response
