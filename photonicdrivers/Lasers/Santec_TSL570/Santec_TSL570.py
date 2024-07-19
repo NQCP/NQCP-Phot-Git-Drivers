@@ -7,27 +7,27 @@ ref = clr.AddReference(r"Santec_FTDI")
 
 import Santec_FTDI as ftdi
 
-class Santec_TSL570():  # Developer: Magnus Linnet Madsen
+class Santec_TSL570_driver():  # Developer: Magnus Linnet Madsen
 
-    def __init__(self, _serial_number):
+    def __init__(self, _serial_number='24040112'):
         # The serial_number of the TSL570 is '24040112'
         print("initalising laser")
         self.serial_number = _serial_number
 
-    def __del__(self):
-        self.disconnect()
-
     def connect(self):
-        ftdi.FTD2xx_helper(self.serial_number)
-
+        self.laser = ftdi.FTD2xx_helper(self.serial_number)
+        print("connecting to laser")
+        
     def disconnect(self):
         """
-        Closes the connections to the Toptica laser
+        Closes the connections to the laser
         """
-        self.laser_controller.close()
+        print("closing laser")
+        self.laser.CloseUsbConnection()
     
-    def get_idn(self) -> str:
-        return self.QueryIdn()
+    def get_idn(self):
+        idn_query = self.laser.QueryIdn()
+        print('\n' + idn_query)
     
     def get_wavelength(self):
         """
@@ -36,7 +36,7 @@ class Santec_TSL570():  # Developer: Magnus Linnet Madsen
         @return: wavelength [nm]
         """
         msg = ':WAV?'
-        return self.Query(msg)
+        return self.laser.Query(msg)
     
     def set_wavelength(self, wavelength_nm: float):
         """
@@ -46,5 +46,36 @@ class Santec_TSL570():  # Developer: Magnus Linnet Madsen
         """
 
         msg = ':WAVelength  ' + str(wavelength_nm) + 'e-9'
-        return self.Query(msg)
+        self.laser.Write(msg)
+        
+        
+    def set_power(self, power_dBm: float):
+        """
+        Set power [dBm] of the laser
+        """
+        power_dBm_decimal = '{:.2e}'.format(power_dBm)
+        msg = ':POW ' + str(power_dBm_decimal) 
+        self.laser.Write(msg)
+        
+    def get_power(self, power_dBm: float):
+        """
+        Get power [dBm] of the laser
+        """
+        msg = ':POW?' 
+        return self.laser.Query(msg)
+        
+    def set_emission_status(self, emission: int):
+        """
+        Set laser emission ON or OFF 
+        """
+        msg = ':POW:STAT ' + str(emission) 
+        self.laser.Write(msg)
+        
+    def get_emission_status(self):
+        """
+        Set laser emission ON or OFF 
+        """
+        msg = ':POW:STAT?'
+        return self.laser.Query(msg)
+        
 
