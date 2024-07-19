@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 # 'usb' is part of the pyusb package (which has dependencies in the libusb package).
 # Neither package is included in the .toml file, because installing the packages with pip does not work.
-# Instead the packages should be installed with conda using:
+# Instead the packages should be INSTALLED WITH CONDA using:
 # conda install conda-forge::pyusb
 # installing pyusb like this will also install its dependencies (libusb) and add the .dll files from libusb to the PATH environment
 # Documentation:
@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 
 class PicoMotorController():
 
-    def __init__(self, vendor_ID_Hex=0x104d, product_ID_Hex=0x4000, IP_adress="10.209.67.98", port=1):
+    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None):
         print("Initialising instance of PicoMotor class")
 
         self.termChar = '\r'  # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
