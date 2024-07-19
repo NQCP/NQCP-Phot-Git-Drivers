@@ -1,18 +1,16 @@
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 
-class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
+class Toptica_DLC_PRO_driver():  # Developer: Magnus Linnet Madsen
 
-    def __init__(self, _ip_address):
+    def __init__(self, ip_address = '10.209.67.103'):
         # The IP of the Toptica CTL in KK4 is '10.209.67.103'
-        print("initalising laser")
-        self.ip_address = _ip_address
-        self.laser_controller = None
+        self.ip_address = ip_address
+        self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(self.ip_address))
 
     def __del__(self):
         self.disconnect()
 
     def connect(self):
-        self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(self.ip_address))
         self.laser_controller.open()
 
     def disconnect(self):
@@ -23,9 +21,6 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
 
     def set_diode(self, enable_bool):
         self.laser_controller.laser1.dl.cc.enabled.set(enable_bool)
-
-    def get_id(self):
-        return "toptica_dlcpro01"
 
     def get_wavelength(self):
         """
@@ -41,11 +36,6 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         @param wavelength_nm: wavelength of the laser [nm]
         @return: None
         """
-
-        self.wavelength_nm_set = wavelength_nm
-        if wavelength_nm < 910 or wavelength_nm > 980:
-            print('ERROR in Toptica->SetWavelength: wavelength range exceeded')
-            return None
 
         self.laser_controller.laser1.ctl.wavelength_set.set(float(wavelength_nm))
 
@@ -124,31 +114,3 @@ class Toptica_CTL950():  # Developer: Magnus Linnet Madsen
         self.laser_controller.laser1.power_stabilization.gain.i.set(i)
         self.laser_controller.laser1.power_stabilization.gain.d.set(d)
         return None
-
-    @staticmethod
-    def get_min_wavelength():
-        """
-        :return: Return the minimum wavelength of type integer (int) in units of nano meters [nm] 
-        """
-        return 910
-
-    @staticmethod
-    def get_max_wavelength() -> int:
-        """
-        :return: Return the maximum wavelength of type integer (int) in units of nano meters [nm] 
-        """
-        return 980
-
-    @staticmethod
-    def get_min_power():
-        """
-        :return: Return the minimum power of the Toptica CTL950 laser of type integer (int) in units of milli watts [mW] 
-        """
-        return 0
-
-    @staticmethod
-    def get_max_power():
-        """
-        :return: Return the maximum power of the Toptica CTL950 laser of type integer (int) in units of milli watts [mW] 
-        """
-        return

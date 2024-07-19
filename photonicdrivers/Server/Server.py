@@ -12,6 +12,9 @@ class Request_Handler(ABC):
 
 class Proxy():
 
+    def __init__(self) -> None:
+        self.socket = None
+
     def server_connect(self):
         """
         Establishes a connection to the server.
@@ -42,6 +45,8 @@ class Proxy():
             ConnectionError: If not connected to the server.
         """
         if not self.sock:
+            msg = "Not connected to the server"
+            print(msg)
             raise ConnectionError("Not connected to the server")
         try:
             self.sock.sendall(request.encode('utf-8'))
@@ -98,7 +103,7 @@ class Instrument_Server(Server):
             Stops the server and closes the socket.
     """
 
-    def __init__(self, request_handler: Request_Handler, host_ip='10.209.67.42', port=8090):
+    def __init__(self, request_handler: Request_Handler, host_ip='10.209.67.42', host_port=8090):
         """
         Initializes the instrument server.
 
@@ -118,7 +123,7 @@ class Instrument_Server(Server):
             socket.error: If there is an issue with creating or binding the socket.
         """
         self.host_ip_address = host_ip
-        self.host_port = port
+        self.host_port = host_port
         self.host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host_socket.bind((self.host_ip_address, self.host_port))
         self.host_socket.listen(5)  # Increase backlog to allow multiple connections
@@ -141,6 +146,7 @@ class Instrument_Server(Server):
         try:
             while self.running:
                 request = client_socket.recv(1024).decode('utf-8')
+                
                 if not request:
                     break
                 
