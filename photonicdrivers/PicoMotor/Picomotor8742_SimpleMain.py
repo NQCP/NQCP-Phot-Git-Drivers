@@ -7,6 +7,7 @@ from Picomotor8742 import PicoMotorController
 
 pico = PicoMotorController(vendor_ID_Hex=0x104d, product_ID_Hex=0x4000)
 #pico = PicoMotorController(IP_adress='10.209.67.98', port=23)
+pico.connect()
 print(pico.get_product_ID())
 print(pico.get_MAC_address())
 print(pico.get_IP_address())

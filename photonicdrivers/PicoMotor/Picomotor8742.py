@@ -23,10 +23,14 @@ class PicoMotorController():
         self.termChar = '\r'  # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
 
         self.connectionType = None
+        self.dev = None
         self.vendor_ID_Hex = vendor_ID_Hex
         self.product_ID_Hex = product_ID_Hex
         self.IP_adress = IP_adress
         self.port = port
+
+        print(vendor_ID_Hex)
+        print(product_ID_Hex)
 
     def get_product_ID(self):
         self._write_command('*IDN?')
@@ -113,6 +117,7 @@ class PicoMotorController():
             self.timeOut = 1000  # ms
 
             self.dev = usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex)
+            print(self.dev)
 
 
         elif self.IP_adress is not None and self.port is not None:
