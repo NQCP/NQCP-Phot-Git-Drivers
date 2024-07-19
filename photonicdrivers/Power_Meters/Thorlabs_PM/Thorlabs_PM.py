@@ -43,7 +43,7 @@ class Thorlabs_PM():
         """End communication"""
         self.powerMeter.close()
 
-    def is_alive(self) -> bool:
+    def is_connected(self) -> bool:
         return bool(self.get_idn())
 
     def get_idn(self) -> str:
@@ -95,7 +95,7 @@ class Thorlabs_PM():
         self._write(msg)
         return float(self._read())
 
-    def get_detector_wavelength(self) -> float:
+    def get_power_meter_wavelength(self) -> float:
         msg = ':SENS:CORR:WAV?'
         self._write(msg)
         return float(self._read())

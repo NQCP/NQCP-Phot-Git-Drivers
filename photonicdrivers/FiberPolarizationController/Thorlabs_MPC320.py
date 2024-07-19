@@ -38,55 +38,30 @@ class Thorlabs_MPC320_Driver(ABC):
         pass
 
     @abstractmethod
-    def get_id(self):
-        """
-        Disconnects from the polarization controller.
-
-        Raises:
-            NotImplementedError: This method must be overridden in a subclass.
-        """
-        pass
-
-    @abstractmethod
-    def get_decription(self):
-        """
-        Returns a describe string of the device
-        """
-        pass
-    
-    @abstractmethod
-    def move_to(self,position_0, position_1, position_2):
-        """
-        Moves the three padlets to their specified positions
-        """
-        pass
-
-    @abstractmethod
-    def move_0_to(self,position):
+    def set_position_0(self,position):
         """
         Moves the first padlets to its specified positions
         """
         pass
 
     @abstractmethod
-    def move_1_to(self,position):
+    def set_position_1(self,position):
         """
         Moves the first padlets to its specified positions
         """
         pass
 
     @abstractmethod
-    def move_2_to(self,position):
+    def set_position_2(self,position):
         """
         Moves the first padlets to its specified positions
         """
         pass
-
 
 class Thorlabs_MPC320_Request_handler(Request_Handler):
 
-    def __init__(self, driver) -> None:
-        self.driver = driver
+    def __init__(self, driver: Thorlabs_MPC320_Driver) -> None:
+        self.driver: Thorlabs_MPC320_Driver = driver
     
     def handle_request(self, request):
         """
@@ -108,28 +83,27 @@ class Thorlabs_MPC320_Request_handler(Request_Handler):
         """
         if request == 'CONNECT':
             self.driver.connect()
-            response = 'Connected'
+            return 'Connected'
 
-        elif request == 'DISCONNECT':
+        if request == 'DISCONNECT':
             self.driver.disconnect()
-            response = 'Disconnected'
-
-        elif request.startswith('SET_POLARIZATION'):
-            _, qwp_angle, hwp_angle = request.split()
-            self.driver.set_polarization(float(qwp_angle), float(hwp_angle))
-            response = f"Polarization set: QWP to {qwp_angle}°, HWP to {hwp_angle}°"
-
-        elif request == 'RESET_POLARIZATION':
-            self.driver.reset_polarization()
-            response = 'Polarization reset'
-
-        elif request == 'GET_ID':
-            response = self.driver.get_id()
-
-        else:
-            response = 'Unknown command'
-            
-        return response
+            return 'Disconnected'
+        
+        if request.startswith("SET_POSITION_0"):
+            _, position = request.split()
+            self.driver.set_position_0(position=float(position))
+            return f'Set position_0 to {position}'
+        
+        if request.startswith("SET_POSITION_1"):
+            _, position = request.split()
+            self.driver.set_position_1(position=float(position))
+            return f'Set position_1 to {position}'
+        
+        if request.startswith("SET_POSITION_2"):
+            _, position = request.split()
+            self.driver.set_position_2(position=float(position))
+            return f'Set position_2 to {position}'        
+        return 'Unknown command'
 
 class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
 
@@ -145,9 +119,6 @@ class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
         self.time_out = 60000 # 60 seconds to complete move.
 
     def connect(self):
-        """
-        
-        """
         self.polarization_controller.Connect(self.serial_number)
         if not self.polarization_controller.IsSettingsInitialized():
             self.polarization_controller.WaitForSettingsInitialized(10000)  # 10 second timeout.
@@ -155,61 +126,79 @@ class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
         self.polarization_controller.StartPolling(self.polling_rate)  
         self.polarization_controller.EnableDevice()
     
-    def get_decription(self):
-        """
-        Returns a describe string of the device
-        """
-        return self.polarization_controller.GetDeviceInfo()
-    
-    def move_to(self,position_0, position_1, position_2):
-        """
-        Moves the three padlets to their specified positions
-        """
-        self.polarization_controller.MoveTo(Decimal(position_0), self.paddle_1, self.time_out)
-        self.polarization_controller.MoveTo(Decimal(position_1), self.paddle_2, self.time_out)
-        self.polarization_controller.MoveTo(Decimal(position_2), self.paddle_3, self.time_out)
-
-    def move_0_to(self,position):
+    def set_position_0(self,position:float):
         """
         Moves the first padlets to its specified positions
         """
         self.polarization_controller.MoveTo(Decimal(position), self.paddle_1, self.time_out)
 
-    def move_1_to(self,position):
+    def set_position_1(self,position:float):
         """
         Moves the first padlets to its specified positions
         """
         self.polarization_controller.MoveTo(Decimal(position), self.paddle_2, self.time_out)
 
-    def move_2_to(self,position):
+    def set_position_2(self,position:float):
         """
         Moves the first padlets to its specified positions
         """
         self.polarization_controller.MoveTo(Decimal(position), self.paddle_3, self.time_out)
-
-    def get_position_0(self):
-        return self.polarization_controller.GetPosition(0, self.time_out)
-        
-    def get_position_1(self):
-        return self.polarization_controller.GetPosition(1, self.time_out)
-    
-    def get_position_2(self):
-        return self.polarization_controller.GetPosition(2, self.time_out)
         
     def disconnect(self):
         self.polarization_controller.StopPolling()
         self.polarization_controller.Disconnect()
-
-    def get_id(self):
-        return "id" 
     
-
-class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver, Proxy):
+class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver):
 
     def __init__(self, host_ip_address: str, host_port: int):
         self.host_ip_address: str = host_ip_address
         self.host_port: int = host_port
         self.socket = None
+
+    def server_connect(self):
+            """
+            Establishes a connection to the server.
+            """
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect((self.host_ip_address, self.host_port))
+            print(f"Connected to {self.host_ip_address}:{self.host_port}")
+
+    def server_disconnect(self):
+        """
+        Closes the connection to the server.
+        """
+        if self.socket:
+            self.socket.close()
+            self.socket = None
+
+    def send_request(self, request: str) -> str:
+        """
+        Sends a request to the server and waits for a response.
+
+        Args:
+            request (str): The request string to send.
+
+        Returns:
+            str: The response from the server.
+
+        Raises:
+            ConnectionError: If not connected to the server.
+        """
+        print(request)
+        if not self.socket:
+            print("Not connected to the server")
+            raise ConnectionError("Not connected to the server")
+        try:
+            self.socket.sendall(request.encode('utf-8'))
+            response = self.socket.recv(1024).decode('utf-8')
+            return response
+        except socket.timeout:
+            print("Socket timeout: No response received")
+            return None
+        except Exception as error:
+            print(error)
+            return None
+
 
     def connect(self):
         """
@@ -237,61 +226,26 @@ class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver, Proxy):
         print(f"Disconnect response: {response}")
         self.server_disconnect()
 
-    def get_id(self):
-        """
-        Disconnects from the polarization controller.
-
-        Raises:
-            NotImplementedError: This method must be overridden in a subclass.
-        """
-        request = 'GET_ID'
-        response = self.send_request(request)
-        print(f"Get ID response: {response}")
-
-    def get_decription(self):
-        """
-        Returns a describe string of the device
-        """
-        request = 'GET_DESCRIPTION'
-        response = self.send_request(request)
-        print(f"Get description response: {response}")
-
-    def move_padlet_0_to(self, position):
+    def set_position_0(self, position):
         """
         Moves the first padlets to its specified positions
         """
-        request = f'MOVE_2_TO {position}'
+        request = f'SET_POSITION_0 {position}'
         response = self.send_request(request)
         print(f"Get move padlet 2 to: {response}")
 
-    def move_padlet_1_to(self, position):
+    def set_position_1(self, position):
         """
         Moves the first padlets to its specified positions
         """
-        request = f'MOVE_2_TO {position}'
+        request = f'SET_POSITION_1 {position}'
         response = self.send_request(request)
         print(f"Get move padlet 2 to: {response}")
 
-    def move_padlet_2_to(self, position):
+    def set_position_2(self, position):
         """
         Moves the first padlets to its specified positions
         """
-        request = f'MOVE_2_TO {position}'
+        request = f'SET_POSITION_2 {position}'
         response = self.send_request(request)
         print(f"Get move padlet 2 to: {response}")
-
-    def get_position_0(self):
-        request = 'GET_POSITION_0'
-        response = self.send_request(request)
-        print(f"Get position 0: {response}")
-
-    def get_position_1(self):
-        request = 'GET_POSITION_1'
-        response = self.send_request(request)
-        print(f"Get position 1: {response}")
-
-    def get_position_2(self):
-        request = 'GET_POSITION_2'
-        response = self.send_request(request)
-        print(f"Get position 2: {response}")
-

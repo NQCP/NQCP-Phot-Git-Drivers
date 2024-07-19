@@ -11,7 +11,7 @@ Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip instal
 """
 
 
-class Thorlabs_PM103E():
+class Thorlabs_PM103E_driver():
 
     def __init__(self, port: str = "TCPIP0::10.209.67.184::PM5020_07::INSTR") -> None:
         """Connect to and reset Thorlabs PM101USB"""     

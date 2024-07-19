@@ -1,11 +1,11 @@
 import pyvisa as visa
-from Toptica_CTL950 import Toptica_CTL950
+from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro import Toptica_CTL950_driver
 
 
 resource_manager = visa.ResourceManager()
 print(resource_manager.list_resources())
 
-toptica_laser = Toptica_CTL950()
+toptica_laser = Toptica_CTL950_driver()
 toptica_laser.connect(IP_address='10.209.67.103')
 toptica_laser.set_diode(True)
 toptica_laser.set_power_stabilization(True)
