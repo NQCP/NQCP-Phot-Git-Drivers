@@ -13,9 +13,11 @@ class QDAC2():
         self.ipAddress = _ip_string
         self.port = _port_number
         self.timeout = 2 # seconds
-
-        self.openEthernetConnection()
-
+        
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
+        self.server_address = (self.ipAddress, self.port)
+        
         self.terminationChar = "\n"
 
     # High level methods are methods that consist of multiple low level methods
@@ -149,9 +151,6 @@ class QDAC2():
 
     def openEthernetConnection(self) -> None:
         print('Connecting to QDAC via ethernet')
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
-        self.server_address = (self.ipAddress, self.port)
         self.sock.connect(self.server_address) 
     
     ##################### PRIVATE METHODS ###########################
