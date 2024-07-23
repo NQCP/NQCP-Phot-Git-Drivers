@@ -132,7 +132,6 @@ class QDAC2():
     def setVoltageMode(self, chNumberString: str, modeString: str) -> None:
         if modeString == "FIX" or modeString == "SWE" or modeString == "LIST":
             command = "sour" + chNumberString + ":mode " + modeString
-            # print(command)
             self._write(command)
             self._checkForErrors(command)
         else:
