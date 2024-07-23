@@ -32,21 +32,21 @@
 
 
 
-# ## Python sample script to communicate with RLS Picus laser
-# import pyvisa #Communication via VISA
-# rm = pyvisa.ResourceManager()
-# # Connect to the laser
-# laser = rm.open_resource('COM5') # use the correct COM port
-# laser.read_termination = '\n'
-# laser.write_termination = '\n'
-# ## Enable Laser
-# print(laser.query('Laser:Enable?'))
-# ## Set and query wavelength
-# # print(laser.query('Laser:Wavelength 850'))
-# # print(laser.query('Laser:Wavelength?'))
-# # ## Shutdown Laser
-# # print(laser.query('Laser:Enable 0'))
-# laser.close()
+## Python sample script to communicate with RLS Picus laser
+import pyvisa #Communication via VISA
+rm = pyvisa.ResourceManager()
+# Connect to the laser
+laser = rm.open_resource('COM5') # use the correct COM port
+laser.read_termination = '\n'
+laser.write_termination = '\n'
+## Enable Laser
+print(laser.query('Laser:Enable?'))
+## Set and query wavelength
+# print(laser.query('Laser:Wavelength 850'))
+# print(laser.query('Laser:Wavelength?'))
+# ## Shutdown Laser
+# print(laser.query('Laser:Enable 0'))
+laser.close()
 
 
 
