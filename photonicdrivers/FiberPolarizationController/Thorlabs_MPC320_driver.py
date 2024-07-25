@@ -1,7 +1,6 @@
 import clr
 from photonicdrivers.utils.execution_time import execution_time
 from abc import ABC, abstractmethod
-from serial import Serial
 import socket
 from photonicdrivers.Server.Server import *
 
@@ -58,53 +57,6 @@ class Thorlabs_MPC320_Driver(ABC):
         """
         pass
 
-class Thorlabs_MPC320_Request_handler(Request_Handler):
-
-    def __init__(self, driver: Thorlabs_MPC320_Driver) -> None:
-        self.driver: Thorlabs_MPC320_Driver = driver
-    
-    def handle_request(self, request):
-        """
-        Processes a single client request and returns the appropriate response.
-
-        Args:
-            request (str): The client request string.
-
-        Returns:
-            str: The response string to be sent back to the client.
-
-        Possible Requests:
-            'CONNECT': Connects the polarization controller.
-            'DISCONNECT': Disconnects the polarization controller.
-            'SET_POLARIZATION <qwp_angle> <hwp_angle>': Sets the polarization angles.
-            'RESET_POLARIZATION': Resets the polarization to default values.
-            'GET_ID': Retrives the id of the connected polarization controller
-            Unknown commands will result in a 'Unknown command' response.
-        """
-        if request == 'CONNECT':
-            self.driver.connect()
-            return 'Connected'
-
-        if request == 'DISCONNECT':
-            self.driver.disconnect()
-            return 'Disconnected'
-        
-        if request.startswith("SET_POSITION_0"):
-            _, position = request.split()
-            self.driver.set_position_0(position=float(position))
-            return f'Set position_0 to {position}'
-        
-        if request.startswith("SET_POSITION_1"):
-            _, position = request.split()
-            self.driver.set_position_1(position=float(position))
-            return f'Set position_1 to {position}'
-        
-        if request.startswith("SET_POSITION_2"):
-            _, position = request.split()
-            self.driver.set_position_2(position=float(position))
-            return f'Set position_2 to {position}'        
-        return 'Unknown command'
-
 class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
 
     def __init__(self, serial_number): # serial number S/N can be found underneath the device 
@@ -150,7 +102,7 @@ class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
     
 class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver):
 
-    def __init__(self, host_ip_address: str, host_port: int):
+    def __init__(self, host_ip_address: str, host_port: int = 12346):
         self.host_ip_address: str = host_ip_address
         self.host_port: int = host_port
         self.socket = None
@@ -249,3 +201,125 @@ class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver):
         request = f'SET_POSITION_2 {position}'
         response = self.send_request(request)
         print(f"Get move padlet 2 to: {response}")
+
+class Thorlabs_MPC320_Server:
+
+    def __init__(self, serial_number="38449564", host_ip='localhost', port=12346):
+
+        self.host_ip_address = host_ip
+        self.host_port = port
+        self.host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.host_socket.bind((self.host_ip_address, self.host_port))
+        self.host_socket.listen(5)  # Increase backlog to allow multiple connections
+        self.running = True
+        print(f"Server listening on {self.host_ip_address}:{self.host_port}")
+
+        Thorlabs_MPC320_Serial(serial_number=serial_number)
+
+    def handle_client(self, client_socket):
+        """
+        Handles a client connection, processing incoming requests and sending responses.
+
+        Args:
+            client_socket (socket.socket): The client socket connected to the server.
+
+        Raises:
+            Exception: If an error occurs while handling the client.
+        """
+        try:
+            while self.running:
+                request = client_socket.recv(1024).decode('utf-8')
+                if not request:
+                    break
+                
+                print(f"Received from {client_socket.getpeername()}: {request}")
+
+                response = self.handle_request(request)
+
+                print(f"Sending response to {client_socket.getpeername()}: {response}")
+                client_socket.send(response.encode('utf-8'))
+        
+        except Exception as e:
+            print(f"Error handling client: {e}")
+        finally:
+            print(f"Closing connection with {client_socket.getpeername()}")
+            client_socket.close()
+
+    def handle_request(self, request):
+        """
+        Processes a single client request and returns the appropriate response.
+
+        Args:
+            request (str): The client request string.
+
+        Returns:
+            str: The response string to be sent back to the client.
+
+        Possible Requests:
+            'CONNECT': Connects the polarization controller.
+            'DISCONNECT': Disconnects the polarization controller.
+            'SET_POSITION_0 <position>': Moves the first padlet to a specified position.
+            'SET_POSITION_1 <position>': Moves the second padlet to a specified position.
+            'SET_POSITION_2 <position>': Moves the third padlet to a specified position.
+            Unknown commands will result in a 'Unknown command' response.
+        """
+        if request == 'CONNECT':
+            self.polarization_controller.connect()
+            response = 'Connected to polarization controller'
+
+        elif request == 'DISCONNECT':
+            self.polarization_controller.disconnect()
+            response = 'Disconnected from polarization controller'
+
+        elif request.startswith('SET_POSITION_0'):
+            _, position = request.split()
+            self.polarization_controller.move_0_to(float(position))
+            response = f'Moved padlet 0 to position: {position}'
+
+        elif request.startswith('SET_POSITION_1'):
+            _, position = request.split()
+            self.polarization_controller.move_1_to(float(position))
+            response = f'Moved padlet 1 to position: {position}'
+
+        elif request.startswith('SET_POSITION_2'):
+            _, position = request.split()
+            self.polarization_controller.move_2_to(float(position))
+            response = f'Moved padlet 2 to position: {position}'
+
+        else:
+            response = 'Unknown command'
+
+        return response
+
+    def start(self):
+        """
+        Starts the server to accept and handle client connections.
+
+        The server runs in a loop, accepting connections and spawning a new thread
+        to handle each client.
+        
+        Raises:
+            Exception: If an error occurs while accepting connections.
+        """
+        try:
+            while self.running:
+                client_socket, addr = self.host_socket.accept()
+                print(f"Accepted connection from {addr}")
+                self.handle_client(client_socket)
+        
+        except Exception as e:
+            print(f"Error accepting connection: {e}")
+        
+        finally:
+            self.host_socket.close()
+            print("Server stopped")
+
+    def stop(self):
+        """
+        Stops the server and closes the socket.
+
+        Sets the running state to False and closes the server socket.
+        """
+        self.running = False
+        self.host_socket.close()
+        print("Server stopped")
