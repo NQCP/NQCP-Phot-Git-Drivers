@@ -4,7 +4,7 @@
 from lakeshore import Model335, Model335InputSensorSettings
 
 # Connect to the first available Model 335 temperature controller over USB using a baud rate of 57600
-my_model_335 = Model335(57600,com_port="COM5")
+my_model_335 = Model335(57600 , com_port="COM5")
 
 # Create a new instance of the input sensor settings class
 # sensor_settings = Model335InputSensorSettings(my_model_335.InputSensorType.DIODE, True, False,
