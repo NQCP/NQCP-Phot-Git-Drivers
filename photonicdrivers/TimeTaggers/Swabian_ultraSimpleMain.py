@@ -9,7 +9,12 @@ from time import sleep
 # The TimeTagger module uses an older version of numpy. I got it to work with 1.26 (the highest 1.x version)
 
 print("hello")
-ttx = TimeTagger.createTimeTagger()
+print("Serial numbers of all available TimeTaggers:")
+print(TimeTagger.scanTimeTagger())
+
+serialNumber = "23010013V4"
+ttx = TimeTagger.createTimeTagger(serialNumber)
+print(ttx.getSerial())
 binwidth_ps = int(1e9)
 
 counter = TimeTagger.Counter(tagger=ttx, channels=[1, 2], binwidth=binwidth_ps, n_values=1000)
