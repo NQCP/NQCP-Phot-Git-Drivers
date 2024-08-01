@@ -14,21 +14,19 @@ serverPort = "41101"
 ttNetwork = SwabianTimeTagger(serverIP=serverIP, serverPort=serverPort)
 
 ttNetwork.connect("Network")
-# print(ttx.getSerial())
 
-binWidth = int(1e11)
+binWidth = int(2e11)
 nBins = 20
+ttNetwork.initialiseCounter([6], binWidth, nBins)
 
 # ttNetwork.setTriggerLevel(1, 0.2)
 # ttNetwork.printAllTriggerLevels()
 
-counter = ttNetwork.countHistogram([6], binWidth, nBins)
-data = counter.getData()
+print(ttNetwork.countForTime(1e12))
+
+data, time_s = ttNetwork.getHistogramSnapshot()
 print(data)
-sleep(2)
-data = counter.getData()
-print(data)
-time_s = counter.getIndex()/1e12
+time_s = time_s/1e12
 ch1 = data[0]
 # ch2 = data[1]
 

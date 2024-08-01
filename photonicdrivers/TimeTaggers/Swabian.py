@@ -52,9 +52,10 @@ class SwabianTimeTagger():
 
     def disconnect(self) -> None:
         print("Disconnecting TimeTagger")
-        TimeTagger.freeTimeTagger(self.connection)#
+        TimeTagger.freeTimeTagger(self.connection)
 
     def initialiseCounter(self, channelList: list[int], binwidth_ps: int, n_bins: int) -> None:
+        # To do any measurements, the TimeTagger must first have initalised a counter
         self.counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
 
     def getSerial(self) -> str:
@@ -67,32 +68,26 @@ class SwabianTimeTagger():
     def setTestSignal(self, channelNo: int, status: bool) -> None:
         self.connection.setTestSignal(channelNo,status)
 
-    def countForTime(self, time_ps: int):
-        # iteratorbase = TimeTagger.IteratorBase()
-        counter = TimeTagger.Counter(tagger=self.connection, channels=[6], binwidth=int(1e9), n_values=1000)
-        counter.startFor(capture_duration=time_ps)
-        counter.waitUntilFinished()
-        data = counter.getDataTotalCounts()
-        return data
-
-    def countHistogram(self, channelList: list[int], binwidth_ps: int, n_bins: int) -> TimeTagger.Counter:        
-        time_s = binwidth_ps/1e12*n_bins
-        print("Starting counting measurement. Measurement will take " + str(time_s) + " seconds. Wait before reading the data.")
-
-        # returns counts per bin
-        counter = self.countHistogram_noWait(channelList,binwidth_ps,n_bins)
-
-        time.sleep(time_s)
-        return counter
-
-    def countHistogram_noWait(self, channelList, binwidth_ps: int, n_bins: int) -> TimeTagger.Counter:
-        # This function returns a complicated class. The "Counter.getData()" contains 0's and is available immediately, but 
-        # it does not contain meaningful data until the measurement time has passed.
-        # The array acts like a FIFO - the default setting is that the counter keeps overwriting data.
-
-        counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
+    def countForTime(self, time_ps: int) -> int:
+        if self.counter is None: 
+            print("TimeTagger Counter not inialised") 
+            return None
+        else:
+            self.counter.startFor(capture_duration=time_ps)
+            self.counter.waitUntilFinished()
+            counts = self.counter.getDataTotalCounts()
+            return counts
         
-        return counter
+    def getHistogramSnapshot(self):
+        # return an array with size (number of channel in counter)x(number of bins) with counts per bin
+        if self.counter is None: 
+            print("TimeTagger Counter not inialised") 
+            return None
+        else:
+            counts = self.counter.getData()
+            times = self.counter.getIndex()
+            return counts, times
+        
     
     def reset(self):
         # Reset the Time Tagger to the start-up state
