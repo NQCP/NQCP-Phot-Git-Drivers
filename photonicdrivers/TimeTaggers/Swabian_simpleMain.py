@@ -8,42 +8,38 @@ from time import sleep
 
 # The TimeTagger module uses an older version of numpy. I got it to work with 1.26 (the highest 1.x version)
 
-serverIP = "10.209.67.53"
+serverIP = "10.209.67.193"
 serverPort = "41101"
 
-ttx = SwabianTimeTagger(_serverIP=serverIP, _serverPort=serverPort)
+ttNetwork = SwabianTimeTagger(serverIP=serverIP, serverPort=serverPort)
 
-ttx.connect("Network")
-print(ttx.getSerial())
+ttNetwork.connect("Network")
+# print(ttx.getSerial())
 
-binWidth = int(1e9)
-nBins = 1000
+binWidth = int(1e11)
+nBins = 20
 
-ttx.disconnect()
+# ttNetwork.setTriggerLevel(1, 0.2)
+# ttNetwork.printAllTriggerLevels()
 
+counter = ttNetwork.countHistogram([6], binWidth, nBins)
+data = counter.getData()
+print(data)
+sleep(2)
+data = counter.getData()
+print(data)
+time_s = counter.getIndex()/1e12
+ch1 = data[0]
+# ch2 = data[1]
 
-# # Apply the built-in test signal (~0.8 to 0.9 MHz) to channel 1
-# ttx.setTestSignal(1, True)
-# print("Test signal on channel 1 enabled")
-# sleep(.5)
-# ttx.setTestSignal(1, False)
-
-# # After waiting two times for 0.5 s, the 1000 values should be filled
-# sleep(.5)
-
-# # Data is retrieved by calling the method "getData" on the measurement class.
-# data = counter.getData()
-# time_s = counter.getIndex()/1e12
-# ch1 = data[0]*1e-3
-# ch2 = data[1]*1e-3
-
-# # Plot the result
-# plt.figure()
-# plt.plot(time_s, ch1, label='channel 1')
+# Plot the result
+plt.figure()
+plt.plot(time_s, ch1, label='channel 1')
 # plt.plot(time_s, ch2, label='channel 2')
-# plt.xlabel('Time (s)')
-# plt.ylabel('Countrate (MHz)')
-# plt.legend()
-# plt.tight_layout()
-# plt.show()
+plt.xlabel('Time (s)')
+plt.ylabel('Counts per bin')
+plt.legend()
+plt.tight_layout()
+plt.show()
 
+ttNetwork.disconnect()
