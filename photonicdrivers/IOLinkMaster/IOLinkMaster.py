@@ -1,5 +1,6 @@
 import requests
-from FlowMeterPF3W720 import FlowMeterPF3W720
+# from FlowMeterPF3W720 import FlowMeterPF3W720
+from photonicdrivers.IOLinkMaster.FlowMeterPF3W720 import FlowMeterPF3W720
 
 class IOLinkMaster:
     def __init__(self, IPAddress):
