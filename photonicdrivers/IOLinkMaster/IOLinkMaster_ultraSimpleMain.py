@@ -1,17 +1,49 @@
-from IOLinkMaster import IOLinkMaster
 
-# sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# sock.settimeout(5) # sets the timeout of the receive command. 
-# server_address = ('10.209.67.95',80) #IP address, port
-# sock.connect(server_address)
+import requests
 
-# print('I got this far!')
+ipadr='10.209.67.95'
+inputPort=1
+datapath = 'iolinkdevice/pdin'
 
-# r = requests.post('http://10.209.67.95:80', json={"code":"request","cid":1,"adr":"/iolinkmaster/port[2]/iolinkdevice/pdin/getdata"})
-# print(r.json)
+url = f"http://{ipadr}/iolinkmaster/port[{inputPort}]/{datapath}/getdata"
+print(url)
+response = requests.get(url).json()
+print(response)
+print(response["data"]['value'])
+hex_number = response["data"]['value']
 
-# print('I got this far again!')
+def hex_to_binary(hexStr):
+    hexInt = int(hexStr, 16)
+    print(hexInt)
+    # convert the hexInt to binaryInt. 
+    binary_number = bin(hexInt)
+    print(binary_number)
+    binary_number = binary_number[2:].zfill(48)
+    print(binary_number)
+    return binary_number
 
-IOLink = IOLinkMaster('10.209.67.95',80)
-IOLink.getFlowAndTemp('2')
-IOLink.closeConnection()
+def split_binary(binary_number):
+    flow_bin = binary_number[:16]
+    temp_bin = binary_number[16:32]
+    dummy = binary_number[32:]
+    return flow_bin, temp_bin, dummy
+
+def binary_to_decimal(binary_number):
+    decimal_number = int(binary_number, 2)
+    return decimal_number
+
+
+binary_number = hex_to_binary(hex_number)
+flow_bin, temp_bin, dummy = split_binary(binary_number)
+
+flow_decimal = binary_to_decimal(flow_bin)
+temp_decimal = binary_to_decimal(temp_bin)
+
+print("Original Hex:", hex_number)
+print("Binary:", binary_number)
+print("flowBin:", flow_bin, "TempBin:", temp_bin, "Dummy:", dummy)
+print("Decimal flowBin:", flow_decimal)
+print("Decimal tempBin:", temp_decimal)
+
+print(str(float(flow_decimal*0.016 + 0)) + " L/min")
+print(str(float(temp_decimal*0.1 + 0)) + " C")
