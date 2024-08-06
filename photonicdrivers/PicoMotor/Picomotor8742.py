@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 
-class PicoMotorController():
+class NewFocus_8742_Driver():
 
     def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None):
         print("Initialising instance of PicoMotor class")
@@ -68,7 +68,7 @@ class PicoMotorController():
         """
         Moves a given axis of the Picomotor a relative position given by the distance parameter.
 
-        @param axis_number_str: Parameter to identify the axis to be moved: {0,1,2,3}
+        @param axis_number_str: Parameter to identify the axis to be moved: {1,2,3,4}
         @param distance_str: The distance to moved: int32
         @return: None
         """
@@ -77,9 +77,10 @@ class PicoMotorController():
     def get_target_position(self, axis_number_str):
         """
         Returns the position of the target axis
-        @param axis_number_str:
+        @param axis_number_str: Parameter to identify the axis to be moved: {1,2,3,4}
         @return: The distance of the target axis
         """
+
         self._write_command(str(axis_number_str) + 'PR?')
         response = self._read_command()
         return response
@@ -99,12 +100,6 @@ class PicoMotorController():
 
         else:
             print('ERROR in PicoMotorClass - connection has not been initialised properly')
-
-    def save_settings(self) -> None:
-        pass
-
-    def get_id(self):
-        return self.get_product_ID()
 
     def connect(self) -> None:
         if self.vendor_ID_Hex is not None and self.product_ID_Hex is not None:
@@ -193,8 +188,8 @@ class PicoMotorController():
 
 class PicoMotor:
 
-    def __init__(self, controller: PicoMotorController, axis_number: int):
-        self.controller = controller
+    def __init__(self, driver: NewFocus_8742_Driver, axis_number: int):
+        self.driver = driver
         self.axis_number = axis_number
 
     def move_target_position(self):
@@ -205,7 +200,7 @@ class PicoMotor:
         """
 
         try:
-            self.controller.move_target_position(self.axis_number)
+            self.driver.move_target_position(self.axis_number)
         except Exception as exception:
             print(exception)
 
@@ -218,7 +213,7 @@ class PicoMotor:
         @return: None
         """
         try:
-            self.controller.move_relative_position(self.axis_number, distance)
+            self.driver.move_relative_position(self.axis_number, distance)
         except Exception as exception:
             print(exception)
 
@@ -226,7 +221,7 @@ class PicoMotor:
 if __name__ == "__main__":
     # Create JoystickHandler instance
 
-    pico_motor_controller = PicoMotorController()
+    pico_motor_controller = NewFocus_8742_Driver()
     pico_motor_controller.connect()
     pico_motor_x = PicoMotor(pico_motor_controller, 1)
     pico_motor_y = PicoMotor(pico_motor_controller, 2)

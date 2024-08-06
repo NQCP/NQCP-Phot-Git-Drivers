@@ -1,53 +1,45 @@
-import json
-
 class FlowMeterPF3W720:
     def __init__(self):
-        print("init")
+        print("initialising a flowmeter")
 
-    def pdin(self, pinNumber):
-        # Create the JSON command
-        strCommand = {
-            "code":"request",
-            "cid":1,
-            "adr":"/iolinkmaster/port[" + pinNumber + "]/iolinkdevice/iolreadacyclic",
-            "data":0,
-            "subindex":0
-        }
-        jsonCommand = json.dumps(strCommand)
-        return jsonCommand
+    def getUrl_pdin_getData(self, pinNumber):
+        # The url ending is device specific
+        return f"/port[{pinNumber}]/iolinkdevice/pdin/getdata"
     
+    def pdin_iolreadacyclic(self, pinNumber):
+        pass
+    
+    def convert_pdinData(self, response_raw_hex):
+        binary_number = self.__hex_to_binary(response_raw_hex)
+        flow_bin, temp_bin, dummy = self.__split_binary(binary_number)
 
-# def hex_to_binary(hexStr):
-#     hexInt = int(hexStr, 16)
-#     print(hexInt)
-#     # convert the hexInt to binaryInt. 
-#     binary_number = bin(hexInt)
-#     print(binary_number)
-#     binary_number = binary_number[2:].zfill(48)
-#     print(binary_number)
-#     return binary_number
+        flow_decimal = self.__binary_to_decimal(flow_bin)
+        temp_decimal = self.__binary_to_decimal(temp_bin)
 
-# def split_binary(binary_number):
-#     flow_bin = binary_number[:16]
-#     temp_bin = binary_number[16:32]
-#     dummy = binary_number[32:]
-#     return flow_bin, temp_bin, dummy
+        flow_converted = flow_decimal*0.016 + 0      # L/min
+        temp_converted = temp_decimal*0.1 + 0        # C
 
-# def binary_to_decimal(binary_number):
-#     decimal_number = int(binary_number, 2)
-#     return decimal_number
+        return flow_converted, temp_converted
 
-# # Example usage
-# hex_number = "000000E00002"
 
-# binary_number = hex_to_binary(hex_number)
-# flow_bin, temp_bin, dummy = split_binary(binary_number)
+    #################################### PRIVATE METHODS ####################################
 
-# flow_decimal = binary_to_decimal(flow_bin)
-# temp_decimal = binary_to_decimal(temp_bin)
+    def __hex_to_binary(self, hex_str):
+        hexInt = int(hex_str, 16)
+        # print(hexInt)
+        # convert the hexInt to binaryInt. 
+        binary_number = bin(hexInt)
+        # print(binary_number)
+        binary_number = binary_number[2:].zfill(48)
+        # print(binary_number)
+        return binary_number
 
-# print("Original Hex:", hex_number)
-# print("Binary:", binary_number)
-# print("flowBin:", flow_bin, "TempBin:", temp_bin, "Dummy:", dummy)
-# print("Decimal flowBin:", flow_decimal)
-# print("Decimal tempBin:", temp_decimal)
+    def __split_binary(self, binary_number):
+        flow_bin = binary_number[:16]
+        temp_bin = binary_number[16:32]
+        dummy = binary_number[32:]
+        return flow_bin, temp_bin, dummy
+
+    def __binary_to_decimal(self, binary_number):
+        decimal_number = int(binary_number, 2)
+        return decimal_number
