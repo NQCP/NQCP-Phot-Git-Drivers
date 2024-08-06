@@ -97,8 +97,7 @@ class Thorlabs_MPC320_Serial(Thorlabs_MPC320_Driver):
         self.polarization_controller.MoveTo(Decimal(position), self.paddle_3, self.time_out)
         
     def disconnect(self):
-        self.polarization_controller.StopPolling()
-        self.polarization_controller.Disconnect()
+        pass
     
 class Thorlabs_MPC320_Proxy(Thorlabs_MPC320_Driver):
 
@@ -214,7 +213,7 @@ class Thorlabs_MPC320_Server:
         self.running = True
         print(f"Server listening on {self.host_ip_address}:{self.host_port}")
 
-        Thorlabs_MPC320_Serial(serial_number=serial_number)
+        self.polarization_controller = Thorlabs_MPC320_Serial(serial_number=serial_number)
 
     def handle_client(self, client_socket):
         """
@@ -264,30 +263,45 @@ class Thorlabs_MPC320_Server:
             Unknown commands will result in a 'Unknown command' response.
         """
         if request == 'CONNECT':
-            self.polarization_controller.connect()
-            response = 'Connected to polarization controller'
+            try:
+                self.polarization_controller.connect()
+                response = 'SUCCESS'
+            except Exception as error:
+                response = 'UNSUCCESFUL'
 
         elif request == 'DISCONNECT':
-            self.polarization_controller.disconnect()
-            response = 'Disconnected from polarization controller'
+            try:
+                self.polarization_controller.disconnect()
+                response = 'SUCCESS'
+            except Exception as error:
+                response = 'UNSUCCESFUL'
 
         elif request.startswith('SET_POSITION_0'):
             _, position = request.split()
-            self.polarization_controller.move_0_to(float(position))
-            response = f'Moved padlet 0 to position: {position}'
+            try:
+                self.polarization_controller.set_position_0(float(position))
+                response = 'SUCCESS'
+            except Exception as error:
+                response = 'UNSUCCESFUL'
 
         elif request.startswith('SET_POSITION_1'):
             _, position = request.split()
-            self.polarization_controller.move_1_to(float(position))
-            response = f'Moved padlet 1 to position: {position}'
+            try:
+                self.polarization_controller.set_position_1(float(position))
+                response = 'SUCCESS'
+            except Exception as error:
+                response = 'UNSUCCESFUL'
 
         elif request.startswith('SET_POSITION_2'):
             _, position = request.split()
-            self.polarization_controller.move_2_to(float(position))
-            response = f'Moved padlet 2 to position: {position}'
+            try:
+                self.polarization_controller.set_position_2(float(position))
+                response = 'SUCCESS'
+            except Exception as error:
+                response = 'UNSUCCESFUL'
 
         else:
-            response = 'Unknown command'
+            response = 'UNKNOWN COMMAND'
 
         return response
 
