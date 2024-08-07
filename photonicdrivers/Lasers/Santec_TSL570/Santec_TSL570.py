@@ -1,9 +1,12 @@
 import clr
 import sys
+import os
+import pathlib
 
-assembly_path = r".\dll_files"  # find .dll file
-sys.path.append(assembly_path)
-ref = clr.AddReference(r"Santec_FTDI")
+
+current_directory = os.path.dirname(__file__)
+file_path = current_directory + "\\dll_files/Santec_FTDI"
+ref = clr.AddReference(file_path)
 
 import Santec_FTDI as ftdi
 

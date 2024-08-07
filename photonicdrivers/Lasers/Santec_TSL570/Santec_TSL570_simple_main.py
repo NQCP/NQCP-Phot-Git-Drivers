@@ -10,3 +10,6 @@ from photonicdrivers.Lasers.Santec_TSL570 import Santec_TSL570
 
 laser = Santec_TSL570.Santec_TSL570_driver()
 laser.connect()
+
+wl_now = laser.get_wavelength()
+print(wl_now)

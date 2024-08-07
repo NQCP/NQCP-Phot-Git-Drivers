@@ -1,5 +1,5 @@
 import pyvisa
-from Thorlabs_PM100U import Thorlabs_PM100U
+from Thorlabs_PM import Thorlabs_PM
 
 
 print("hello")
@@ -21,11 +21,11 @@ for idx, resource in enumerate(available_resources, start=1):
 print("hello")
 
 # Open a VISA instrument connection
-powerMeter = Thorlabs_PM100U(rm, 'USB0::0x1313::0x8078::P0041989::INSTR')
+powerMeter = Thorlabs_PM(rm, "USB0::0x1313::0x807A::M01044633::INSTR")
 
 powerMeter.connect()
 print(powerMeter.get_detector_power())
-print(powerMeter.get_detector_wavelength())
+print(powerMeter.get_power_meter_wavelength())
 print(powerMeter.get_units())
 print(powerMeter.get_averaging())
 powerMeter.disconnect()
