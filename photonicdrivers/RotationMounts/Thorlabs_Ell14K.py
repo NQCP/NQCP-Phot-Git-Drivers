@@ -36,12 +36,13 @@ class Thorlabs_ELL14K:
     def __init__(
             self,
             serial_connection, 
-            address: int, # Device address on controller bus.
+            address: str, # Device address on controller bus.
             offset: int, # Software angle offset, in encoder counts.
         ):
         self._conn = serial_connection
         self.address = address
         self._offset = offset
+        self.current_angle = 0
 
     def send(self, command, data=b''):
         """Send the given command type, with the given data payload."""
@@ -83,13 +84,10 @@ class Thorlabs_ELL14K:
 
     def get_angle(self):
         """Return the current angle (CCW)."""
-        return self.angle_unwrapped % 360
+        return self.current_angle % 360
         
     def set_angle(self, degrees):
-        delta = degrees - self.get_angle
-        if delta > 180: delta -= 360
-        if delta < -180: delta += 360
-
+        delta = (degrees - self.get_angle()) % 360 
         self.set_relative_angle(delta)
 
     def set_relative_angle(self, degrees):

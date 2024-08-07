@@ -8,7 +8,7 @@ class iSMA_MAC36:
     def __init__(self, _ip_address, _port=502, _slave_id=1, _debug=False) -> None:
         # _ip_address: IP of the Modbus TCP server
         # _port: port of the Modbus TCP server. Default is 502
-        # _slace_ID: slave ID of the device
+        # _slave_ID: slave ID of the device
         
         print('Inilialisting iSMA_MAC36 class')
         

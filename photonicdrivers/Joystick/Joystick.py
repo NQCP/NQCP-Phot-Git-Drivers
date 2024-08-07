@@ -1,7 +1,5 @@
 import pygame
 
-from photonicdrivers.Instruments.Settings.Console_Controller import Console_Controller
-
 
 class Joystick:
     def __init__(self):
@@ -26,7 +24,7 @@ class Joystick:
             self.joystick.init()
             return True
         else:
-            Console_Controller.print_message("No joystick connected.")
+            print("No joystick connected.")
             return False
 
     def joystick_acquisition(self):
