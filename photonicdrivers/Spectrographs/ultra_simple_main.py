@@ -54,7 +54,6 @@ array_1d = arr  # A 1D array from 0 to 255
 
 time.sleep(5)
 print("TURN OFF LIGHTS")
-background = 
 # Reshape the 1D array to a 2D array with shape (200, 1600)
 image = np.flip(np.flip(np.reshape(array_1d, (200, 1600)), axis=1),axis=0)
 collapse = np.sum(image, axis=0)

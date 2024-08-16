@@ -41,10 +41,13 @@ class Image_Plotter():
 
 class Spectograph_Calibration:
 
-    def __init__(self, degree, pixel_list, wavelength_list) -> None:
-        self.degree = degree
+    def __init__(self, pixel_list, wavelength_list, grating, center_wavelength) -> None:
         self.pixel_list = pixel_list
         self.wavelength_list = wavelength_list
+        self.grating = grating
+        self.center_wavelength = center_wavelength
+        self.fit_function = None
+        self.degree = None
 
     def get_polynomial_degree(self):
         return self.degree
@@ -58,18 +61,29 @@ class Spectograph_Calibration:
     def get_wavelength_list(self):
         return self.wavelength_list
     
-    def plot_calib(pixel_list, wavelength_list):
+    def get_grating(self):
+        return self.grating
+    
+    def get_center_wavelength(self):
+        return self.center_wavelength
+    
+    def set_degree(self, degree):
+        self.degree = degree
+    
+    def fit(self, degree):
+        coefficients = np.polyfit(self.pixel_list, self.wavelength_list, degree)
+        self.fit_function = lambda x: np.polyval(coefficients, x)
+
+    def plot_fit(self):
         plt.figure()
-        plt.scatter(pixel_list, wavelength_list)
+        plt.scatter(self.pixel_list, self.wavelength_list)
         plt.title("calibration plot")
 
         #plt.xlim(x_axis_range)
         plt.xlabel("x axis [pixels]")
         plt.ylabel("y axis [pixels]")
-        coefficients = np.polyfit(pixel_list, wavelength_list, 2)
-        calibration = lambda x: np.polyval(coefficients, x)
-        fit_xaxis = np.linspace(np.min(pixel_list), np.max(pixel_list))
-        plt.plot(fit_xaxis, calibration(fit_xaxis))
+        fit_xaxis = np.linspace(np.min(self.pixel_list), np.max(self.pixel_list))
+        plt.plot(fit_xaxis, self.fit_function(fit_xaxis))
 
 
     
@@ -139,6 +153,10 @@ class Spectrograph_Calibrator():
         time.sleep(5)
         laser.set_wavelength(wavelength_list[0])
         pixel_list = []
+
+        grating = spectrograph.get_grating()
+        center_wavelength = spectrograph.get_center_wavelength()
+
         for wavelength in wavelength_list:
             print("actual wavelength: ",wavelength )
             laser.set_wavelength(wavelength)
@@ -150,7 +168,7 @@ class Spectrograph_Calibrator():
             max_wavelength = x_axis[argmax_ycount]
             print("the peak: ", max_wavelength)
 
-        return pixel_list, wavelength_list
+        return Spectograph_Calibration(2,pixel_list, wavelength_list,grating, center_wavelength)
 
 
 
