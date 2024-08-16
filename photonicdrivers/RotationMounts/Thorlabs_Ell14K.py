@@ -31,7 +31,6 @@ RESPONSES = [
 ]
 
 
-
 class Thorlabs_ELL14K:
     def __init__(
             self,

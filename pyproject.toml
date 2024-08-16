@@ -6,6 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = "photonicdrivers"
 maintainers = [
     { name = "Rasmus Bjerregaard Christensen", email = "rbcmail@gmail.com" },
+    { name = "Magnus Linnet Madsen", email = "magnuslinnetmadsen@gmail.com"},
 ]
 description = "QCoDeS drivers for photonic equipment"
 classifiers = [
