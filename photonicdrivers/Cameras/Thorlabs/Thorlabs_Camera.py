@@ -1,15 +1,14 @@
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-
+from photonicdrivers.Cameras.Thorlabs.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
 class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
 
-    def __init__(self, resource_manager: TLCameraSDK, serial_number: str):
+    def __init__(self, driver: TLCameraSDK, serial_number: str):
         """
         :param resource_manager:
         :param serial_number:
         """
-        self.resource_manager = resource_manager
-        self.camera_driver = None
+        self.sdk = sdk
+        self.driver = driver
         self.serial_number = serial_number
         self.is_connected = False
 
@@ -26,7 +25,7 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
         """
 
         try:
-            camera_serial_list = self.resource_manager.discover_available_cameras()
+            camera_serial_list = self.driver.discover_available_cameras()
 
             if not camera_serial_list:
                 message = "Thorlabs Cameras.connect: No Thorlabs camera found"
@@ -40,7 +39,7 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
                 message = "Thorlabs Cameras.connect: Cameras already connected"
                 raise ConnectionError(message)
 
-            self.camera_driver = self.resource_manager.open_camera(self.serial_number)
+            self.camera_driver = self.driver.open_camera(self.serial_number)
             self.camera_driver.frames_per_trigger_zero_for_unlimited = 0
             self.camera_driver.arm(2)
             self.camera_driver.issue_software_trigger()
@@ -57,7 +56,7 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
         :return: None
         """
         try:
-            camera_serial_list = self.resource_manager.discover_available_cameras()
+            camera_serial_list = self.driver.discover_available_cameras()
 
             if not camera_serial_list:
                 message = "Thorlabs Cameras.disconnect: No Thorlabs camera found"
@@ -182,11 +181,38 @@ class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
         """
         print("Current camera settings: " + str(self.load_settings()))
 
-
-
 if __name__ == "__main__":
-    resource_manager = TLCameraSDK()
-    serial_number = "26925"
-    camera = Thorlabs_Camera(resource_manager, serial_number)
-    camera.connect()
-    camera.disconnect()
+    from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
+    from examples.tkinter_camera_live_view import ImageAcquisitionThread, LiveViewCanvas
+    import tkinter as tk
+
+    with TLCameraSDK() as sdk:
+        camera_list = sdk.discover_available_cameras()
+        print(camera_list)
+        with sdk.open_camera(camera_list[0]) as camera:
+            # create generic Tk App with just a LiveViewCanvas widget
+            print("Generating app...")
+            root = tk.Tk()
+            root.title(camera.name)
+            image_acquisition_thread = ImageAcquisitionThread(camera)
+            camera_widget = LiveViewCanvas(parent=root, image_queue=image_acquisition_thread.get_output_queue())
+
+            print("Setting camera parameters...")
+            camera.frames_per_trigger_zero_for_unlimited = 0
+            camera.arm(2)
+            camera.issue_software_trigger()
+
+            print("Starting image acquisition thread...")
+            image_acquisition_thread.start()
+
+            print("App starting")
+            root.mainloop()
+
+            print("Waiting for image acquisition thread to finish...")
+            image_acquisition_thread.stop()
+            image_acquisition_thread.join()
+
+            print("Closing resources...")
+
+    print("App terminated. Goodbye!")
+

@@ -11,7 +11,6 @@ import queue
 import threading
 
 from PIL import Image
-from photonicdrivers.Controller.Instruments.Settings.Console_Controller import Console_Controller
 
 from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
 from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
@@ -69,7 +68,7 @@ class CameraAcquisitionThread(threading.Thread):
         if (width != self._image_width) or (height != self._image_height):
             self._image_width = width
             self._image_height = height
-            Console_Controller.print_message("Image dimension change detected, image acquisition thread was updated")
+            print("Image dimension change detected, image acquisition thread was updated")
 
         color_image_data = self._mono_to_color_processor.transform_to_24(frame.image_buffer,
                                                                          self._image_width,
@@ -97,7 +96,7 @@ class CameraAcquisitionThread(threading.Thread):
         except Exception as error:
             self.stop()
     def _stop(self):
-        Console_Controller.print_message("Image acquisition has stopped")
+        print("Image acquisition has stopped")
         self._mono_to_color_processor.dispose()
         self._mono_to_color_sdk.dispose()
         self.is_alive = False

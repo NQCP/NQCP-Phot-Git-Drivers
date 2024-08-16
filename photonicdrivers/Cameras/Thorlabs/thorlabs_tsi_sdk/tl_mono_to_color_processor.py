@@ -2,16 +2,16 @@
 tl_mono_to_color_processor.py
 """
 
+from ctypes import cdll, POINTER, c_int, c_ushort, c_void_p, c_char_p, c_float, c_ubyte
+from typing import Any
+from traceback import format_exception
 import logging
 import platform
-from ctypes import cdll, POINTER, c_int, c_ushort, c_void_p, c_char_p, c_float, c_ubyte
-from traceback import format_exception
-from typing import Any
 
 import numpy as np
 
-from .tl_camera_enums import SENSOR_TYPE
 from .tl_color_enums import FORMAT, FILTER_ARRAY_PHASE
+from .tl_camera_enums import SENSOR_TYPE
 from .tl_mono_to_color_enums import COLOR_SPACE
 
 """ Setup logger """

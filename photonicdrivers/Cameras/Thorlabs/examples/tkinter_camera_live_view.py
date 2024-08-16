@@ -1,5 +1,5 @@
 """
-Cameras Live View - TkInter
+Camera Live View - TkInter
 
 This example shows how one could create a live image viewer using TkInter.
 It also uses the third party library 'pillow', which is a fork of PIL.
@@ -11,17 +11,24 @@ This example uses threading to enqueue images coming off the camera in one threa
 dequeue them in the UI thread for quick displaying.
 
 """
+from photonicdrivers.Cameras.Thorlabs.thorlabs_tsi_sdk.tl_camera import TLCameraSDK, TLCamera, Frame
 
-from windows_setup import configure_path
-configure_path()
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK, TLCamera, Frame
-from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
-from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
-import tkinter as tk
+from photonicdrivers.Cameras.Thorlabs.thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
+from photonicdrivers.Cameras.Thorlabs.thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
+
+try:
+    #  For python 2.7 tkinter is named Tkinter
+    import Tkinter as tk
+except ImportError:
+    import tkinter as tk
 from PIL import Image, ImageTk
 import typing
 import threading
-import queue
+try:
+    #  For Python 2.7 queue is named Queue
+    import Queue as queue
+except ImportError:
+    import queue
 
 """ LiveViewCanvas
 
@@ -55,7 +62,7 @@ class LiveViewCanvas(tk.Canvas):
             self.create_image(0, 0, image=self._image, anchor='nw')
         except queue.Empty:
             pass
-        self.after(50, self._get_image)
+        self.after(10, self._get_image)
 
 
 """ ImageAcquisitionThread
@@ -74,34 +81,34 @@ class ImageAcquisitionThread(threading.Thread):
     def __init__(self, camera):
         # type: (TLCamera) -> ImageAcquisitionThread
         super(ImageAcquisitionThread, self).__init__()
-        self.camera_driver = camera
-        self.previous_timestamp = 0
+        self._camera = camera
+        self._previous_timestamp = 0
 
         # setup color processing if necessary
-        if self.camera_driver.camera_sensor_type != SENSOR_TYPE.BAYER:
+        if self._camera.camera_sensor_type != SENSOR_TYPE.BAYER:
             # Sensor type is not compatible with the color processing library
-            self.is_color = False
+            self._is_color = False
         else:
             self._mono_to_color_sdk = MonoToColorProcessorSDK()
-            self._image_width = self.camera_driver.image_width_pixels
-            self._image_height = self.camera_driver.image_height_pixels
+            self._image_width = self._camera.image_width_pixels
+            self._image_height = self._camera.image_height_pixels
             self._mono_to_color_processor = self._mono_to_color_sdk.create_mono_to_color_processor(
                 SENSOR_TYPE.BAYER,
-                self.camera_driver.color_filter_array_phase,
-                self.camera_driver.get_color_correction_matrix(),
-                self.camera_driver.get_default_white_balance_matrix(),
-                self.camera_driver.bit_depth
+                self._camera.color_filter_array_phase,
+                self._camera.get_color_correction_matrix(),
+                self._camera.get_default_white_balance_matrix(),
+                self._camera.bit_depth
             )
-            self.is_color = True
+            self._is_color = True
 
         self._bit_depth = camera.bit_depth
-        self.camera_driver.image_poll_timeout_ms = 0  # Do not want to block for long periods of time
-        self.image_queue = queue.Queue(maxsize=2)
-        self.stop_event = threading.Event()
+        self._camera.image_poll_timeout_ms = 0  # Do not want to block for long periods of time
+        self._image_queue = queue.Queue(maxsize=2)
+        self._stop_event = threading.Event()
 
     def get_output_queue(self):
         # type: (type(None)) -> queue.Queue
-        return self.image_queue
+        return self._image_queue
 
     def stop(self):
         self._stop_event.set()
@@ -150,38 +157,3 @@ class ImageAcquisitionThread(threading.Thread):
             self._mono_to_color_processor.dispose()
             self._mono_to_color_sdk.dispose()
 
-
-""" Main
-
-When run as a script, a simple Tkinter app is created with just a LiveViewCanvas widget. 
-
-"""
-if __name__ == "__main__":
-    with TLCameraSDK() as sdk:
-        camera_list = sdk.discover_available_cameras()
-        with sdk.open_camera(camera_list[0]) as camera:
-            # create generic Tk App with just a LiveViewCanvas widget
-            print("Generating app...")
-            root = tk.Tk()
-            root.title(camera.name)
-            image_acquisition_thread = ImageAcquisitionThread(camera)
-            camera_widget = LiveViewCanvas(parent=root, image_queue=image_acquisition_thread.get_output_queue())
-
-            print("Setting camera parameters...")
-            camera.frames_per_trigger_zero_for_unlimited = 0
-            camera.arm(2)
-            camera.issue_software_trigger()
-
-            print("Starting image acquisition thread...")
-            image_acquisition_thread.start()
-
-            print("App starting")
-            root.mainloop()
-
-            print("Waiting for image acquisition thread to finish...")
-            image_acquisition_thread.stop()
-            image_acquisition_thread.join()
-
-            print("Closing resources...")
-
-    print("App terminated. Goodbye!")

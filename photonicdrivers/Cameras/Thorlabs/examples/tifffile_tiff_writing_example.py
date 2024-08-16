@@ -24,11 +24,11 @@ except ImportError:
     configure_path = None
 
 import os
-
 import tifffile
+
 from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
-from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
 from thorlabs_tsi_sdk.tl_mono_to_color_processor import MonoToColorProcessorSDK
+from thorlabs_tsi_sdk.tl_camera_enums import SENSOR_TYPE
 
 NUMBER_OF_IMAGES = 10  # Number of TIFF images to be saved
 OUTPUT_DIRECTORY = os.path.abspath(r'.')  # Directory the TIFFs will be saved to

@@ -14,7 +14,7 @@ except ImportError:
     configure_path = None
 
 import numpy as np
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
+from thorlabs_tsi_sdk.tl_camera import TLCameraSDK, OPERATION_MODE
 
 NUM_FRAMES = 10  # adjust to the desired number of frames
 

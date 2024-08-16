@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 import socket
 from photonicdrivers.Server.Server import *
 
+# To use this driver the software Kinesis from Thorlabs must be installed to match the following
+# Also consider attaching the path to settings.JSON file to access the code
 clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.DeviceManagerCLI.dll")
 clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\Thorlabs.MotionControl.GenericMotorCLI.dll")
 clr.AddReference("C:\\Program Files\\Thorlabs\\Kinesis\\ThorLabs.MotionControl.PolarizerCLI.dll")
