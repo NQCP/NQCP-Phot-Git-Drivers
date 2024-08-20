@@ -91,7 +91,7 @@ class Thorlabs_PM100D_driver():
 
     def get_detector_power(self) -> float:
         """Get a power measurement"""
-        msg = ':READ?'
+        msg = 'MEAS:POW?'
         self._write(msg)
         return float(self._read())
 

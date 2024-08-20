@@ -21,7 +21,7 @@ for idx, resource in enumerate(available_resources, start=1):
 print("hello")
 
 # Open a VISA instrument connection
-powerMeter = Thorlabs_PM100D_driver(rm, "USB0::0x1313::0x807A::M01044633::INSTR")
+powerMeter = Thorlabs_PM100D_driver("USB0::0x1313::0x807A::M01044633::INSTR")
 
 powerMeter.connect()
 print(powerMeter.get_detector_power())
