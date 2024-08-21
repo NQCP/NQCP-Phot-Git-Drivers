@@ -8,11 +8,11 @@ Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM
 Supported units: {'W', 'mW', 'dBm'}
 """
 
-class Thorlabs_PM():
+class Thorlabs_PM100D_driver():
 
-    def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
+    def __init__(self, port: str) -> None:
         """Connect to and reset Thorlabs PM101USB"""        
-        self.resource_manager = resource_manager
+        self.resource_manager = pyvisa.ResourceManager()
         self.port = port
         self.powerMeter = None
         
@@ -91,7 +91,7 @@ class Thorlabs_PM():
 
     def get_detector_power(self) -> float:
         """Get a power measurement"""
-        msg = ':READ?'
+        msg = 'MEAS:POW?'
         self._write(msg)
         return float(self._read())
 

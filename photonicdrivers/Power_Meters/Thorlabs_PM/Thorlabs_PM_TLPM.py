@@ -9,14 +9,13 @@ sys.path.extend(glob.glob(f'{pathlib.Path(__file__).parents[0].resolve()}/*/**/'
 import pythonnet
 import clr
 clr.AddReference('System')
-from System import String, Char, Int32, IntPtr,Text, UInt32
 
 from copy import deepcopy
 from win32api import GetFileVersionInfo, LOWORD, HIWORD
 
 import time
 
-class ThorlabsPowerMeter():
+class Thorlabs_PowerMeter():
     
     defaultPath:str=os.path.join(os.path.join(os.path.dirname(__file__),'Thorlabs_DotNet_dll'),'')
     defaultName:str='Thorlabs.TLPM_64.Interop'

@@ -31,7 +31,6 @@ RESPONSES = [
 ]
 
 
-
 class Thorlabs_ELL14K:
     def __init__(
             self,
@@ -85,8 +84,11 @@ class Thorlabs_ELL14K:
     def get_angle(self):
         """Return the current angle (CCW)."""
         return self.current_angle % 360
-        
+    
     def set_angle(self, degrees):
+        self.set_relative_angle(degrees)
+        
+    def set_angle_2(self, degrees):
         delta = (degrees - self.get_angle()) % 360 
         self.set_relative_angle(delta)
 

@@ -19,8 +19,7 @@ class Andor_Kymera():
     
     def set_grating(self, grating):
         #1 broader, 2 narrower
-        (message, grating) = self.spectrograph.SetGrating(self.device_index)
-        return grating
+        (message, grating) = self.spectrograph.SetGrating(self.device_index, grating)
 
     def get_wavelength_range(self):
         (message, min_wavelength, max_wavelength) = self.spectrograph.GetWavelengthLimits(self.device_index, self.get_grating())

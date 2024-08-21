@@ -1,11 +1,13 @@
 from Andor_Newton import Andor_Newton
 from Andor_Kymera import Andor_Kymera
 import matplotlib.pyplot as plt
-from photonicdrivers.utils.Range import Range
 import numpy as np
 from instruments.Implementations.Toptica_CTL950 import Toptica_CTL950
 from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro import Toptica_DLC_PRO_driver
 import time
+import datetime    
+import os
+from configparser import ConfigParser
 
 class Andor_Spectrograph():
 
@@ -41,16 +43,16 @@ class Image_Plotter():
 
 class Spectograph_Calibration:
 
-    def __init__(self, degree, pixel_list, wavelength_list) -> None:
-        self.degree = degree
+    def __init__(self, pixel_list, wavelength_list, grating, center_wavelength, degree) -> None:
         self.pixel_list = pixel_list
         self.wavelength_list = wavelength_list
+        self.grating = grating
+        self.center_wavelength = center_wavelength
+        self.fit_function = None
+        self.degree = 2
 
     def get_polynomial_degree(self):
         return self.degree
-    
-    def get_calibration(self):
-        return self.calibration
     
     def get_pixel_list(self):
         return self.pixel_list
@@ -58,35 +60,49 @@ class Spectograph_Calibration:
     def get_wavelength_list(self):
         return self.wavelength_list
     
-    def plot_calib(pixel_list, wavelength_list):
+    def get_grating(self):
+        return self.grating
+    
+    def get_center_wavelength(self):
+        return self.center_wavelength
+    
+    def set_degree(self, degree):
+        self.degree = degree
+    
+    def fit(self, degree):
+        coefficients = np.polyfit(self.pixel_list, self.wavelength_list, degree)
+        self.fit_function = lambda x: np.polyval(coefficients, x)
+
+    def plot_fit(self):
         plt.figure()
-        plt.scatter(pixel_list, wavelength_list)
+        plt.scatter(self.pixel_list, self.wavelength_list)
         plt.title("calibration plot")
 
         #plt.xlim(x_axis_range)
         plt.xlabel("x axis [pixels]")
         plt.ylabel("y axis [pixels]")
-        coefficients = np.polyfit(pixel_list, wavelength_list, 2)
-        calibration = lambda x: np.polyval(coefficients, x)
-        fit_xaxis = np.linspace(np.min(pixel_list), np.max(pixel_list))
-        plt.plot(fit_xaxis, calibration(fit_xaxis))
+        fit_xaxis = np.linspace(np.min(self.pixel_list), np.max(self.pixel_list))
+        plt.plot(fit_xaxis, self.fit_function(fit_xaxis))
 
 
     
-import configparser
+from configparser import RawConfigParser
+config = ConfigParser()
 
 class Spectrograph_Calibration_Loader():
 
-    def load_calibration(path):
+    def load_calibration(self, path):
         # Create a ConfigParser object
-        config = configparser.ConfigParser()
+        config = ConfigParser()
 
         # Open and read the .cfg file
         config.read(path)
 
         # Accessing the values
-        calibration_polynomial_degree = int(config.get('Manual X-Calibration', 'Type'))
+        degree = int(config.get('Manual X-Calibration', 'Type'))
         number_of_points = int(config.get('Manual X-Calibration', 'Number'))
+        center_wavelength = float(config.get('Manual X-Calibration', 'Center_Wavelength'))
+        grating = int(config.get('Manual X-Calibration', 'Grating'))
 
         # Initialize empty lists for x and y coordinates
         pixel_list = []
@@ -100,30 +116,31 @@ class Spectrograph_Calibration_Loader():
             wavelength_list.append(y)
 
         # Perform a polynomial fit (degree 1 for linear, 2 for quadratic, etc.)
-        coefficients = np.polyfit(pixel_list, wavelength_list, calibration_polynomial_degree)
+        coefficients = np.polyfit(pixel_list, wavelength_list, degree)
         
         # Create a lambda function that represents the polynomial
         calibration = lambda x: np.polyval(coefficients, x)
-        return Spectograph_Calibration(calibration_polynomial_degree, calibration, pixel_list, wavelength_list)
+        return Spectograph_Calibration(pixel_list, wavelength_list, grating, center_wavelength, degree)
     
-    def save_calibration(path, calibration: Spectograph_Calibration):
-        # Create a ConfigParser object
-        config = configparser.ConfigParser()
+    def save_calibration(self, path, calibration):
+        # Ensure the path ends with .cfg
+        if not path.endswith('.cfg'):
+            path += '.cfg'
 
-        # Add a section for manual X-Calibration
-        config.add_section('Manual X-Calibration')
+        # Ensure the directory exists
+        directory = os.path.dirname(path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
 
-        # Save the polynomial degree (Type) and number of points (Number)
-        config.set('Manual X-Calibration', 'Type', str(calibration.get_polynomial_degree()))
-        config.set('Manual X-Calibration', 'Number', str(len(calibration.get_pixel_list())))
-
-        # Save each point as 'Point1', 'Point2', etc.
-        for i, (x, y) in enumerate(zip(calibration.get_pixel_list(), calibration.get_wavelength_list()), start=1):
-            config.set('Manual X-Calibration', f'Point{i}', f'{x},{y}')
-
-        # Write the config to the specified path
-        with open(path, 'w') as configfile:
-            config.write(configfile)
+        # Manually write the configuration data to the file
+        with open(path, 'w') as file:
+            file.write('[Manual X-Calibration]\n')
+            file.write(f'Type={calibration.get_polynomial_degree()}\n')
+            file.write(f'Center_Wavelength={calibration.get_center_wavelength()}\n')
+            file.write(f'Grating={calibration.get_grating()}\n')
+            file.write(f'Number={len(calibration.get_pixel_list())}\n')
+            for i, (x, y) in enumerate(zip(calibration.get_pixel_list(), calibration.get_wavelength_list()), start=1):
+                file.write(f'Point{i}={x},{y}\n')
 
         print(f"Calibration data saved to {path}")
 
@@ -132,13 +149,17 @@ class Spectrograph_Calibrator():
     def __init__(self) -> None:
         pass
 
-    def calibrate(self, laser: Toptica_CTL950, spectrograph: Andor_Kymera, camera: Andor_Newton):
+    def calibrate(self, laser: Toptica_CTL950, spectrograph: Andor_Kymera, camera: Andor_Newton, lower_limit, higher_limit, steps):
         # Connect to Toptica Laser
                     
-        wavelength_list = np.arange(910, 981, 10)
+        wavelength_list = np.arange(lower_limit, higher_limit, steps)
         time.sleep(5)
         laser.set_wavelength(wavelength_list[0])
         pixel_list = []
+
+        grating = spectrograph.get_grating()
+        center_wavelength = spectrograph.get_center_wavelength()
+
         for wavelength in wavelength_list:
             print("actual wavelength: ",wavelength )
             laser.set_wavelength(wavelength)
@@ -150,7 +171,7 @@ class Spectrograph_Calibrator():
             max_wavelength = x_axis[argmax_ycount]
             print("the peak: ", max_wavelength)
 
-        return pixel_list, wavelength_list
+        return Spectograph_Calibration(pixel_list, wavelength_list,grating, center_wavelength, 2)
 
 
 
@@ -178,19 +199,30 @@ if __name__ == "__main__":
     center_wavelength = spectrograph.get_center_wavelength()
     print("center_wavelength: ", center_wavelength)
 
-    wavelength_range = spectrograph.get_wavelength_range()
-    print("wavelength_range: ", wavelength_range)
-
-    spectrograph.set_grating(1)
+    #spectrograph.set_grating(1)
 
     grating = spectrograph.get_grating()
     print("grating used: ", grating)
 
-    #andor_spectrograph: Andor_Spectrograph = Andor_Spectrograph(spectrograph=spectrograph,camera=camera)
-    #calibrator = Spectrograph_Calibrator()
-    #pixel_list, wavelength_list = calibrator.calibrate(laser, spectrograph, camera)
-    #Spectograph_Calibration.plot_calib(pixel_list, wavelength_list)
+    andor_spectrograph: Andor_Spectrograph = Andor_Spectrograph(spectrograph=spectrograph,camera=camera)
+    calibrator = Spectrograph_Calibrator()
 
+    calibration = calibrator.calibrate(laser, spectrograph, camera, 910, 981, 5)
+    calibration.fit(2)
+    calibration.plot_fit()
+    loader = Spectrograph_Calibration_Loader()
+
+
+    now = datetime.datetime.now()
+    formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")    # Format the date and time as a string
+
+    # Define the path using the formatted date and time
+    path = "N:\\SCI-NBI-NQCP\\Phot\\byHardware\\Spectrograph\\Calibration\\" + formatted_time + ".cfg" 
+
+    loader.save_calibration(path, calibration)
+    calibration_loaded = loader.load_calibration(path)
+    calibration.fit(2)
+    calibration.plot_fit()
 
     plt.show()
 

@@ -6,6 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = "photonicdrivers"
 maintainers = [
     { name = "Rasmus Bjerregaard Christensen", email = "rbcmail@gmail.com" },
+    { name = "Magnus Linnet Madsen", email = "magnuslinnetmadsen@gmail.com"},
 ]
 description = "QCoDeS drivers for photonic equipment"
 classifiers = [
@@ -20,7 +21,7 @@ classifiers = [
 ]
 license = { text = "MIT" }
 requires-python = ">=3.9"
-dependencies = ["numpy", "qcodes", "versioningit~=2.0.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus"]
+dependencies = ["numpy", "qcodes", "versioningit~=2.0.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "tlpm"]
 
 dynamic = ["version"]
 
