@@ -1,6 +1,7 @@
 
 import pyvisa
 import numpy as np
+from abc import abstractmethod, ABC
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -42,15 +43,8 @@ class Thorlabs_Power_Meter_Driver(ABC):
     def get_wavelength(self):
         pass
 
-    @abstractmethod
-    def get_averaging(self):
-        pass
 
-    @abstractmethod
-    def set_averaging(self):
-        pass
 
-    
 
 
 class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
