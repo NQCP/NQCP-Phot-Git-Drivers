@@ -13,5 +13,3 @@ polarization_controller.set_position_0(40)
 polarization_controller.set_position_1(20)
 polarization_controller.set_position_2(160)
 polarization_controller.disconnect()
-
-from 

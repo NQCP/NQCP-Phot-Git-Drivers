@@ -8,8 +8,8 @@ import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
 from photonicdrivers.utils.Range import Range
-sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
 sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
+sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
 from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
 codes = atmcd_codes
 

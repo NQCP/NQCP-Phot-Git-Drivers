@@ -8,7 +8,52 @@ Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM
 Supported units: {'W', 'mW', 'dBm'}
 """
 
-class Thorlabs_PM100D_driver():
+class Thorlabs_Power_Meter_Driver(ABC):
+
+    @abstractmethod
+    def connect(self):
+        """
+        Establishes a connection to the power meter.
+
+        Raises:
+            NotImplementedError: This method must be overridden in a subclass.
+        """
+        pass
+
+    @abstractmethod
+    def disconnect(self):
+        """
+        Disconnects from the power meter.
+
+        Raises:
+            NotImplementedError: This method must be overridden in a subclass.
+        """
+        pass
+
+    @abstractmethod
+    def get_detector_power(self):
+        pass
+
+    @abstractmethod
+    def set_wavelength(self):
+        pass
+
+    @abstractmethod
+    def get_wavelength(self):
+        pass
+
+    @abstractmethod
+    def get_averaging(self):
+        pass
+
+    @abstractmethod
+    def set_averaging(self):
+        pass
+
+    
+
+
+class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
 
     def __init__(self, port: str) -> None:
         """Connect to and reset Thorlabs PM101USB"""        

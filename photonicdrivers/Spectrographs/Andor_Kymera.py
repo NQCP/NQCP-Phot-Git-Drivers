@@ -2,6 +2,7 @@ import sys
 import time
 from pyAndorSpectrograph.spectrograph import ATSpectrograph
 from photonicdrivers.utils.Range import Range
+sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
 sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
 
 class Andor_Kymera():
