@@ -22,6 +22,7 @@ class Thorlabs_PM103E_driver():
         """Connect to and reset Thorlabs PM101USB"""     
         self.port = port 
         self.power_meter = None
+        self.is_connected = False
         
 
 #################################### HIGH LEVEL METHODS ###########################################
@@ -47,15 +48,17 @@ class Thorlabs_PM103E_driver():
         """
         Opens the connections to the Thorlabs detector
         """
-
-        self.power_meter = AnyVisa.TL_Open(self.port)
-        self.power_meter.open()
-        self.power_meter.write("CONF:POW")
+        if self.is_connected is False:
+            self.power_meter = AnyVisa.TL_Open(self.port)
+            self.power_meter.open()
+            self.power_meter.write("CONF:POW")
+            self.is_connected = True
 
     def disconnect(self) -> None:
         """
         Closes the connections to the Thorlabs detector
         """
+
         self.power_meter.close()
 
     def is_alive(self) -> bool:
