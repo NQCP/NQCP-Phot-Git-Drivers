@@ -548,6 +548,7 @@ class WebSQControl(object):
     def get_temperature_stage_1(self):
         """ Gets the cryo temperature of the first stage (warmer, ~40k)"""
         t, T, T2, _, _, _ = self.get_cryo_temperature()
+        print(T)
         # print('Cryo temp stage 2: time = {}, T = {}.Length={}'.format(t[-1], T2[-1], len(T2)))
         return t, T2
 
