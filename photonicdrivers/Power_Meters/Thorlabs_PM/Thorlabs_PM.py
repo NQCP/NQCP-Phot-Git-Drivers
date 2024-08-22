@@ -1,5 +1,6 @@
 import pyvisa
 import numpy as np
+from abc import ABC, abstractmethod
 
 """
 Class for interfacing with Thorlab powermeters.
