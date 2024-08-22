@@ -1,48 +1,13 @@
 import pyvisa
 import numpy as np
 from abc import abstractmethod, ABC
+from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM100USB')
 Supported units: {'W', 'mW', 'dBm'}
 """
-
-class Thorlabs_Power_Meter_Driver(ABC):
-
-    @abstractmethod
-    def connect(self):
-        """
-        Establishes a connection to the power meter.
-
-        Raises:
-            NotImplementedError: This method must be overridden in a subclass.
-        """
-        pass
-
-    @abstractmethod
-    def disconnect(self):
-        """
-        Disconnects from the power meter.
-
-        Raises:
-            NotImplementedError: This method must be overridden in a subclass.
-        """
-        pass
-
-    @abstractmethod
-    def get_detector_power(self):
-        pass
-
-    @abstractmethod
-    def set_wavelength(self):
-        pass
-
-    @abstractmethod
-    def get_wavelength(self):
-        pass
-
-
 
 
 
