@@ -33,3 +33,11 @@ class Thorlabs_Power_Meter_Driver(ABC):
     @abstractmethod
     def get_wavelength(self):
         pass
+
+    @abstractmethod
+    def set_averaging(self):
+        pass
+
+    @abstractmethod
+    def get_averaging(self):
+        pass

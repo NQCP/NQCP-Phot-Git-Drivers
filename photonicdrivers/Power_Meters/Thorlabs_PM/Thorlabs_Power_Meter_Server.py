@@ -1,5 +1,5 @@
 import socket
-from Thorlabs_PM import Thorlabs_Power_Meter_Driver
+from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 from threading import Thread
 
 class Thorlabs_Power_Meter_Server():
@@ -83,14 +83,12 @@ class Thorlabs_Power_Meter_Server():
         """
         if request == 'CONNECT':
             try:
-                self.driver.connect()
                 response = 'SUCCESS'
             except Exception as error:
                 response = 'UNSUCCESFUL'
 
         elif request == 'DISCONNECT':
             try:
-                self.driver.disconnect()
                 response = 'SUCCESS'
             except Exception as error:
                 response = 'UNSUCCESFUL'
@@ -103,6 +101,17 @@ class Thorlabs_Power_Meter_Server():
         elif request == 'GET_WAVELENGTH':
             try:
                 response = str(self.driver.get_wavelength())
+            except Exception as error:
+                response = 'UNSUCCESFUL'
+
+        elif request.startswith('SET_AVERAGING'):
+            _, averaging = request.split()
+            self.driver.set_averaging(float(averaging))
+            response = f"AVERAGING set to {averaging}"
+
+        elif request == 'GET_AVERAGING':
+            try:
+                response = str(self.driver.get_averaging())
             except Exception as error:
                 response = 'UNSUCCESFUL'
 
@@ -165,4 +174,10 @@ if __name__ == "__main__":
     thread = Thread(target=server.start)
     thread.start()
 
+
+    driver_2 = Thorlabs_PM103E_driver("TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR")
+    driver_2.connect()
+    server_2 = Thorlabs_Power_Meter_Server(driver=driver_2, host_ip='10.209.67.42', port=12501)
+    thread_2 = Thread(target=server_2.start)
+    thread_2.start()
 
