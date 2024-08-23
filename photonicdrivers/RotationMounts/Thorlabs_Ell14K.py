@@ -40,7 +40,7 @@ class Thorlabs_ELL14K:
         ):
         self._conn = serial_connection
         self.address = address
-        self._offset = offset
+        self.offset = offset
         self.current_angle = 0
 
     def send(self, command, data=b''):
@@ -79,23 +79,26 @@ class Thorlabs_ELL14K:
 
     def tare(self):
         """Mark the current position as 0° in software."""
-        self._offset = -self._position
+        self.offset = 0
 
     def get_angle(self):
         """Return the current angle (CCW)."""
         return self.current_angle % 360
     
-    def set_angle(self, degrees):
-        self.set_relative_angle(degrees)
-        
-    def set_angle_2(self, degrees):
-        delta = (degrees - self.get_angle()) % 360 
-        self.set_relative_angle(delta)
+    def set_angle(self):
+        pass
+    
 
-    def set_relative_angle(self, degrees):
-        """Move by the given number of degrees, counterclockwise."""
-        delta = -round(degrees * COUNTS_PER_REVOLUTION/360)
-        data = to_twos_complement(delta).to_bytes(4, 'big')
-        header, response = self.query('mr', data=data)
-        assert header in ['GS', 'PO']
-        if header == 'GS': raise ValueError(RESPONSES[response])
+
+
+if __name__ == "__main__":
+    from serial import Serial
+    port = "COM8"
+    connection = Serial(port=port, baudrate=9600, stopbits=1, parity='N', timeout=0.05)
+    rotation_mount_quarter = Thorlabs_ELL14K(serial_connection=connection, offset=0, address="A")
+    rotation_mount_half = Thorlabs_ELL14K(serial_connection=connection, offset=0, address="B")
+    rotation_mount_quarter.home()
+    
+    connection.close_connection()
+
+

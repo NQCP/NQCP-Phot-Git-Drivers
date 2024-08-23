@@ -10,7 +10,7 @@ ttNetwork = TimeTagger.createTimeTaggerNetwork('10.209.67.193:41101')
 print("hello")
 binwidth_ps = int(1e9)
 
-counter = TimeTagger.Counter(tagger=ttNetwork, channels=[1, 2], binwidth=binwidth_ps, n_values=1000)
+counter = TimeTagger.Counter(tagger=ttNetwork, channels=[6, 7], binwidth=binwidth_ps, n_values=1000)
 
 # Apply the built-in test signal (~0.8 to 0.9 MHz) to channel 1
 ttNetwork.setTestSignal(1, True)

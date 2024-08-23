@@ -1,6 +1,6 @@
 import pyvisa
 import numpy as np
-from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -76,6 +76,11 @@ class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
         self._write(msg)
 
     def set_detector_wavelength(self, wavelength_nm: float):
+        """Set the wavelength in nm"""
+        msg = ':SENS:CORR:WAV ' + str(wavelength_nm)
+        self._write(msg)
+
+    def set_power_meter_wavelength(self, wavelength_nm: float):
         """Set the wavelength in nm"""
         msg = ':SENS:CORR:WAV ' + str(wavelength_nm)
         self._write(msg)

@@ -1,5 +1,6 @@
 
 from abc import abstractmethod, ABC
+
 class Thorlabs_Power_Meter_Driver(ABC):
 
     @abstractmethod
@@ -27,15 +28,15 @@ class Thorlabs_Power_Meter_Driver(ABC):
         pass
 
     @abstractmethod
-    def set_wavelength(self):
+    def set_power_meter_wavelength(self, wavelength_nm: float):
         pass
 
     @abstractmethod
-    def get_wavelength(self):
+    def get_power_meter_wavelength(self):
         pass
 
     @abstractmethod
-    def set_averaging(self):
+    def set_averaging(self, average: int):
         pass
 
     @abstractmethod
