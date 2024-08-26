@@ -170,14 +170,6 @@ if __name__ == "__main__":
 
     driver = Thorlabs_PM103E_driver("TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR")
     driver.connect()
-    server = Thorlabs_Power_Meter_Server(driver=driver, host_ip='10.209.67.42', port=12500)
+    server = Thorlabs_Power_Meter_Server(driver=driver, host_ip='10.209.67.42', port=12501)
     thread = Thread(target=server.start)
     thread.start()
-
-
-    driver_2 = Thorlabs_PM103E_driver("TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR")
-    driver_2.connect()
-    server_2 = Thorlabs_Power_Meter_Server(driver=driver_2, host_ip='10.209.67.42', port=12501)
-    thread_2 = Thread(target=server_2.start)
-    thread_2.start()
-
