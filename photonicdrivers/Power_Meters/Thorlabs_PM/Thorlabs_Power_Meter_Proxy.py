@@ -1,5 +1,5 @@
 
-from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 import socket 
 
 class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
@@ -93,7 +93,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         return response
 
 
-    def set_wavelength(self, wavelength: float):
+    def set_power_meter_wavelength(self, wavelength: float):
         """
         Sends a request to the server to set the wavelength of the power meter
         Args:
@@ -123,7 +123,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         response = self.send_request(request)
         print(f"Set averaging response: {response}")
 
-    def get_wavelength(self):
+    def get_power_meter_wavelength(self):
         """
         Sends a request to the server to get the wavelength set of the power meter.
         """

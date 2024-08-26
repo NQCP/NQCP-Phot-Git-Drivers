@@ -78,6 +78,11 @@ class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
         msg = ':SENS:CORR:WAV ' + str(wavelength_nm)
         self._write(msg)
 
+    def set_power_meter_wavelength(self, wavelength_nm: float):
+        """Set the wavelength in nm"""
+        msg = ':SENS:CORR:WAV ' + str(wavelength_nm)
+        self._write(msg)
+
     def set_units(self, unit: str) -> None:
         """Set the units to W or dBm"""
         msg = ':SENS:POW:UNIT ' + unit
