@@ -1,14 +1,12 @@
 import pyvisa
 import numpy as np
-from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM100USB')
 Supported units: {'W', 'mW', 'dBm'}
 """
-
-
 
 class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
 

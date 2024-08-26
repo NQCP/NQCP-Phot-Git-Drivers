@@ -133,8 +133,8 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         return response
 
 if __name__ == "__main__": 
-    proxy_1 = Thorlabs_Power_Meter_Proxy(host_ip_address = '10.209.67.42', host_port=12500)
-    proxy_2 = Thorlabs_Power_Meter_Proxy(host_ip_address = '10.209.67.42', host_port=12501)
+    proxy_1 = Thorlabs_Power_Meter_Proxy(host_ip_address = '10.209.67.42', host_port=12501)
+    proxy_2 = Thorlabs_Power_Meter_Proxy(host_ip_address = '10.209.67.42', host_port=12502)
 
     proxy_1.connect()
     print(proxy_1.get_detector_power())

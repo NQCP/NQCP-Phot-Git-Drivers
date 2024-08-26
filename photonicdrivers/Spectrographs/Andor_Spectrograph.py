@@ -8,6 +8,8 @@ import time
 import datetime    
 import os
 from configparser import ConfigParser
+from mpl_toolkits.mplot3d import Axes3D
+from itertools import product
 
 class Andor_Spectrograph():
 
@@ -43,7 +45,7 @@ class Image_Plotter():
 
 class Spectograph_Calibration:
 
-    def __init__(self, pixel_list, wavelength_list, grating, center_wavelength, degree, center_wavelength_list) -> None:
+    def __init__(self, pixel_list, wavelength_list, grating, center_wavelength, degree, center_wavelength_list, fit_coeff) -> None:
         self.pixel_list = pixel_list
         self.wavelength_list = wavelength_list
         self.grating = grating
@@ -51,6 +53,7 @@ class Spectograph_Calibration:
         self.fit_function = None
         self.degree = 2
         self.center_wavelength_list = center_wavelength_list
+        self.fit_coeff = fit_coeff
 
     def get_polynomial_degree(self):
         return self.degree
@@ -72,6 +75,9 @@ class Spectograph_Calibration:
     
     def set_degree(self, degree):
         self.degree = degree
+
+    def get_fit_coeff(self):
+        return self.fit_coeff
     
     def fit(self, degree):
         coefficients = np.polyfit(self.pixel_list, self.wavelength_list, degree)
@@ -88,65 +94,109 @@ class Spectograph_Calibration:
         fit_xaxis = np.linspace(np.min(self.pixel_list), np.max(self.pixel_list))
         plt.plot(fit_xaxis, self.fit_function(fit_xaxis))
 
-    def polyfit2d(x, y, z, kx=3, ky=3, order=None):
-        # '''
-        # https://stackoverflow.com/questions/33964913/equivalent-of-polyfit-for-a-2d-polynomial-in-python
-        # Two dimensional polynomial fitting by least squares.
-        # Fits the functional form f(x,y) = z.
 
-        # Notes
-        # -----
-        # Resultant fit can be plotted with:
-        # np.polynomial.polynomial.polygrid2d(x, y, soln.reshape((kx+1, ky+1)))
 
-        # Parameters
-        # ----------
-        # x, y: array-like, 1d
-        #     x and y coordinates.
-        # z: np.ndarray, 2d
-        #     Surface to fit.
-        # kx, ky: int, default is 3
-        #     Polynomial order in x and y, respectively.
-        # order: int or None, default is None
-        #     If None, all coefficients up to maxiumum kx, ky, ie. up to and including x^kx*y^ky, are considered.
-        #     If int, coefficients up to a maximum of kx+ky <= order are considered.
+#-#-#-#-#-#-#-# 2 D FIT #-#-#-#-#-#-#-#
+def create_design_matrix(x, y, degree):
+    """Creates a design matrix for polynomial fitting up to a given degree."""
+    columns = []
+    for i, j in product(range(degree + 1), repeat=2):
+        if i + j <= degree:
+            columns.append((x ** i) * (y ** j))
+    return np.vstack(columns).T
 
-        # Returns
-        # -------
-        # Return paramters from np.linalg.lstsq.
+# Function to fit a polynomial and calculate coefficients
+def fit_polynomial(x, y, z, degree):
+    """Fits a polynomial to the data and returns the coefficients and covariance matrix."""
+    x_flat = x.flatten()
+    y_flat = y.flatten()
+    z_flat = z.flatten()
 
-        # soln: np.ndarray
-        #     Array of polynomial coefficients.
-        # residuals: np.ndarray
-        # rank: int
-        # s: np.ndarray
+    A = create_design_matrix(x_flat, y_flat, degree)
+    coefficients, residuals, rank, singular_values = np.linalg.lstsq(A, z_flat, rcond=None)
 
-        # '''
+    # Calculate residual variance and covariance matrix
+    residuals = z_flat - (A @ coefficients)
+    residual_variance = np.sum(residuals ** 2) / (len(z_flat) - len(coefficients))
+    covariance_matrix = residual_variance * np.linalg.inv(A.T @ A)
 
-        # grid coords
-        x, y = np.meshgrid(x, y)
-        # coefficient array, up to x^kx, y^ky
-        coeffs = np.ones((kx+1, ky+1))
+    return coefficients, covariance_matrix
 
-        # solve array
-        a = np.zeros((coeffs.size, x.size))
+# Function to calculate the prediction variance
+def calculate_prediction_variance(x, y, covariance_matrix, degree):
+    """Calculates the prediction variance for given x, y based on the covariance matrix."""
+    x_flat = x.flatten()
+    y_flat = y.flatten()
+    A_pred = create_design_matrix(x_flat, y_flat, degree)
+    variance = np.sum(A_pred @ covariance_matrix * A_pred, axis=1)
+    return variance
 
-        # for each coefficient produce array x^i, y^j
-        for index, (j, i) in enumerate(np.ndindex(coeffs.shape)):
-            # do not include powers greater than order
-            if order is not None and i + j > order:
-                arr = np.zeros_like(x)
-            else:
-                arr = coeffs[i, j] * x**i * y**j
-            a[index] = arr.ravel()
+# Function to plot the results
+def plot_results(x, y, z, x_grid, y_grid, z_fitted, z_true, z_upper, z_lower):
+    """Plots the noisy data, true surface, fitted surface, and confidence intervals."""
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-        # do leastsq fitting and return leastsq result
-        return np.linalg.lstsq(a.T, np.ravel(z), rcond=None)
+    # Plot the data points
+    ax.scatter(x.flatten(), y.flatten(), z.flatten(), color='r', label='Data')
 
-    # def poly2Dreco(X, Y, c):
-    # return (c[0] + X*c[1] + Y*c[2] + X**2*c[3] + X**2*Y*c[4] + X**2*Y**2*c[5] + 
-    #        Y**2*c[6] + X*Y**2*c[7] + X*Y*c[8])
+    # Plot the true surface
+    ax.plot_surface(x_grid, y_grid, z_true, color='g', alpha=0.5, label='True Polynomial Surface')
 
+    # Plot the fitted surface
+    ax.plot_surface(x_grid, y_grid, z_fitted, color='b', alpha=0.5, label='Fitted Polynomial Surface')
+
+    # Plot the upper and lower confidence bounds
+    ax.plot_surface(x_grid, y_grid, z_upper, color='b', alpha=0.2, linestyle='--', label='Upper Confidence Bound')
+    ax.plot_surface(x_grid, y_grid, z_lower, color='b', alpha=0.2, linestyle='--', label='Lower Confidence Bound')
+
+    # Set labels
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    # Show legend
+    ax.legend()
+
+    # Show the plot
+    plt.show()
+
+# Main function to fit polynomial and plot results
+def poly2d_fit(x, y, z, degree=3):
+    """Main function to fit a polynomial to the given data and plot results."""
+
+    # Fit polynomial to the data
+    coefficients, covariance_matrix = fit_polynomial(x, y, z, degree)
+
+    # Create grid for plotting
+    x_range = np.linspace(np.min(x), np.max(x), 50)
+    y_range = np.linspace(np.min(y), np.max(y), 50)
+    x_grid, y_grid = np.meshgrid(x_range, y_range)
+
+    # Flatten the grid for evaluation
+    x_grid_flat = x_grid.flatten()
+    y_grid_flat = y_grid.flatten()
+
+    # Create the design matrix for the grid
+    A_grid = create_design_matrix(x_grid_flat, y_grid_flat, degree)
+
+    # Calculate the fitted z values
+    z_grid_flat = A_grid @ coefficients
+    z_fitted = z_grid_flat.reshape(x_grid.shape)
+
+    # Calculate the confidence interval for each point on the grid
+    variances = calculate_prediction_variance(x_grid, y_grid, covariance_matrix, degree)
+    confidence_interval = 1.96 * np.sqrt(variances)  # 95% confidence interval
+
+    # Reshape confidence intervals to match grid shape
+    confidence_interval_grid = confidence_interval.reshape(x_grid.shape)
+
+    # Calculate upper and lower confidence bounds
+    z_upper = z_fitted + confidence_interval_grid
+    z_lower = z_fitted - confidence_interval_grid
+
+
+    return(x, y, z, x_grid, y_grid, z_fitted, z_fitted, z_upper, z_lower)
 
 
     
@@ -246,28 +296,37 @@ class Spectrograph_Calibrator():
         time.sleep(5)
         laser.set_wavelength(laser_wavelength_list[0])
         spectrograph.set_center_wavelength(center_wavelength_list[0])
-        pixel_list = []
+        pixel_matrix = []
 
         grating = spectrograph.get_grating()
         time.sleep(5)
 
-        for center_wavelength in center_wavelength_list:
+        for i, center_wavelength in enumerate(center_wavelength_list):
             spectrograph.set_center_wavelength(center_wavelength)
             print("set center wavelength to: ", center_wavelength )
             time.sleep(10)
-            for wavelength in laser_wavelength_list:
+            
+            for j, wavelength in enumerate(laser_wavelength_list):
                 print("set laser wavelength: ", wavelength )
                 laser.set_wavelength(wavelength)
                 time.sleep(5)
+                
                 y_counts = camera.get_trace()
-                x_axis = range(0,np.size(y_counts))
+                x_axis = range(0, np.size(y_counts))
                 argmax_ycount = np.argmax(y_counts)
-                pixel_list.append(argmax_ycount)
+                
+                # Store the argmax_ycount value in the matrix at the corresponding position
+                pixel_matrix[i, j] = argmax_ycount
+                
                 max_wavelength = x_axis[argmax_ycount]
                 print("the peak: ", max_wavelength)
 
+        #create matrices
+        laser_wavelength_matrix = np.tile(laser_wavelength_list, (len(center_wavelength_list), 1) )
+        center_wavelength_matrix= np.tile(center_wavelength_list[:, np.newaxis], (1,len(laser_wavelength_list)) )
 
-        return Spectograph_Calibration(pixel_list, laser_wavelength_list,grating, center_wavelength, 2, center_wavelength_list)
+
+        return pixel_matrix, laser_wavelength_matrix, center_wavelength_matrix
         
 
 
@@ -317,7 +376,29 @@ if __name__ == "__main__":
     # # Define the path using the formatted date and time
     # path = "N:\\SCI-NBI-NQCP\\Phot\\byHardware\\Spectrograph\\Calibration\\" + formatted_time + ".cfg" 
 
-    calibration = calibrator.calibrate_2d(laser, spectrograph, camera, 910, 941, 10)
+    pixel_list, laser_wavelength_list, center_wavelength_list = calibrator.calibrate_2d(laser, spectrograph, camera, 910, 941, 10)
+    x, y, z, x_grid, y_grid, z_fitted, z_fitted, z_upper, z_lower = poly2d_fit(pixel_list, center_wavelength_list, pixel_list, degree=3)
+    plot_results(x, y, z, x_grid, y_grid, z_fitted, z_fitted, z_upper, z_lower)
+
+
+        # Example usage
+    if __name__ == "__main__":
+    # Define example matrices for x, y, and z
+    x_range = np.linspace(0, 10, 12)
+    y_range = np.linspace(0, 10, 12)
+    x, y = np.meshgrid(x_range, y_range)
+    
+    # Define a true polynomial surface for demonstration
+    z = 0.001 * (x ** 3) - 0.01 * (x ** 2) + 0.005 * x * y + 0.0002 * (y ** 3) - 0.02 * (y ** 2) + 0.1 * x - 0.05 * y + 700
+    
+    # Call the main function with example data
+    main(x, y, z)
+#____________________________________________________________________________________
+
+
+
+
+
 
 
     now = datetime.datetime.now()
