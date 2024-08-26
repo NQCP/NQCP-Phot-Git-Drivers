@@ -2,6 +2,7 @@
 
 import sys
 import serial
+from serial import Serial
 from tools import parse
 
 
@@ -24,27 +25,37 @@ class Controller:
         write_timeout=0.5,
         debug=True,
     ):
+        self.port = port
+        self. baudrate = baudrate
+        self.bytesize = bytesize
+        self.parity = parity
+        self.stopbits = stopbits
+        self.timeout = timeout
+        self.write_timeout = write_timeout
+        self.debug = debug 
+        self.connection: Serial = None 
+
+    def connect(self):
         try:
-            self.s = serial.Serial(
-                port,
-                baudrate=baudrate,
-                bytesize=bytesize,
-                parity=parity,
-                stopbits=stopbits,
-                timeout=timeout,
-                write_timeout=write_timeout,
+            self.connection = serial.Serial(
+                port = self.port,
+                baudrate=self.baudrate,
+                bytesize=self.bytesize,
+                parity=self.parity,
+                stopbits=self.stopbits,
+                timeout=self.timeout,
+                write_timeout=self.write_timeout,
             )
         except serial.SerialException:
             print("Could not open port {port}.")
             # TODO: nicer/more logical shutdown (this kills the entire app?)
             sys.exit()
 
-        self.debug = debug
-        self.port = port
+        self.port = self.port
 
         if self.s.is_open:
             if self.debug:
-                print(f"Controller on port {port}: Connection established!")
+                print(f"Controller on port {self.port}: Connection established!")
 
     def __enter__(self):
         return self
@@ -97,8 +108,8 @@ class Controller:
 
         return response
 
-    def close_connection(self):
+    def disconnect(self):
         """Closes the serial connection."""
-        if self.s.is_open:
-            self.s.close()
+        if self.connection.is_open:
+            self.connection.close()
             print("Connection is closed!")

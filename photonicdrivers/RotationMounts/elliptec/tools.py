@@ -1,5 +1,5 @@
 """Miscellaneous helper functions for the elliptec package."""
-from errcodes import error_codes
+from photonicdrivers.RotationMounts.elliptec.error_codes import error_codes
 
 
 def is_null_or_empty(msg):

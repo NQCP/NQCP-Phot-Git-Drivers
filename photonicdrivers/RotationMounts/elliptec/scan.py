@@ -3,8 +3,8 @@
 
 import serial as s
 import serial.tools.list_ports as listports
-from .errors import ExternalDeviceNotFound
-from .motor import Motor
+from errors import ExternalDeviceNotFound
+from motor import Motor
 
 # Scanning functions
 

@@ -2,18 +2,17 @@
 from cmd import get_, set_, mov_, do_
 from tools import error_check, move_check
 from errors import ExternalDeviceNotFound
-
+from controller import Controller
 
 class Motor:
     """A class that represents a general motor. Each device inherits from this class."""
 
-    def __init__(self, controller, address="0", debug=True):
+    def __init__(self, controller: Controller, address="0", debug=True):
         # the controller object which services the COM port
-        self.controller = controller
+        self.controller: Controller = controller
         # self.address is kept as a 0-F string and encoded in send_instruction()
         self.address = address
         self.debug = debug
-
         self.last_position = None
 
         # Load motor info on creation
@@ -144,6 +143,6 @@ class Motor:
             string += key + " - " + str(self.info[key]) + "\n"
         return string
 
-    def close_connection(self):
+    def disconnect(self):
         """Closes the serial port."""
-        self.controller.close_connection()
+        self.controller.disconnect()
