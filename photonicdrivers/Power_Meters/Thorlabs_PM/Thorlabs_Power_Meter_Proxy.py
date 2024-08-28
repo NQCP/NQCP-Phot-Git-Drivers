@@ -38,7 +38,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         Raises:
             ConnectionError: If not connected to the server.
         """
-        print(request)
+        #print(request)
         if not self.socket:
             print("Not connected to the server")
             raise ConnectionError("Not connected to the server")
@@ -64,7 +64,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         self.server_connect()
         request = 'CONNECT'
         response = self.send_request(request)
-        print(f"Connect response: {response}")
+        #print(f"Connect response: {response}")
 
     def disconnect(self):
         """
@@ -76,7 +76,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         
         request = 'DISCONNECT'
         response = self.send_request(request)
-        print(f"Disconnect response: {response}")
+        #print(f"Disconnect response: {response}")
         self.server_disconnect()
 
     def get_detector_power(self):
@@ -89,7 +89,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         
         request = 'GET_DETECTOR_POWER'
         response = self.send_request(request)
-        print(f"Get dector power: {response}")
+        #print(f"Get dector power: {response}")
         return response
 
 
@@ -101,7 +101,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         """
         request = f'SET_WAVELENGTH {str(wavelength)}'
         response = self.send_request(request)
-        print(f"Set wavelength response: {response}")
+        #print(f"Set wavelength response: {response}")
 
 
     def get_averaging(self):
@@ -110,7 +110,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         """
         request = 'GET_AVERAGING'
         response = self.send_request(request)
-        print(f"Get averaging response: {response}")
+        #print(f"Get averaging response: {response}")
         return response
     
     def set_averaging(self, averaging: int):
@@ -121,7 +121,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         """
         request = f'SET_AVERAGING {str(averaging)}'
         response = self.send_request(request)
-        print(f"Set averaging response: {response}")
+        #print(f"Set averaging response: {response}")
 
     def get_power_meter_wavelength(self):
         """
@@ -129,7 +129,7 @@ class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
         """
         request = 'GET_WAVELENGTH'
         response = self.send_request(request)
-        print(f"Get wavelength response: {response}")
+        #print(f"Get wavelength response: {response}")
         return response
 
 if __name__ == "__main__": 

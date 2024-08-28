@@ -1,6 +1,6 @@
 """Module for linear stages. Inherits from elliptec.Motor."""
-from . import Motor
-from .devices import devices
+from motor import Motor
+from devices import devices
 
 class Iris(Motor):
     """Iris class for elliptec motorized iris. Inherits from elliptec.Motor."""

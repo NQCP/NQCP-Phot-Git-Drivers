@@ -1,5 +1,5 @@
 """Module for linear stages. Inherits from elliptec.Motor."""
-from . import Motor
+from motor import Motor
 
 
 class Linear(Motor):

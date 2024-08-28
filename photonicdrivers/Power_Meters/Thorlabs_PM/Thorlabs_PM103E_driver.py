@@ -7,7 +7,7 @@ from photonicdrivers.utils.execution_time import execution_time
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
 Supported units: {'W', 'mW', 'dBm'}
-Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl
+Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl"
 
 
 TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR
@@ -67,7 +67,13 @@ class Thorlabs_PM103E_driver():
         @rtype: boolean
         @return: is alive boolean
         """
-        return bool(self.get_idn())
+        
+        try:
+            return self.get_idn()
+        except ConnectionError:
+            return False
+        except Exception as exception:
+            pass
 
     def get_idn(self) -> str:
         """
@@ -75,6 +81,7 @@ class Thorlabs_PM103E_driver():
         @rtype: string
         @return: response from the *IDN? command 
         """
+        
         return self._query("*IDN?")
 
     def get_averaging(self) -> int:
@@ -126,10 +133,14 @@ class Thorlabs_PM103E_driver():
     
     def get_detector_power(self) -> float:
         """Get a power measurement"""
-        self.power_meter.write("ABOR") #aborts any ongoing measurments
-        self.power_meter.write("INIT")
-        res = float(self.power_meter.query("FETCH?"))
-        return res
+        try:
+            self._write("ABOR") #aborts any ongoing measurments
+            self._write("INIT")
+            res = float(self._query("FETCH?"))
+            return res
+        except ConnectionError as connection_error:
+            print(connection_error)
+            self.connect()
 
     def get_detector_wavelength(self) -> float:
         msg = ':SENS:CORR:WAV?'
@@ -166,10 +177,19 @@ class Thorlabs_PM103E_driver():
 #################################### PRIVATE METHODS ###########################################
 
     def _write(self,command: str) -> None:
-        self.power_meter.write(command)
+        try:
+            return self.power_meter.write(command)
+        except Exception as exception:
+            raise ConnectionError("An error occurred while writing to the power meter") from exception
 
     def _read(self) -> None:
-        return self.power_meter.read()
+        try:
+            return self.power_meter.read()
+        except Exception as exception:
+            raise ConnectionError("An error occurred while reading the power meter") from exception
     
-    def _query(self, command: str) -> None:
-        return self.power_meter.query(command)
+    def _query(self, command: str):
+        try:
+            return self.power_meter.query(command)
+        except Exception as exception:
+            raise ConnectionError("An error occurred while querying the power meter") from exception
