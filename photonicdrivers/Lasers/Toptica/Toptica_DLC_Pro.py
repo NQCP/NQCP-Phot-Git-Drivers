@@ -13,6 +13,48 @@ class Toptica_DLC_PRO_driver():  # Developer: Magnus Linnet Madsen
     def connect(self):
         self.laser_controller.open()
 
+    def set_scan_mode(self, enable_bool):
+        self.laser_controller.laser1.scan.enabled.set(enable_bool)
+
+    def get_scan_mode(self):
+        self.laser_controller.laser1.scan.enabled.get()
+
+    def set_scan_amplitude(self, scan_amplitude):
+        self.laser_controller.laser1.scan.amplitude.set(scan_amplitude)
+
+    def get_scan_amplitude(self):
+        self.laser_controller.laser1.scan.amplitude.get()
+
+    def set_scan_offset(self, offset):
+        self.laser_controller.laser1.scan.offset.set(offset)
+
+    def get_scan_offset(self):
+        self.laser_controller.laser1.scan.offset.get()
+
+    def set_wide_scan_continuous_mode(self, enable_bool):
+        self.laser_controller.laser1.wide_scan.continuous_mode.set(enable_bool)
+
+    def get_wide_scan_continuous_mode(self):
+        self.laser_controller.laser1.wide_scan.continuous_mode.get()
+
+    def set_wide_scan_offset(self, offset):
+        self.laser_controller.laser1.wide_scan.offset(offset)
+
+    def get_wide_scan_offset(self):
+        self.laser_controller.laser1.wide_scan.offset.get()
+
+    def set_wide_scan_amplitude(self, amplitude):
+        self.laser_controller.laser1.wide_scan.amplitude(amplitude)
+
+    def get_wide_scan_amplitude(self):
+        self.laser_controller.laser1.wide_scan.amplitude.get()
+
+    def get_wide_scan_begin(self):
+        self.laser_controller.laser1.wide_scan.scan_end()
+
+    def get_wide_scan_begin(self):
+        self.laser_controller.laser1.wide_scan.scan_begin()
+
     def disconnect(self):
         """
         Closes the connections to the Toptica laser
