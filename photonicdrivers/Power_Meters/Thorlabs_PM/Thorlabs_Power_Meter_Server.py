@@ -119,6 +119,7 @@ class Thorlabs_Power_Meter_Server():
             try:
                 response = str(self.driver.get_detector_power())
             except Exception as error:
+                print(error)
                 response = 'UNSUCCESFUL'
 
         else:
@@ -173,3 +174,5 @@ if __name__ == "__main__":
     server = Thorlabs_Power_Meter_Server(driver=driver, host_ip='10.209.67.42', port=12501)
     thread = Thread(target=server.start)
     thread.start()
+
+    
