@@ -1,7 +1,7 @@
 """Module for shutter. Inherits from elliptec.Motor."""
 
-from .devices import devices
-from . import Motor
+from devices import devices
+from motor import Motor
 
 
 class Shutter(Motor):

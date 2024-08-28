@@ -41,7 +41,6 @@ class Rotator(Motor):
         else:
             return None
 
-    # Home set/get
     def get_home_offset(self):
         """Gets the home offset."""
         status = self.get("home_offset")
