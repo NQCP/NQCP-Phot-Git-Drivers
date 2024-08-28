@@ -7,7 +7,7 @@ from photonicdrivers.utils.execution_time import execution_time
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
 Supported units: {'W', 'mW', 'dBm'}
-Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl
+Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl"
 
 
 TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR
