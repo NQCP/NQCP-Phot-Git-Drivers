@@ -1,8 +1,8 @@
 
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
 import socket 
 
-class Thorlabs_Power_Meter_Proxy(Thorlabs_Power_Meter_Driver):
+class Thorlabs_Power_Meter_Proxy(Abstract_Thorlabs_Power_Meter_Driver):
 
     def __init__(self, host_ip_address: str, host_port: int):
         self.host_ip_address: str = host_ip_address

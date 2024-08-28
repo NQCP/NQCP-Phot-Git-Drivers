@@ -1,7 +1,7 @@
 
 from abc import abstractmethod, ABC
 
-class Thorlabs_Power_Meter_Driver(ABC):
+class Abstract_Thorlabs_Power_Meter_Driver(ABC):
 
     @abstractmethod
     def connect(self):

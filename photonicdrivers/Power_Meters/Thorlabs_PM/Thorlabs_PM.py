@@ -1,6 +1,6 @@
 import pyvisa
 import numpy as np
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -8,7 +8,7 @@ Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC  (e.g. model='PM
 Supported units: {'W', 'mW', 'dBm'}
 """
 
-class Thorlabs_PM100D_driver(Thorlabs_Power_Meter_Driver):
+class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
 
     def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
         """Connect to and reset Thorlabs PM101USB"""        

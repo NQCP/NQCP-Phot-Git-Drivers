@@ -1,10 +1,10 @@
 import socket
-from Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
 from threading import Thread
 
 class Thorlabs_Power_Meter_Server():
 
-    def __init__(self, driver: Thorlabs_Power_Meter_Driver, host_ip='10.209.67.42', port=12347):
+    def __init__(self, driver: Abstract_Thorlabs_Power_Meter_Driver, host_ip='10.209.67.42', port=12347):
             """
             Initializes the power meter.
 
