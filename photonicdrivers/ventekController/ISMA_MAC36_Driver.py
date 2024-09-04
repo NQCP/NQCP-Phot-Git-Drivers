@@ -4,7 +4,7 @@ from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodb
 from pymodbus import pymodbus_apply_logging_config # to enable debug mode
 import struct
 
-class iSMA_MAC36:
+class ISMA_MAC36_Driver:
     def __init__(self, _ip_address, _port=502, _slave_id=1, _debug=False) -> None:
         # _ip_address: IP of the Modbus TCP server
         # _port: port of the Modbus TCP server. Default is 502

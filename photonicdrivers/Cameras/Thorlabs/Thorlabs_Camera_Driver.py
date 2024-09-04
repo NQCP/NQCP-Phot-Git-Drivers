@@ -1,6 +1,6 @@
 from photonicdrivers.Cameras.Thorlabs.thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
-class Thorlabs_Camera():  # Developer: Magnus Linnet Madsen
+class Thorlabs_Camera_Driver():  # Developer: Magnus Linnet Madsen
 
     def __init__(self, driver: TLCameraSDK, serial_number: str):
         """

@@ -3,7 +3,7 @@ from Andor_Kymera import Andor_Kymera
 import matplotlib.pyplot as plt
 import numpy as np
 from instruments.Implementations.Toptica_CTL950 import Toptica_CTL950
-from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro import Toptica_DLC_PRO_driver
+from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro_Driver import Toptica_DLC_PRO_driver
 import time
 import datetime    
 import os

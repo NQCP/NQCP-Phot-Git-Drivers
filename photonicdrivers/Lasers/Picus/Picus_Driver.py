@@ -1,7 +1,7 @@
 import pyvisa
 from serial import Serial
 
-class Picus():
+class Picus_Driver():
 
     def __init__(self, _resource_manager: pyvisa.ResourceManager=None, _port: str=None, _connectionMethod=None) -> None:
         self.resource_manager = _resource_manager

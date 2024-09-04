@@ -3,14 +3,14 @@
 import pyvisa
 from matplotlib import pyplot as plt
 
-from Picus import Picus
+from photonicdrivers.Lasers.Picus.Picus_Driver import Picus_Driver
 
 rm = pyvisa.ResourceManager()
 print(rm.list_resources())
 
 port = 'ASRL3::INSTR'
 
-laser = Picus(_resource_manager=rm,_port=port,_connectionMethod="pyvisa")
+laser = Picus_Driver(_resource_manager=rm,_port=port,_connectionMethod="pyvisa")
 # laser = Picus(_connectionMethod="serial")
 laser.connect()
 print("Enable state: " + str(laser.getEnabledState()))

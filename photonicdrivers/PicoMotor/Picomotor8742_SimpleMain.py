@@ -1,6 +1,6 @@
 # code for communicating with the PicoMotor from NewFocus model 8742 via USB
 
-from Picomotor8742 import NewFocus_8742_Driver
+from photonicdrivers.PicoMotor.Picomotor8742_Driver import NewFocus_8742_Driver
 
 #Decimal VendorID = 1027 & ProductID = 24596
 #Hexadecimal VendorID = 0x403 & ProductID = 0x6014

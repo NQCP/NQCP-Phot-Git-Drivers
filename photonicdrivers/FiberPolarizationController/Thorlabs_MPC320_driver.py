@@ -2,7 +2,6 @@ import clr
 from photonicdrivers.utils.execution_time import execution_time
 from abc import ABC, abstractmethod
 import socket
-from photonicdrivers.Server.Server import *
 
 # To use this driver the software Kinesis from Thorlabs must be installed to match the following
 # Also consider attaching the path to settings.JSON file to access the code
