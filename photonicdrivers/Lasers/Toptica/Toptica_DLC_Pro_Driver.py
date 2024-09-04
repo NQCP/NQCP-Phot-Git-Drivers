@@ -1,6 +1,6 @@
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
 
-class Toptica_DLC_PRO_driver:
+class Toptica_DLC_PRO_Driver:
     """
     A driver class for controlling a Toptica CTL950 laser via the Toptica DLC pro laser controller.
 
