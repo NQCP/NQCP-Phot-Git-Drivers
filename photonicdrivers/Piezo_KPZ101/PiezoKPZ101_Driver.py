@@ -17,7 +17,7 @@ from Thorlabs.MotionControl.KCube.PiezoCLI import *
 from System import Decimal  # necessary for real world units
 
 
-class PiezoKPZ101:
+class PiezoKPZ101_Driver:
     def __init__(self, _serialNo):
         print("Initialising instance of thorlabs piezo class")
         DeviceManagerCLI.BuildDeviceList()

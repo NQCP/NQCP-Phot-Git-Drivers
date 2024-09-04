@@ -1,6 +1,5 @@
 import pygame
 
-
 class Joystick:
     def __init__(self):
         # Initialize Pygame

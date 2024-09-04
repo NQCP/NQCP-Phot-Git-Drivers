@@ -20,7 +20,7 @@ from Thorlabs.MotionControl.GenericMotorCLI import *
 from Thorlabs.MotionControl.KCube.PiezoCLI import *
 
 
-class PiezoKPZ101(Instrument):
+class PiezoKPZ101_QCodes(Instrument):
     def __init__(self, _serialNo, **kwargs):
         print("Initialising instance of thorlabs piezo class")
         super().__init__(**kwargs)

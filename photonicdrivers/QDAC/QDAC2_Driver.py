@@ -8,7 +8,7 @@
 
 import socket
 
-class QDAC2():
+class QDAC2_Driver():
     def __init__(self,_ip_string: str,_port_number: int) -> None:
         self.ipAddress = _ip_string
         self.port = _port_number

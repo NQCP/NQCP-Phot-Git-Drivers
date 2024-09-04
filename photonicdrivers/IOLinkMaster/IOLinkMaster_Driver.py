@@ -1,12 +1,12 @@
 import requests
 # from FlowMeterPF3W720 import FlowMeterPF3W720
-from photonicdrivers.IOLinkMaster.FlowMeterPF3W720 import FlowMeterPF3W720
+from photonicdrivers.IOLinkMaster.FlowMeterPF3W720_Driver import FlowMeterPF3W720_Driver
 
-class IOLinkMaster:
+class IOLinkMaster_Driver:
     def __init__(self, IPAddress):
         self.ip = IPAddress
         print("Initalising an IO master")
-        self.flowMeter = FlowMeterPF3W720()
+        self.flowMeter = FlowMeterPF3W720_Driver()
 
     def getFlowAndTemp(self, pinNumber):
         url_ending = self.flowMeter.getUrl_pdin_getData(pinNumber)

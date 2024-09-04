@@ -1,5 +1,5 @@
 import pyvisa
-from Thorlabs_PM import Thorlabs_PM100D_driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_PM100D_Driver import Thorlabs_PM100D_driver
 
 
 print("hello")

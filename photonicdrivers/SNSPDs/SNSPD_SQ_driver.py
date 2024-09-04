@@ -1,6 +1,6 @@
 from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQControl
 
-class SNSPD_SQ():
+class SNSPD_SQ_Driver():
     def __init__(self,_ip_string: str, _control_port: int=12000, _counts_port: int=12345) -> None:
         self.ipAddress = _ip_string
         self.controlPort = _control_port

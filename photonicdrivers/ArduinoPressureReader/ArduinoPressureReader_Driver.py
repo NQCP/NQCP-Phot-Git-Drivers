@@ -8,7 +8,7 @@ import json
 from urllib.request import urlopen
 import numpy as np 
 
-class arduinoPressureReader:
+class ArduinoPressureReader_Driver:
     def __init__(self, _ip_address_string, _port_string, _pressureRanges_npArray):
         # _pressureRanges_npArray has to be length 4 to match the number of sensors
         print("Initialising arduinoPressureReader class with IP:")

@@ -1,5 +1,5 @@
 # from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQControl
-from Swabian import SwabianTimeTagger
+from photonicdrivers.TimeTaggers.Swabian_TimeTagger_Driver import Swabian_TimeTagger_Driver
 from matplotlib import pyplot as plt
 from time import sleep
 
@@ -11,7 +11,7 @@ from time import sleep
 serverIP = "10.209.67.193"
 serverPort = "41101"
 
-ttNetwork = SwabianTimeTagger(serverIP=serverIP, serverPort=serverPort)
+ttNetwork = Swabian_TimeTagger_Driver(serverIP=serverIP, serverPort=serverPort)
 
 ttNetwork.connect("Network")
 

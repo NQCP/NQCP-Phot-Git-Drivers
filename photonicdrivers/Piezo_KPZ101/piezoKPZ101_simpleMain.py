@@ -3,7 +3,7 @@ import tkinter as tk
 from queue import Queue
 from threading import Thread, Event
 
-from PiezoKPZ101 import PiezoKPZ101
+from photonicdrivers.Piezo_KPZ101.PiezoKPZ101_Driver import PiezoKPZ101_Driver
 
 
 # piezo = PiezoKPZ101("29252886")
@@ -22,7 +22,7 @@ class App:
         self.create_widgets()
 
         # Queue some initial functions
-        self.piezo = PiezoKPZ101(self.piezoID)
+        self.piezo = PiezoKPZ101_Driver(self.piezoID)
 
         # Start a separate thread to run the main loop to prevent the GUI from freezing
         self.thread = Thread(target=self.main_loop)
