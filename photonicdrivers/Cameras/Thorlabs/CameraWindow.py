@@ -38,6 +38,3 @@ class CameraWindow(tk.Canvas):
     def set_acquisition_thread(self, camera_acquisition_thread):
         self._camera_acquisition_thread = camera_acquisition_thread
         self._image_queue = self._camera_acquisition_thread.get_queue()
-
-
-

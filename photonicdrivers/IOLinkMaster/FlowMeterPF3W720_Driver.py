@@ -1,4 +1,4 @@
-class FlowMeterPF3W720:
+class FlowMeterPF3W720_Driver:
     def __init__(self):
         print("initialising a flowmeter")
 

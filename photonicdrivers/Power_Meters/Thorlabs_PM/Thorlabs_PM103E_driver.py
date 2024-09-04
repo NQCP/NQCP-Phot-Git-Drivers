@@ -133,14 +133,8 @@ class Thorlabs_PM103E_driver():
     
     def get_detector_power(self) -> float:
         """Get a power measurement"""
-        try:
-            self._write("ABOR") #aborts any ongoing measurments
-            self._write("INIT")
-            res = float(self._query("FETCH?"))
-            return res
-        except ConnectionError as connection_error:
-            print(connection_error)
-            self.connect()
+        msg = "MEAS:SCAL:POW?"
+        return self._query(msg)
 
     def get_detector_wavelength(self) -> float:
         msg = ':SENS:CORR:WAV?'

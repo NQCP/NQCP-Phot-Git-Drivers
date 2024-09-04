@@ -186,7 +186,7 @@ class NewFocus_8742_Driver():
         return MAC_joinedStr
 
 
-class PicoMotor:
+class PicoMotor_Driver:
 
     def __init__(self, driver: NewFocus_8742_Driver, axis_number: int):
         self.driver = driver
@@ -223,8 +223,8 @@ if __name__ == "__main__":
 
     pico_motor_controller = NewFocus_8742_Driver()
     pico_motor_controller.connect()
-    pico_motor_x = PicoMotor(pico_motor_controller, 1)
-    pico_motor_y = PicoMotor(pico_motor_controller, 2)
+    pico_motor_x = PicoMotor_Driver(pico_motor_controller, 1)
+    pico_motor_y = PicoMotor_Driver(pico_motor_controller, 2)
 
     while True:
         plt.pause(0.01)

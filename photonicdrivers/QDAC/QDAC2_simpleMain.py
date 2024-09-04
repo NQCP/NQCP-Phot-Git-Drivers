@@ -1,4 +1,4 @@
-from QDAC import QDAC2
+from photonicdrivers.QDAC.QDAC2_Driver import QDAC2_Driver
 
 IPAddress = "10.209.67.125"
 Port= 5025
@@ -19,7 +19,7 @@ COMPort = "COM4"
 
 
 
-qdac = QDAC2(IPAddress,Port)
+qdac = QDAC2_Driver(IPAddress,Port)
 qdac.openEthernetConnection()
 id = qdac.getProductID()
 print(id)

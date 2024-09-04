@@ -1,6 +1,6 @@
 import pyvisa
 import numpy as np
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Abstract_Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
