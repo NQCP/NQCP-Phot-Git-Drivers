@@ -10,10 +10,11 @@ Supported units: {'W', 'mW', 'dBm'}
 
 class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
 
-    def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
+    def __init__(self, config: dict):
         """Connect to and reset Thorlabs PM101USB"""        
-        self.resource_manager = resource_manager
-        self.port = port
+        self.resource_manager = pyvisa.ResourceManager
+        self.config = config
+        self.port = config["port"]
         self.powerMeter = None
         
 
