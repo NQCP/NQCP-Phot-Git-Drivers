@@ -1,6 +1,7 @@
 import pyvisa
 from photonicdrivers.Power_Meters.Thorlabs_PM.Abstract_Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
 
+
 """
 Class for interfacing with Thorlabs powermeters.
 Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC (e.g., model='PM100USB')
