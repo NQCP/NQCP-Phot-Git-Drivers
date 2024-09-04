@@ -1,7 +1,4 @@
-
 from anyvisa import AnyVisa
-import numpy as np
-from photonicdrivers.utils.execution_time import execution_time
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -9,46 +6,27 @@ Supported models: PM103E
 Supported units: {'W', 'mW', 'dBm'}
 Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip install anyvisa-0.3.0-py3-none-any.whl"
 
-
 TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR
 TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR
 """
 
-
-
-class Thorlabs_PM103E_driver():
-
+class Thorlabs_PM103E_Driver:
     def __init__(self, port: str) -> None:
-        """Connect to and reset Thorlabs PM101USB"""     
-        self.port = port 
+        """
+        Initializes the Thorlabs PM103E Driver instance.
+
+        Args:
+            port (str): The VISA resource string for connecting to the Thorlabs PM103E power meter.
+        """
+        self.port = port
         self.power_meter = None
         self.is_connected = False
-        
-
-#################################### HIGH LEVEL METHODS ###########################################
-
-    def get_median_power(self, n_median: int=10) -> float:
-        # The instanteneous power measurement can be unstable, so it can be useful to use the median over multiple measurements if outliers is present
-        measurements = np.zeros(n_median)
-        for j in range(n_median):
-            measurements[j] = self.get_detector_power()
-        return np.median(measurements)
-
-    def get_average_power(self, n_averages: int=10) -> float:
-        # The instanteneous power measurement can be unstable, so it is better to average over multiple measurements. Conider using the median method.
-        measurements = np.zeros(n_averages)
-        for j in range(n_averages):
-            measurements[j] = self.get_detector_power()
-        return np.mean(measurements)
-
-        
-#################################### LOW LEVEL METHODS ###########################################
 
     def connect(self) -> None:
         """
-        Opens the connections to the Thorlabs detector
+        Opens a connection to the Thorlabs PM103E power meter and configures it for power measurements.
         """
-        if self.is_connected is False:
+        if not self.is_connected:
             self.power_meter = AnyVisa.TL_Open(self.port)
             self.power_meter.open()
             self.power_meter.write("CONF:POW")
@@ -56,133 +34,216 @@ class Thorlabs_PM103E_driver():
 
     def disconnect(self) -> None:
         """
-        Closes the connections to the Thorlabs detector
+        Closes the connection to the Thorlabs PM103E power meter.
         """
-
-        self.power_meter.close()
+        if self.is_connected:
+            self.power_meter.close()
+            self.is_connected = False
 
     def is_alive(self) -> bool:
         """
-        Returns a boolean specifing wether the a connection to the device is established
-        @rtype: boolean
-        @return: is alive boolean
+        Checks if a connection to the Thorlabs PM103E power meter is established.
+
+        Returns:
+            bool: True if the device is connected, False otherwise.
         """
-        
         try:
-            return self.get_idn()
+            return self.get_idn() is not None
         except ConnectionError:
             return False
-        except Exception as exception:
-            pass
+        except Exception:
+            return False
 
     def get_idn(self) -> str:
         """
-        Returns the response from the *IDN? command
-        @rtype: string
-        @return: response from the *IDN? command 
+        Retrieves the identification string of the Thorlabs PM103E power meter.
+
+        Returns:
+            str: The response from the *IDN? command.
         """
-        
         return self._query("*IDN?")
 
     def get_averaging(self) -> int:
         """
-        Get the number of averaging of the detector
-        @rtype: integer
-        @return: the number of averaging of the detector
+        Gets the current number of averaging cycles configured on the power meter.
+
+        Returns:
+            int: The number of averaging cycles.
         """
-        msg = ':SENS:AVER?'
-        self._write(msg)
+        self._write(':SENS:AVER?')
         return int(self._read())
 
     def set_averaging(self, average: int) -> None:
         """
-        Set the number of averaging of the detector 
-        @param average:
-        @return: None
+        Sets the number of averaging cycles on the power meter.
+
+        Args:
+            average (int): The number of averaging cycles to set.
         """
-        msg = ':SENS:AVER ' + str(average)
-        self._write(msg)
+        self._write(f':SENS:AVER {average}')
 
     def set_config_power(self) -> None:
-        msg = ':SENS:CONF:POW'
-        self._write(msg)
+        """
+        Configures the power meter for power measurements.
+        """
+        self._write(':SENS:CONF:POW')
 
-    def set_auto_range(self, auto_range: str ='ON') -> None:
-        msg = ':SENS:POW:RANG:AUTO ' + auto_range
-        self._write(msg)
+    def set_auto_range(self, auto_range: str = 'ON') -> None:
+        """
+        Sets the auto range mode of the power meter.
 
-    def set_beam(self, beam: str ='MIN') -> None:
-        """Set the wavelength in nm"""
-        msg = ':SENS:CORR:BEAM ' + beam
-        self._write(msg)
+        Args:
+            auto_range (str): 'ON' to enable auto range, 'OFF' to disable.
+        """
+        self._write(f':SENS:POW:RANG:AUTO {auto_range}')
 
-    def set_detector_wavelength(self, wavelength_nm: float):
-        """Set the wavelength in nm"""
-        msg = ':SENS:CORR:WAV ' + str(wavelength_nm)
-        self._write(msg)
+    def set_beam(self, beam: str = 'MIN') -> None:
+        """
+        Sets the beam correction type.
+
+        Args:
+            beam (str): The beam correction type ('MIN', 'MAX', etc.).
+        """
+        self._write(f':SENS:CORR:BEAM {beam}')
+
+    def set_detector_wavelength(self, wavelength_nm: float) -> None:
+        """
+        Sets the detector wavelength for calibration.
+
+        Args:
+            wavelength_nm (float): The wavelength in nanometers.
+        """
+        self._write(f':SENS:CORR:WAV {wavelength_nm}')
 
     def set_units(self, unit: str) -> None:
-        """Set the units to W or dBm"""
-        msg = ':SENS:POW:UNIT ' + unit
-        self._write(msg)
+        """
+        Sets the units for power measurements.
+
+        Args:
+            unit (str): The unit to set ('W', 'mW', or 'dBm').
+        """
+        self._write(f':SENS:POW:UNIT {unit}')
 
     def get_units(self) -> str:
-        """Set the units to W or dBm"""
-        msg = ':SENS:POW:UNIT?'
-        return self._query(msg)
-    
+        """
+        Retrieves the current units for power measurements.
+
+        Returns:
+            str: The current units ('W', 'mW', or 'dBm').
+        """
+        return self._query(':SENS:POW:UNIT?')
+
     def get_detector_power(self) -> float:
-        """Get a power measurement"""
-        msg = "MEAS:SCAL:POW?"
-        return self._query(msg)
+        """
+        Retrieves the current power measurement from the detector.
+
+        Returns:
+            float: The measured power.
+        """
+        return float(self._query("MEAS:SCAL:POW?"))
 
     def get_detector_wavelength(self) -> float:
-        msg = ':SENS:CORR:WAV?'
-        return float(self._query(msg))
+        """
+        Retrieves the current wavelength setting of the detector.
+
+        Returns:
+            float: The wavelength in nanometers.
+        """
+        return float(self._query(':SENS:CORR:WAV?'))
 
     def reset(self) -> None:
-        """Reset"""
-        self._write('*RST') 
+        """
+        Resets the power meter to its default state.
+        """
+        self._write('*RST')
 
-    def get_auto_range(self):
-        resp = self._query("SENS:POW:RANG:AUTO?")
-        self.auto_range = bool(int(resp))
-        return self.auto_range
-    
-    def set_auto_range(self, auto = True):
-        if auto:
-            self._write("SENS:POW:RANG:AUTO ON") # turn on auto range
-        else:
-            self._write("SENS:POW:RANG:AUTO OFF") # turn off auto range
+    def get_auto_range(self) -> bool:
+        """
+        Retrieves the current status of the auto range mode.
 
-    def get_zero_magnitude(self):
-        resp = self._query("SENS:CORR:COLL:ZERO:MAGN?")
-        self.zero_magnitude = float(resp)
-        return self.zero_magnitude
-        
-    def get_zero_state(self): 
-        resp = self._query("SENS:CORR:COLL:ZERO:STAT?")
-        self.zero_state = bool(int(resp))
-        return self.zero_state
-    
-    def run_zero(self):
-        return self._write("SENS:CORR:COLL:ZERO:INIT")
+        Returns:
+            bool: True if auto range is enabled, False otherwise.
+        """
+        return bool(int(self._query("SENS:POW:RANG:AUTO?")))
 
-#################################### PRIVATE METHODS ###########################################
+    def set_auto_range(self, auto: bool) -> None:
+        """
+        Enables or disables the auto range mode.
 
-    def _write(self,command: str) -> None:
+        Args:
+            auto (bool): True to enable auto range, False to disable.
+        """
+        self._write(f"SENS:POW:RANG:AUTO {'ON' if auto else 'OFF'}")
+
+    def get_zero_magnitude(self) -> float:
+        """
+        Retrieves the zero magnitude of the detector.
+
+        Returns:
+            float: The zero magnitude value.
+        """
+        return float(self._query("SENS:CORR:COLL:ZERO:MAGN?"))
+
+    def get_zero_state(self) -> bool:
+        """
+        Retrieves the current zero state of the detector.
+
+        Returns:
+            bool: True if the zero state is active, False otherwise.
+        """
+        return bool(int(self._query("SENS:CORR:COLL:ZERO:STAT?")))
+
+    def run_zero(self) -> None:
+        """
+        Initiates a zero correction procedure on the detector.
+        """
+        self._write("SENS:CORR:COLL:ZERO:INIT")
+
+    #################################### PRIVATE METHODS ###########################################
+
+    def _write(self, command: str) -> None:
+        """
+        Sends a command to the power meter.
+
+        Args:
+            command (str): The command string to send.
+
+        Raises:
+            ConnectionError: If an error occurs while writing to the power meter.
+        """
         try:
-            return self.power_meter.write(command)
+            self.power_meter.write(command)
         except Exception as exception:
             raise ConnectionError("An error occurred while writing to the power meter") from exception
 
-    def _read(self) -> None:
+    def _read(self) -> str:
+        """
+        Reads a response from the power meter.
+
+        Returns:
+            str: The response string.
+
+        Raises:
+            ConnectionError: If an error occurs while reading from the power meter.
+        """
         try:
             return self.power_meter.read()
         except Exception as exception:
             raise ConnectionError("An error occurred while reading the power meter") from exception
-    
-    def _query(self, command: str):
+
+    def _query(self, command: str) -> str:
+        """
+        Sends a command to the power meter and retrieves the response.
+
+        Args:
+            command (str): The command string to query.
+
+        Returns:
+            str: The response from the power meter.
+
+        Raises:
+            ConnectionError: If an error occurs while querying the power meter.
+        """
         try:
             return self.power_meter.query(command)
         except Exception as exception:
