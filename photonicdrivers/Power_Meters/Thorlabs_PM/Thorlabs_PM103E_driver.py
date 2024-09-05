@@ -20,25 +20,19 @@ class Thorlabs_PM103E_Driver:
         """
         self.port = port
         self.power_meter = None
-        self.is_connected = False
 
     def connect(self) -> None:
         """
         Opens a connection to the Thorlabs PM103E power meter and configures it for power measurements.
         """
-        if not self.is_connected:
-            self.power_meter = AnyVisa.TL_Open(self.port)
-            self.power_meter.open()
-            self.power_meter.write("CONF:POW")
-            self.is_connected = True
+        self.power_meter = AnyVisa.TL_Open(self.port)
+        self.power_meter.open()
 
     def disconnect(self) -> None:
         """
         Closes the connection to the Thorlabs PM103E power meter.
         """
-        if self.is_connected:
-            self.power_meter.close()
-            self.is_connected = False
+        self.power_meter.close()
 
     def is_alive(self) -> bool:
         """
