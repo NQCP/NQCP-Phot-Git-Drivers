@@ -1,9 +1,9 @@
 """
 tl_color.py
 """
-import logging
 from ctypes import cdll, POINTER, c_int, c_ushort, c_void_p, c_float, c_ubyte
 from traceback import format_exception
+import logging
 
 import numpy as np
 

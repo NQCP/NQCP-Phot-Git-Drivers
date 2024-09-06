@@ -2,11 +2,11 @@
 tl_mono_to_color_processor.py ***BETA***
 """
 
+from ctypes import cdll, POINTER, c_int, c_ushort, c_void_p, c_char_p, c_float, c_ubyte
+from typing import Any
+from traceback import format_exception
 import logging
 import platform
-from ctypes import cdll, POINTER, c_int, c_ushort, c_void_p, c_float
-from traceback import format_exception
-from typing import Any
 
 import numpy as np
 

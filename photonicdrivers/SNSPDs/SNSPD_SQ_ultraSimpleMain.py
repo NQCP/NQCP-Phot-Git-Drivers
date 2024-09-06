@@ -48,6 +48,10 @@ websq.connect()
 # Acquire number of detectors in the system
 number_of_detectors = websq.get_number_of_detectors()
 print("Your system has " + str(number_of_detectors) + ' detectors\n')
+t, T, T2, v_av, board_T1, board_T2 = websq.get_cryo_temperature()
+
+print("Temperature of stage 1: " + str(T[199]))
+
 
 # print("Set integration time to 20 ms\n")
 # websq.set_measurement_periode(20)   # Time in ms

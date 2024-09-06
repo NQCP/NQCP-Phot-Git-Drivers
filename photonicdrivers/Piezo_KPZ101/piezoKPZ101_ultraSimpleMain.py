@@ -1,8 +1,8 @@
 import time
 
-from PiezoKPZ101 import PiezoKPZ101
+from photonicdrivers.Piezo_KPZ101.PiezoKPZ101_Driver import PiezoKPZ101_Driver
 
-piezo = PiezoKPZ101("29252886")
+piezo = PiezoKPZ101_Driver("29252886")
 piezo.enable()
 piezo.setZero()
 time.sleep(1)

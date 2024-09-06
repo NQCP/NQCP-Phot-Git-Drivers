@@ -3,15 +3,15 @@
 tl_camera.py
 """
 
-import decimal
+from ctypes import cdll, create_string_buffer, POINTER, CFUNCTYPE, c_int, c_ushort, c_void_p, c_char_p, c_uint, \
+    c_char, c_double, c_bool, c_float, c_longlong
+from typing import Callable, Any, Optional, NamedTuple, List
+from traceback import format_exception
 import logging
 import platform
 import struct
+import decimal
 import sys
-from ctypes import cdll, create_string_buffer, POINTER, CFUNCTYPE, c_int, c_ushort, c_void_p, c_char_p, c_uint, \
-    c_char, c_double, c_bool, c_float, c_longlong
-from traceback import format_exception
-from typing import Callable, Any, Optional, NamedTuple, List
 
 import numpy as np
 
