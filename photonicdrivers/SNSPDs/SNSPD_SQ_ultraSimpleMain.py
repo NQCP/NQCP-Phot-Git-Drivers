@@ -24,6 +24,7 @@ N = 10
 
 # TCP IP Address of your system (default 192.168.1.1)
 tcp_ip_address = "10.209.67.158"
+# tcp_ip_address = "192.168.1.1"
 
 # The control port (default 12000)
 control_port = 12000
