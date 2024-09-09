@@ -1,5 +1,5 @@
 import pyvisa
-from photonicdrivers.Power_Meters.Thorlabs_PM.Abstract_Thorlabs_Power_Meter_Driver import Abstract_Thorlabs_Power_Meter_Driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 
 """
@@ -8,7 +8,7 @@ Supported models: N7747A; PM100D; PM100USB; THORLABS PM101A TMC (e.g., model='PM
 Supported units: {'W', 'mW', 'dBm'}
 """
 
-class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
+class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
 
     def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
         """
@@ -42,7 +42,12 @@ class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
         Returns:
             bool: True if the device is connected, False otherwise.
         """
-        return bool(self.get_idn())
+        try:
+            return self.get_idn() is not None
+        except ConnectionError:
+            return False
+        except Exception:
+            return False
 
     def get_idn(self) -> str:
         """
@@ -96,18 +101,9 @@ class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:CORR:BEAM {beam}')
 
-    def set_detector_wavelength(self, wavelength_nm: float) -> None:
+    def set_wavelength(self, wavelength_nm: float) -> None:
         """
         Sets the detector wavelength for calibration.
-
-        Args:
-            wavelength_nm (float): The wavelength in nanometers.
-        """
-        self._write(f':SENS:CORR:WAV {wavelength_nm}')
-
-    def set_power_meter_wavelength(self, wavelength_nm: float) -> None:
-        """
-        Sets the wavelength of the power meter for calibration.
 
         Args:
             wavelength_nm (float): The wavelength in nanometers.
@@ -133,7 +129,7 @@ class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
         self._write(':SENS:POW:UNIT?')
         return self._read()
 
-    def get_detector_power(self) -> float:
+    def get_power(self) -> float:
         """
         Retrieves the current power measurement from the detector.
 
@@ -143,7 +139,7 @@ class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
         self._write('MEAS:POW?')
         return float(self._read())
 
-    def get_power_meter_wavelength(self) -> float:
+    def get_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the power meter.
 
@@ -158,6 +154,12 @@ class Thorlabs_PM100D_driver(Abstract_Thorlabs_Power_Meter_Driver):
         Resets the power meter to its default state.
         """
         self._write('*RST')
+
+    def zero(self) -> None:
+        """
+        Initiates a zero correction procedure on the detector.
+        """
+        self._write("SENS:CORR:COLL:ZERO:INIT")
 
     #################################### PRIVATE METHODS ###########################################
 
