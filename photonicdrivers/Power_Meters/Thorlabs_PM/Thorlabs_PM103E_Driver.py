@@ -10,6 +10,7 @@ TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR
 TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR
 """
 
+
 class Thorlabs_PM103E_Driver:
     def __init__(self, port: str) -> None:
         """
