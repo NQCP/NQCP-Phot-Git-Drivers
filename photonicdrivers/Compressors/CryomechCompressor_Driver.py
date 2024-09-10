@@ -288,10 +288,3 @@ class CryomechCompressor_Driver:
             )
 
         return data_flag, data
-
-
-# compressor = CryomechCompressor_Driver('10.209.67.223')
-
-# print(compressor.get_low_pressure_average())
-
-# print(compressor.get_data_lst())
