@@ -291,14 +291,17 @@ class TLPMX:
 			dllabspath = os.path.dirname(os.path.abspath(__file__)) + os.path.sep + dll_name
 			self.dll = cdll.LoadLibrary(dllabspath)
 		else:
-			dll_name = "TLPMX_32.dll"
+			dll_name = "TLPMX_64.dll"
 			dllabspath = os.path.dirname(os.path.abspath(__file__)) + os.path.sep + dll_name
 			self.dll = cdll.LoadLibrary(dllabspath)
+			print("Found dll file!")
 
 		self.devSession = c_long()
 		self.devSession.value = 0
 		if resourceName!= None:
+			print("A")
 			pInvokeResult = self.dll.TLPMX_init(resourceName, IDQuery, resetDevice, byref(self.devSession))
+			print("B")
 			self.__testForError(pInvokeResult)
 
 
@@ -374,8 +377,12 @@ class TLPMX:
 		Returns:
 			int: The return value, 0 is for success
 		"""
+		print("F")
 		pInvokeResult = self.dll.TLPMX_findRsrc(self.devSession, resourceCount)
+		print("G")
+		print(pInvokeResult)
 		self.__testForError(pInvokeResult)
+		print("H")
 		return pInvokeResult
 
 	def getRsrcName(self, index, resourceName):

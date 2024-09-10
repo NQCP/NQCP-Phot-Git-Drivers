@@ -7,8 +7,12 @@ from TLPMX import TLPM_DEFAULT_CHANNEL
 
 # Find connected power meter devices.
 tlPM = TLPMX()
+print("C")
 deviceCount = c_uint32()
+print("D")
+print(deviceCount)
 tlPM.findRsrc(byref(deviceCount))
+print("E")
 
 print("Number of found devices: " + str(deviceCount.value))
 print("")
