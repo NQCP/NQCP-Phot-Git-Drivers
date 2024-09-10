@@ -20,12 +20,12 @@ COMPort = "COM4"
 
 
 qdac = QDAC2_Driver(IPAddress,Port)
-qdac.openEthernetConnection()
-id = qdac.getProductID()
+qdac.connect()
+id = qdac.get_product_ID()
 print(id)
 qdac.printSystemInformation()
-print(qdac.getErrorAll())
-print(qdac.getErrorCount())
+print(qdac.get_error_all())
+print(qdac.get_error_count())
 
 #qdac.setVoltageRange("2","HIGH")
 #print(qdac.getVoltageRange("1", ""))
@@ -35,4 +35,4 @@ print(qdac.getErrorCount())
 #print(qdac.getVoltage("2"))
 #qdac.setVoltage
 
-qdac.closeEthernetConnection()
+qdac.disconnect()

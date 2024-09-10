@@ -1,4 +1,5 @@
 from anyvisa import AnyVisa
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 """
 Class for interfacing with Thorlab powermeters.
@@ -11,7 +12,8 @@ TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR
 """
 
 
-class Thorlabs_PM103E_Driver:
+class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
+    
     def __init__(self, port: str) -> None:
         """
         Initializes the Thorlabs PM103E Driver instance.
@@ -35,7 +37,7 @@ class Thorlabs_PM103E_Driver:
         """
         self.power_meter.close()
 
-    def is_alive(self) -> bool:
+    def is_connected(self) -> bool:
         """
         Checks if a connection to the Thorlabs PM103E power meter is established.
 
@@ -101,7 +103,7 @@ class Thorlabs_PM103E_Driver:
         """
         self._write(f':SENS:CORR:BEAM {beam}')
 
-    def set_detector_wavelength(self, wavelength_nm: float) -> None:
+    def set_wavelength(self, wavelength_nm: float) -> None:
         """
         Sets the detector wavelength for calibration.
 
@@ -128,7 +130,7 @@ class Thorlabs_PM103E_Driver:
         """
         return self._query(':SENS:POW:UNIT?')
 
-    def get_detector_power(self) -> float:
+    def get_power(self) -> float:
         """
         Retrieves the current power measurement from the detector.
 
@@ -137,7 +139,7 @@ class Thorlabs_PM103E_Driver:
         """
         return float(self._query("MEAS:SCAL:POW?"))
 
-    def get_detector_wavelength(self) -> float:
+    def get_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the detector.
 
@@ -188,7 +190,7 @@ class Thorlabs_PM103E_Driver:
         """
         return bool(int(self._query("SENS:CORR:COLL:ZERO:STAT?")))
 
-    def run_zero(self) -> None:
+    def zero(self) -> None:
         """
         Initiates a zero correction procedure on the detector.
         """

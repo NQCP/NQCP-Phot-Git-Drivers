@@ -7,8 +7,9 @@
 # print(qdac.status())
 
 import socket
+from photonicdrivers.Abstract.Connectable import Connectable
 
-class QDAC2_Driver():
+class QDAC2_Driver(Connectable):
     def __init__(self,_ip_string: str,_port_number: int) -> None:
         self.ipAddress = _ip_string
         self.port = _port_number
@@ -27,101 +28,101 @@ class QDAC2_Driver():
 
     def printSystemInformation(self) -> None:
         print("IDN:")
-        print(self.getProductID())
+        print(self.get_product_ID())
         print("MAC address:")
-        print(self.getMACAddress())
+        print(self.get_MAC_address())
         print("IP address:")
-        print(self.getIPAddress())
+        print(self.get_IP_address())
         print("Subnet mask:")
-        print(self.getSubnetMask())
+        print(self.get_subnet_mask())
         print("Gateway:")
-        print(self.getGetway())
+        print(self.get_getway())
         print("Hostname:")
-        print(self.getHostName())
+        print(self.get_host_name())
         print("DHCP [on/off]:")
-        print(self.getDHCPStatus())
+        print(self.get_DHCP_status())
 
     ##################### LOW LEVEL SYSTEM METHODS ###########################
 
-    def getProductID(self) -> str:
+    def get_product_ID(self) -> str:
         response = self._query("*IDN?")
         return response
     
-    def getIPAddress(self) -> str:
+    def get_IP_address(self) -> str:
         response = self._query("syst:comm:lan:ipad?")
         return response
     
-    def getMACAddress(self) -> str:
+    def get_MAC_address(self) -> str:
         response = self._query("syst:comm:lan:mac?")
         return response
     
-    def getGetway(self) -> str:
+    def get_getway(self) -> str:
         response = self._query("syst:comm:lan:gat?")
         return response
     
-    def getSubnetMask(self) -> str:
+    def get_subnet_mask(self) -> str:
         response = self._query("syst:comm:lan:smas?")
         return response
     
-    def getHostName(self) -> str:
+    def get_host_name(self) -> str:
         response = self._query("syst:comm:lan:host?")
         return response
     
-    def getDHCPStatus(self) -> str:
+    def get_DHCP_status(self) -> str:
         response = self._query("syst:comm:lan:dhcp?")
         return response
     
-    def getErrorAll(self) -> str:
+    def get_error_all(self) -> str:
         response = self._query("syst:err:all?")
         return response
     
-    def getErrorCount(self) -> str:
+    def get_error_count(self) -> str:
         response = self._query("syst:err:coun?")
         return response
 
-    def restartSystem(self) -> None:
+    def restart_system(self) -> None:
         command = "syst:comm:lan:rest"
         self._write(command)        
         self._checkForErrors(command)
 
-    def setDCHP(self, DHCPStatusString: str) -> None:
+    def set_DCHP(self, DHCPStatusString: str) -> None:
         if DHCPStatusString == "ON" or DHCPStatusString == "OFF":
             command = "SYST:COMM:LAN:DHCP " + DHCPStatusString
             self._write(command)            
             self._checkForErrors(command)
-            self.updateMemory()
-            self.restartSystem()
+            self.update_memory()
+            self.restart_system()
         else:
             print("The DHCPStatusString provided is not valid. It must be either ON of OFF.")
 
-    def setIPAddress(self) -> None:
+    def set_IP_address(self) -> None:
         print("Setting the IP address must be done via USB communication, which has not been implemented yet.")
 
-    def updateMemory(self) -> None:
+    def update_memory(self) -> None:
         command = "syst:comm:lan:upd"
         self._write(command)
         self._checkForErrors(command)
 
     ##################### LOW LEVEL SOURCE METHODS ###########################
 
-    def getVoltageRange(self, chNumberString: str, chListNumberString: str) -> str:
+    def get_voltage_range(self, chNumberString: str, chListNumberString: str) -> str:
         # Either chNumberString or chListNumberString must be empty - the command either changes a single channel OR a list of channels
         response = self._query("sour" + chNumberString + ":rang? " + chListNumberString) # return LOW for 2 V, HIGH for 10 V
         return response
     
-    def getVoltageMode(self, chNumberString: str) -> str:
+    def get_voltage_mode(self, chNumberString: str) -> str:
         response = self._query("sour" + chNumberString + ":mode?") # returns FIXED, SWEEP, or LIST
         return response
     
-    def getVoltage(self, chNumberString: str) -> str:
+    def get_voltage(self, chNumberString: str) -> str:
         response = self._query("sour" + chNumberString + ":volt?")
         return response
     
-    def getCurrent(self, chNumberString: str) -> str:
+    def get_current(self, chNumberString: str) -> str:
         response = self._query("sour" + chNumberString + ":curr?")
         return response
 
-    def setVoltageRange(self, chNumberString: str, rangeString: str) -> None:
+    def set_voltage_range(self, chNumberString: str, rangeString: str) -> None:
         if rangeString == "HIGH" or rangeString == "LOW":
             command = "sour" + chNumberString + ":rang " + rangeString
             self._write(command) # returns LOW for 2 V, HIGH for 10 V
@@ -129,7 +130,7 @@ class QDAC2_Driver():
         else:
             print("The rangeString must be either HIGH or LOW")
 
-    def setVoltageMode(self, chNumberString: str, modeString: str) -> None:
+    def set_voltage_mode(self, chNumberString: str, modeString: str) -> None:
         if modeString == "FIX" or modeString == "SWE" or modeString == "LIST":
             command = "sour" + chNumberString + ":mode " + modeString
             self._write(command)
@@ -137,20 +138,23 @@ class QDAC2_Driver():
         else:
             print("The modeString must be either FIX, SWE, or LIST")
 
-    def setVoltage(self,chNumberString: str,voltageString: str) -> None:
+    def set_voltage(self,chNumberString: str,voltageString: str) -> None:
         command = "sour" + chNumberString + ":volt " + voltageString
         self._write(command) # returns the current output voltage
         self._checkForErrors(command)
 
-    ##################### OTHER METHODS ###########################
+    ##################### CONNECTABLE ###########################
     
-    def closeEthernetConnection(self) -> None:
+    def disconnect(self) -> None:
         print('Closing QDAC ethernet connection')
         self.sock.close()
 
-    def openEthernetConnection(self) -> None:
+    def connect(self) -> None:
         print('Connecting to QDAC via ethernet')
         self.sock.connect(self.server_address) 
+
+    def is_connected(self) -> bool:
+        return bool(self.get_product_ID())
     
     ##################### PRIVATE METHODS ###########################
 
