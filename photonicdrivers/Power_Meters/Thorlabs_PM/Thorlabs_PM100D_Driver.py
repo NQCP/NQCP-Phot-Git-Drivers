@@ -10,7 +10,7 @@ Supported units: {'W', 'mW', 'dBm'}
 
 class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
 
-    def __init__(self, resource_manager: pyvisa.ResourceManager, port: str) -> None:
+    def __init__(self, resource_manager: pyvisa.ResourceManager, resource_name: str) -> None:
         """
         Initializes the Thorlabs_PM100D_driver instance.
 
@@ -19,7 +19,7 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
             port (str): The VISA resource string for connecting to the Thorlabs PM100D power meter.
         """
         self.resource_manager = resource_manager
-        self.port = port
+        self.port = resource_name
         self.powerMeter = None
         
     def connect(self) -> None:
@@ -110,7 +110,7 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:CORR:WAV {wavelength_nm}')
 
-    def set_units(self, unit: str) -> None:
+    def set_power_unit(self, unit: str) -> None:
         """
         Sets the units for power measurements.
 
@@ -119,7 +119,7 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:POW:UNIT {unit}')
 
-    def get_units(self) -> str:
+    def get_power_unit(self) -> str:
         """
         Retrieves the current units for power measurements.
 

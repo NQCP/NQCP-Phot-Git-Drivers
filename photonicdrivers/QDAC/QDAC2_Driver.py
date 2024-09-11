@@ -182,7 +182,11 @@ class QDAC2_Driver(Connectable):
         # To avoid recursion, the commands are typed in directly rather than calling the class methods
         self._write("syst:err:coun?")
         errorCount = self._read()
-        if float(errorCount) > 0:            
-            self._write("syst:err:all?")
-            errors = self._read()
-            print("The QDAC returned the error(s): " + errors + "when executing the command: " + commandString)
+        try:
+            if float(errorCount) > 0:            
+                self._write("syst:err:all?")
+                errors = self._read()
+                print("The QDAC returned the error(s): " + errors + "when executing the command: " + commandString)
+        except:
+            pass     #if float(errorCount) > 0: 
+                        #ValueError: could not convert string to float: '0\n0\n'

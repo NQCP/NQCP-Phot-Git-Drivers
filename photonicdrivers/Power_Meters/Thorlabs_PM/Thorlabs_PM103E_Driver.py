@@ -112,7 +112,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:CORR:WAV {wavelength_nm}')
 
-    def set_units(self, unit: str) -> None:
+    def set_power_unit(self, unit: str) -> None:
         """
         Sets the units for power measurements.
 
@@ -121,7 +121,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:POW:UNIT {unit}')
 
-    def get_units(self) -> str:
+    def get_power_unit(self) -> str:
         """
         Retrieves the current units for power measurements.
 

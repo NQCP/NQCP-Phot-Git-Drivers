@@ -26,7 +26,7 @@ powerMeter = Thorlabs_PM100D_Driver("USB0::0x1313::0x807A::M01044633::INSTR")
 powerMeter.connect()
 print(powerMeter.get_power())
 print(powerMeter.get_wavelength())
-print(powerMeter.get_units())
+print(powerMeter.get_power_unit())
 print(powerMeter.get_averaging())
 powerMeter.disconnect()
 

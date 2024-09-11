@@ -13,7 +13,7 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def set_auto_range(auto_range):
+    def set_auto_range(self, auto_range_bool: bool):
         pass
 
     @abstractmethod
@@ -33,11 +33,11 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def get_units(self):
+    def get_power_unit(self):
         pass
 
     @abstractmethod
-    def set_units(self, unit):
+    def set_power_unit(self, power_unit_str):
         pass
 
     @abstractmethod

@@ -1,11 +1,10 @@
-from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
+from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp, c_uint16
 
-from TLPMX import TLPMX
-from TLPMX import TLPM_DEFAULT_CHANNEL
+from photonicdrivers.Power_Meters.Thorlabs_PM.TLPMX import TLPMX, TLPM_DEFAULT_CHANNEL
 
 from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
-# See Thorlabs' githib for example https://github.com/Thorlabs/Light_Analysis_Examples/tree/main 
+# See Thorlabs' github for example https://github.com/Thorlabs/Light_Analysis_Examples/tree/main 
 # Get the dll files by downloading the Thorlabs "Optical Power Monitor" software, which will put the files here:
 # C:\Program Files\IVI Foundation\VISA\Win64\Bin
 
@@ -16,7 +15,7 @@ Driver class for interfacing with Thorlabs powermeters via the TLPMX dll.
 
 class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
-    def __init__(self, _resource_name:str) -> None:
+    def __init__(self, resource_name:str) -> None:
         """
         Initializes the Thorlabs_PM100D_driver instance.
 
@@ -24,20 +23,21 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             resource_manager (pyvisa.ResourceManager): The VISA resource manager for handling VISA resources.
             port (str): The VISA resource string for connecting to the Thorlabs PM100D power meter.
         """
-        self.powerMeter = TLPMX()
-        self.resource_name = c_char_p(_resource_name.encode('utf-8'))
+        self.driver = TLPMX()
+        self.resource_name = resource_name
         
     def connect(self) -> None:
         """
         Establishes a connection to the Thorlabs power meter.
         """
-        self.powerMeter.open(self.resource_name, c_bool(True), c_bool(True))
+
+        self.driver.open(resourceName=c_char_p(self.resource_name.encode('utf-8')), IDQuery=c_bool(True), resetDevice=c_bool(True))
 
     def disconnect(self) -> None:
         """
         Closes the connection to the Thorlabs power meter.
         """
-        self.powerMeter.close()
+        self.driver.close()
 
     def is_connected(self) -> bool:
         """
@@ -64,7 +64,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         device_name = create_string_buffer(256)
         serial_number = create_string_buffer(256)
         firmware_revision = create_string_buffer(256)
-        self.powerMeter.identificationQuery(manufacturer_name, device_name, serial_number, firmware_revision)
+        self.driver.identificationQuery(manufacturer_name, device_name, serial_number, firmware_revision)
         return manufacturer_name.value, device_name.value, serial_number.value, firmware_revision.value
 
     def get_averaging(self) -> int:
@@ -91,14 +91,20 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         pass
 
-    def set_auto_range(self, auto_range: str = 'ON') -> None:
+    def set_auto_range(self, auto_range_bool: bool) -> None:
         """
         Sets the auto range mode of the power meter.
 
         Args:
             auto_range (str): 'ON' to enable auto range, 'OFF' to disable.
         """
-        pass
+        if auto_range_bool:
+            auto_range = c_uint16(1)
+        else:
+            auto_range = c_uint16(0)
+        
+        result_code = self.driver.setPowerAutoRange(auto_range, channel=TLPM_DEFAULT_CHANNEL)
+        return result_code
 
     def set_beam(self, beam: str = 'MIN') -> None:
         """
@@ -109,32 +115,65 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         pass
 
-    def set_wavelength(self, wavelength_nm: float) -> None:
+    def set_wavelength(self, wavelength):
         """
-        Sets the detector wavelength for calibration.
+        Sets the wavelength value in nanometers.
 
         Args:
-            wavelength_nm (float): The wavelength in nanometers.
-        """
-        pass
+            wavelength (float): The wavelength value to set in nanometers.
+            channel (int, optional): The sensor channel number. Default is 1.
 
-    def set_units(self, unit: str) -> None:
+        Returns:
+            int: The return value, 0 is for success.
+        """
+
+        wavelength = c_double(wavelength)
+        result_code = self.driver.setWavelength(wavelength, channel=TLPM_DEFAULT_CHANNEL)
+        return result_code
+    
+    def get_wavelength(self) -> float:
+        """
+        Retrieves the current wavelength setting of the power meter.
+
+        Returns:
+            float: The wavelength in nanometers.
+        """
+
+        wavelength = c_double()
+        attribute = c_int()
+        attribute.value = 0
+        self.driver.getWavelength(attribute=attribute, wavelength=byref(wavelength), channel=TLPM_DEFAULT_CHANNEL)
+
+        return wavelength.value
+
+    def set_power_unit(self, power_unit: str) -> None:
         """
         Sets the units for power measurements.
 
         Args:
-            unit (str): The unit to set ('W', 'mW', or 'dBm').
+            unit (str): The unit to set ('W', or 'dBm').
         """
-        pass
+        if power_unit == "W":
+            unit_num = c_uint16(0)    
+        elif power_unit == "dBm":
+            unit_num = c_uint16(1)
+        
+        self.driver.setPowerUnit(powerUnit=unit_num, channel=TLPM_DEFAULT_CHANNEL)
 
-    def get_units(self) -> str:
+    def get_power_unit(self) -> str:
         """
         Retrieves the current units for power measurements.
 
         Returns:
             str: The current units ('W', 'mW', or 'dBm').
         """
-        pass
+        
+        power_unit = c_uint16()
+        self.driver.getPowerUnit(powerUnit=byref(power_unit), channel=TLPM_DEFAULT_CHANNEL)
+        if power_unit.value:
+            return "dBm"
+        else:
+            return "W"
 
     def get_power(self) -> float:
         """
@@ -143,19 +182,57 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         Returns:
             float: The measured power.
         """
-        power =  c_double()
-        self.powerMeter.measPower(byref(power),TLPM_DEFAULT_CHANNEL)
-        return power.value
 
-    def get_wavelength(self) -> float:
+        power =  c_double()
+        self.driver.measPower(byref(power),TLPM_DEFAULT_CHANNEL)
+        return power.value
+    
+    def get_power_mW(self) -> float:
+        return self.get_power() * 1000
+    
+    def get_min_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the power meter.
 
         Returns:
             float: The wavelength in nanometers.
         """
-        pass
 
+        wavelength = c_double()
+        attribute = c_int()
+        attribute.value = 1
+        self.driver.getWavelength(attribute=attribute, wavelength=byref(wavelength), channel=TLPM_DEFAULT_CHANNEL)
+
+        return wavelength.value
+    
+    def get_max_wavelength(self) -> float:
+        """
+        Retrieves the current wavelength setting of the power meter.
+
+        Returns:
+            float: The wavelength in nanometers.
+        """
+
+        wavelength = c_double()
+        attribute = c_int()
+        attribute.value = 2
+        self.driver.getWavelength(attribute=attribute, wavelength=byref(wavelength), channel=TLPM_DEFAULT_CHANNEL)
+
+        return wavelength.value
+
+    def set_power_ref(self, power_reference_value):
+        """
+        Sets the power reference value.
+
+        Args:
+            power_reference_value (float): Specifies the power reference value.
+
+        Returns:
+            int: The return value, 0 is for success.
+        """
+        
+        self.driver.setPowerRef(power_reference_value, channel=TLPM_DEFAULT_CHANNEL)
+    
     def reset(self) -> None:
         """
         Resets the power meter to its default state.
@@ -166,5 +243,5 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         Initiates a zero correction procedure on the detector.
         """
-        pass
+        self.driver.startDarkAdjust(channel=TLPM_DEFAULT_CHANNEL)
 
