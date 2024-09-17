@@ -19,12 +19,6 @@ class Toptica_DLC_PRO_Driver(Connectable):
         self.ip_address = ip_address
         self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(self.ip_address))
 
-    def __del__(self):
-        """
-        Destructor method that ensures the connection to the laser controller is closed when the object is deleted.
-        """
-        self.disconnect()
-
     def connect(self):
         """
         Opens the connection to the laser controller.
