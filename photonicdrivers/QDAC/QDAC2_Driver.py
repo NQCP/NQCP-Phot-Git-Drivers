@@ -146,11 +146,9 @@ class QDAC2_Driver(Connectable):
     ##################### CONNECTABLE ###########################
     
     def disconnect(self) -> None:
-        print('Closing QDAC ethernet connection')
         self.sock.close()
 
     def connect(self) -> None:
-        print('Connecting to QDAC via ethernet')
         self.sock.connect(self.server_address) 
 
     def is_connected(self) -> bool:

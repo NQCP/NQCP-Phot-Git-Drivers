@@ -45,7 +45,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
             bool: True if the device is connected, False otherwise.
         """
         try:
-            return self.get_idn() is not None
+            return bool(self.get_idn()) is not None
         except ConnectionError:
             return False
         except Exception:
