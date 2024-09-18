@@ -74,7 +74,10 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         Returns:
             int: The number of averaging cycles.
         """
-        pass
+
+        average = c_int()
+        self.driver.getAvgCnt(averageCount=byref(average), channel=TLPM_DEFAULT_CHANNEL)
+        return average.value
 
     def set_averaging(self, average: int) -> None:
         """
@@ -83,7 +86,9 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         Args:
             average (int): The number of averaging cycles to set.
         """
-        pass
+
+        average = c_uint16(average)
+        self.driver.setAvgCnt(averageCount=average, channel=TLPM_DEFAULT_CHANNEL)
 
     def set_config_power(self) -> None:
         """
