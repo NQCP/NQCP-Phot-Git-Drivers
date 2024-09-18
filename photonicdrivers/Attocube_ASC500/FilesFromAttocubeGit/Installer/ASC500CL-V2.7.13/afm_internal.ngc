@@ -1,0 +1,30 @@
+<!-- GUI-und Display-Konfiguration AFM-Experiment - NHands 2007 -->
+<!-- $Id: afm_internal.ngc,v 1.4 2009/06/24 22:13:47 trurl Exp $ -->
+<Experiment Name="AFM internal settings" ScreenX="10" ScreenY="1" >
+  <Tab Name="AFM" Icon="scanner.xpm">
+
+
+    <Widget Type="Box"   Caption=""  Style="Flat"           Height="5"               X="0" Y="0"    >
+		
+		<Widget Type="Check" Caption="Feedback Z absolute"        X="0" Y="3"               Address="0x6F" Index="0"  Persist="1" />
+		
+		<Widget Type="Box" Caption="DAC Spec Connect"             X="0" Y="4" >
+			<Widget Type="Xedit" Caption="DAC No 0  (DAC1)"       X="0" Y="0"               Address="0x83" Index="0"  Persist="1" DefVal="2" />
+			<Widget Type="Xedit" Caption="DAC No 1  (DAC2)"       X="0" Y="1"               Address="0x83" Index="1"  Persist="1" DefVal="0" />
+			<Widget Type="Xedit" Caption="DAC No 3  (DAC3)"       X="0" Y="2"               Address="0x83" Index="2"  Persist="1" DefVal="0" />
+			<Widget Type="Xedit" Caption="DAC No 4  (DAC4)"       X="0" Y="3"               Address="0x83" Index="3"  Persist="1" DefVal="0" />
+			<Widget Type="Xedit" Caption="DAC No 24 (Frequ)"      X="0" Y="4"               Address="0x83" Index="24" Persist="1" DefVal="4" />
+			<Widget Type="Xedit" Caption="DAC No 26 (Z)"          X="0" Y="5"               Address="0x83" Index="26" Persist="1" DefVal="1" />
+			<Widget Type="Xedit" Caption="DAC No 27 (LF)"         X="0" Y="6"               Address="0x83" Index="27" Persist="1" DefVal="3" />
+		</Widget>
+		
+		<Widget Type="Xedit" Caption="Path Spec Channel"          X="0" Y="5"               Address="0x26B" Index="0" Persist="1" DefVal="3" />
+		
+		<Widget Type="Check" Caption="Allow dynamic scan speed change" X="0" Y="6"          Address="0x103D" Index="0" Persist="1" DefVal="1" />
+		
+    </Widget>
+    
+
+  </Tab>
+  
+</Experiment>

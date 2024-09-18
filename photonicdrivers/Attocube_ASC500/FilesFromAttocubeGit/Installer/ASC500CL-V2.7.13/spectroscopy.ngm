@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: spectroscopy.ngm,v 1.6 2018/05/03 09:07:53 zaphod Exp $ -->
+<!-- Eine ASC500-Spektroskopie
+     Parameter: P0 = Spektroskopie-Nummer
+     Parameter: P1 = DAC-No u.a. anzeigen (unterdrücken für Calibration) (bool) -->
+<Module>
+  <Widget Type="Box" Style="Flat"                         X="0" Y="0" Align="Top" >
+    <Widget Type="Label"    Caption=""                      X="0" Y="0" />
+    <Widget Type="Label"    Caption=""                      X="0" Y="1" />
+    <Widget Type="Label"    Caption="DAC"                   X="0" Y="2" Condition="P1" Align="Left" />
+    <Widget Type="Combo"    Caption=""                      X="1" Y="2" Width="2" Address="0x257" Index="$P0$" Condition="and(P1,or(==(HwType,4096),==(HwType,8192),<(HwType,0)))"
+                                                                        Choices="Disable=-1:DAC 1=0:DAC 2=1:Z=26:Low Freq=27" Persist="1"/>
+    <Widget Type="Combo"    Caption=""                      X="1" Y="2" Width="2" Address="0x257" Index="$P0$" Condition="and(P1,or(==(HwType,4352),==(HwType,4608),==(HwType,4864),==(HwType,5120)))"
+                                                                        Choices="Disable=-1:DAC 1=0:DAC 2=1:DAC 3=2:DAC 4=3:Z=26:Low Freq=27" Persist="1" />
+    <Widget Type="Label"    Caption="Start"                 X="0" Y="3" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="3" Width="2" Address="0x1500" Index="$P0$" Prefix=" " Scale="1000." Accuracy="10" Persist="1" >
+      <Connect Name="Unit"  Address="0x1502" Index="$P0$" />
+    </Widget>
+    <Widget Type="Label"    Caption="End"                   X="0" Y="4" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="4" Width="2" Address="0x1501" Index="$P0$" Prefix=" " Scale="1000." Accuracy="10" Persist="1" >
+      <Connect Name="Unit"  Address="0x1502" Index="$P0$" />
+    </Widget>
+    <Widget Type="Label"    Caption="Points"                X="0" Y="5" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="5" Width="2" Address="0x252" Index="$P0$" Unit="" Prefix="X" Scale="1" Min="0" Max="65535" Persist="1" />
+    <Widget Type="Label"    Caption="Fwd/Bwd"               X="0" Y="6" Align="Left" />
+    <Widget Type="Check"    Caption=""                      X="1" Y="6" Width="2" Address="0x259" Index="$P0$"  Persist="1" />
+    <Widget Type="Label"    Caption="Repeat"                X="0" Y="7" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="7" Width="2" Address="0x258" Index="$P0$" Unit="" Prefix="X" Scale="1" Min="0" Max="65535" Persist="1" />
+    <Widget Type="Label"    Caption="Avg Time"              X="0" Y="8" Tip="Average Time per Data Point" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="8" Width="2" Address="0x253" Index="$P0$" Unit="s" Prefix="u" Scale="0.4" Min="2.5" Max="163837"   Persist="1" Tip="Average Time per Data Point" />
+    <Widget Type="Label"    Caption="Delay"                 X="0" Y="9" Tip="Delay per Data Point" Align="Left" />
+    <Widget Type="Xedit"    Caption=""                      X="1" Y="9" Width="2" Address="0x255" Index="$P0$" Unit="s" Prefix="u" Scale="0.4" Min="0"   Max="10000000" Persist="1" Tip="Delay per Data Point" />
+
+    <Dialog                 Caption="Details"               X="1" Y="10" Width="2" Modal="0" Popup="Button" Tip="Extended Settings" >
+      <Widget Type="Label"    Caption="Wait Start"          X="0" Y="0" Align="Left" />
+      <Widget Type="Xedit"    Caption=""                    X="1" Y="0" Width="2" Address="0x0268" Index="$P0$" Unit="s" Prefix="m" Min="0" Max="65535" Persist="1" />
+      <Widget Type="Label"    Caption="Wait Finish"         X="0" Y="1" Align="Left" />
+      <Widget Type="Xedit"    Caption=""                    X="1" Y="1" Width="2" Address="0x0269" Index="$P0$" Unit="s" Prefix="m" Min="0" Max="65535" Persist="1" />
+      <Widget Type="Label"    Caption="Loop Off"            X="0" Y="2" Align="Left" />
+      <Widget Type="Check"    Caption=""                    X="1" Y="2" Width="2" Address="0x026A" Index="$P0$" Persist="1" />
+      <Widget Type="Box"      Caption="Limiter"             X="0" Y="3" Width="3" Style="Box" Condition="P1" >
+        <Widget Type="Label"    Caption="Active"            X="0" Y="0" Align="Left" />
+        <Widget Type="Check"    Caption=""                  X="1" Y="0" Address="0x025D" Index="$P0$" Persist="1"  />
+        <Widget Type="Label"    Caption="Source"            X="0" Y="1" Align="Left" />
+        <Widget Type="Combo"    Caption=""                  X="1" Y="1" Address="0x025A" Index="$P0$" Choices="$SignalNames$" Persist="1" />
+        <Widget Type="Label"    Caption="Value"             X="0" Y="2" Align="Left" />
+        <Widget Type="Xedit"    Caption=""                  X="1" Y="2" Address="0x025B" Index="$P0$" Scale="1" Persist="1" >
+          <Connect Name="Unit"     Address="0x25F"   Index="$P0$" />
+          <Connect Name="Scale"    Address="0x1503"  Index="$P0$" />
+          <Connect Name="Offset"   Address="0x1504"  Index="$P0$" />
+        </Widget>
+        <Widget Type="Label"    Caption="Sign"              X="0" Y="3" Align="Left" />
+        <Widget Type="Combo"    Caption=""                  X="1" Y="3" Address="0x025C" Index="$P0$" Choices="Source > Value=0:Source < Value" Persist="1" />
+      </Widget>
+    </Dialog>
+
+    <Widget Type="Label"    Caption=""                      X="0" Y="11" Align="Left" />
+    <Widget Type="Box"      Style="Box"                     X="0" Y="12" Width="3" Spacing="0" >
+      <Widget Type="Label" Caption="   "                    X="0" Y="0" />
+      <Widget Type="Button" Icon="scanstop.xpm"             X="1" Y="0" Address="0x256" Index="$P0$" Toggle="0" Data="0" Tip="Stop Spectroscopy" />
+      <Widget Type="Button" Icon="scanstart.xpm"            X="2" Y="0" Address="0x256" Index="$P0$" Toggle="1" Data="1" Tip="Start Spectroscopy" />
+      <Widget Type="Label" Caption="   "                    X="3" Y="0" />
+      <Widget Type="Led"   Caption=""                       X="4" Y="0" Width="1" Align="Right" Address="0x256" Index="$P0$" Grey="0" Red="-1" Green="1" Tip="Spectroscopy Status" />
+      <Widget Type="Label" Caption="   "                    X="5" Y="0" />
+    </Widget>
+  </Widget>
+
+</Module>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Panel Name="Signals">
+
+  <Widget Type="Box" Style="Flat" Align="Top">
+
+    <Widget Type="Label" Caption="Internal Calibration"  X="1" Y="0" Width="2" />
+    <Widget Type="Label" Caption="External Transfer"     X="4" Y="0" Width="3" />
+    <Widget Type="Label" Caption="Signal"                X="0" Y="1" Align="Left" />
+    <Widget Type="Label" Caption="Gain"                  X="1" Y="1" Align="Left" />
+    <Widget Type="Label" Caption="Offset"                X="2" Y="1" Align="Left" />
+    <Widget Type="Label" Caption="Gain"                  X="4" Y="1" Align="Left" />
+    <Widget Type="Label" Caption="Offset"                X="5" Y="1" Align="Left" />
+    <Widget Type="Label" Caption="Unit"                  X="6" Y="1" Align="Left" />
+
+    <Macro Type="Repeater" Entries="$SignalNames$" >
+      <Widget Type="Label"  Caption="$Text$"    X="0" Y="$+(Counter,2)$" Rich="0" Align="Left" />
+      <Widget Type="Xedit"  Caption=""          X="1" Y="$+(Counter,2)$" Address="0x1040" Index="$Index$" Scale="1000000." />
+      <Widget Type="Xedit"  Caption=""          X="2" Y="$+(Counter,2)$" Address="0x1041" Index="$Index$" Scale="1000000." >
+        <Connect Name="Unit"  Address="0x1048" Index="$Index$" />
+      </Widget>
+      <Widget Type="Label"  Caption=" "         X="3" Y="$+(Counter,2)$" />
+      <Widget Type="Xedit"  Caption=""          X="4" Y="$+(Counter,2)$" Address="0x1042" Index="$Index$" Scale="1000000." Prefix="X" />
+      <Widget Type="Xedit"  Caption=""          X="5" Y="$+(Counter,2)$" Address="0x1043" Index="$Index$" Scale="1000000." >
+        <Connect Name="Unit"  Address="0x1048" Index="$Index$" />
+      </Widget>
+      <Widget Type="Combo"  Caption=""          X="6" Y="$+(Counter,2)$" Address="0x1044" Index="$Index$" Choices="mm:um:nm:pm:V:mV:uv:nV:MHz:kHz:Hz:mHz:s:ms:us:ns:A:mA:uA:nA:deg:mdeg:[cos]=24:[dB]=28:W=32:mW:uW:nW:T=36:mT:uT:nT:transparent=0xFF"/>
+    </Macro>
+
+  </Widget>
+
+</Panel>

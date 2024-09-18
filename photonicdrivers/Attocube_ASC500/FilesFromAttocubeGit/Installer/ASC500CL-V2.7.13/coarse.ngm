@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: coarse.ngm,v 1.1 2013/05/08 13:42:29 zaphod Exp $ -->
+<!-- Widget zur Einstellung der Setpoint-Mudulation für Regler Nr. P0
+     Parameter: P0 = Reglernummer, Index in Adresse 0x77 0x78 0x79 0x7B 0x10DF
+                P1 = Adresse für Einheit des Setpoint
+                P2 = Index für Einheit des Setpoint      -->
+<Module>
+    <Widget Type="Box"   Caption="Axis $+(Counter,1)$"             X="$P0$" Y="0"  Style="Box"  >  
+      <Widget Type="Xedit"  Caption="Frequency"                    X="0" Y="0"  Address="0x280" Index="$P0$" Unit="Hz" Prefix=" " Width="1"  Min="1" Max="8000" Persist="1" />
+      <Widget Type="Xedit"  Caption="Amplitude"                    X="0" Y="1"  Address="0x281" Index="$P0$" Unit="V" Prefix=" " Width="1"  Min="0" Max="70"   Persist="1" />
+      <Widget Type="Check" Caption="Enable"                        X="0" Y="2"  Address="0x284" Index="$P0$" Data="1" OffData="2"  Persist="1" />
+      <Widget Type="Xedit"  Caption="Max. Crs. Steps"              X="0" Y="3"  Address="0x289" Index="$P0$" Width="1"  Min="0" Max="65535"   Persist="1" />
+      <Widget Type="Box" Caption="" Style="Flat"                   X="0" Y="4"  Height="2" />
+      <Widget Type="Box"   Caption=""                              X="0" Y="5"  Style="Flat"  >  
+        <Widget Type="Box"   Caption=""                            X="0" Y="0"  Style="Flat"  >
+          <Widget Type="Label"  Caption="Step"                     X="0" Y="0"  Align="Left VCenter"/>
+          <Widget Type="Box"   Caption=""                          X="0" Y="1"  Style="Flat"  >
+            <Widget Type="Button" Icon="arrow_up_broken.xpm"       X="1" Y="0"  Address="0x285" Index="$P0$"/>
+            <Widget Type="Button" Icon="arrow_down_broken.xpm"     X="2" Y="0"  Address="0x286" Index="$P0$"/>
+          </Widget>
+        </Widget>
+        <Widget Type="Box"   Caption=""                            X="0" Y="1"  Style="Flat"  >
+          <Widget Type="Label"  Caption="Cont"                     X="0" Y="0"  Align="Left VCenter"/>
+          <Widget Type="Box"   Caption=""                          X="0" Y="1"  Style="Flat"  >
+            <Widget Type="Button" Icon="arrow_up.xpm"              X="1" Y="1"  Address="0x287" Index="$P0$" Toggle="2" />
+            <Widget Type="Button" Icon="arrow_down.xpm"            X="2" Y="1"  Address="0x288" Index="$P0$" Toggle="2" />
+          </Widget>
+        </Widget>
+      </Widget>
+    </Widget>
+</Module>

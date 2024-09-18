@@ -1,0 +1,173 @@
+ASC500CL Software Release Notes
+===============================
+
+Version 2.7 (main trunk)
+========================
+
+ASC500CL-V2.7.13
+----------------
+- Bugfix in Daisybase documentation: autoapproach threshold parameter outdated
+
+ASC500CL-V2.7.12
+----------------
+- Bugfix: Frame view displayed incorrect coordinates when zoomed and rotated
+- Bugfix: Removed crosslink signals from GUI if KPFM feature is not active
+
+ASC500CL-V2.7.11
+----------------
+- Z out inv signal fixed for bipolar Z
+- Retract Z behaviour fixed for changes in output limits
+
+ASC500CL-V2.7.10
+----------------
+- Closed loop sensitivity adjustment in higher resolution
+
+ASC500CL-V2.7.9
+---------------
+- Fixed memory leak in Daisy
+
+ASC500CL-V2.7.8
+---------------
+- Piezo voltage range monitoring fixed
+
+ASC500CL-V2.7.7
+---------------
+- Pixel, line and frame trigger output fixed
+
+ASC500CL-V2.7.6
+---------------
+- External handshake for path mode added to DLL
+
+ASC500CL-V2.7.5
+---------------
+- Closed loop fixed
+
+ASC500CL-V2.7.4
+---------------
+- Version info of installer version fixed
+- Lithographie features enabled by dongle fixed
+
+ASC500CL-V2.7.3
+---------------
+- Lithographie feature fixed
+
+ASC500CL-V2.7.2
+---------------
+- Goto X/Y feature added to DLL
+
+ASC500CL-V2.7.1
+ASC500CL-19_02_25
+-----------------
+- Pixel- Line- and Frametrigger fixed
+
+ASC500CL-18_11_13
+----------------
+- Possible overflow in scanner limitation fixed
+
+ASC500CL-18_10_16
+-----------------
+- Added a few parameters and helper function to clientlib
+
+ASC500CL-18_09_25
+-----------------
+- Bugfix: GPIO Output doesn't work
+
+ASC500CL-18_08_08
+-----------------
+- Bugfix: Scanner stops after first line when rotated by 270 deg
+
+ASC500CL-18_07_27
+-----------------
+- Bugfix: Autoapproach threshold re-enabled for daisybase "remote control"
+- Bugfix: Dual pass topography timing fixed
+
+ASC500CL-18_07_09
+-----------------
+- Absolute coordinates in Horiba Raman spectrometer interface
+
+ASC500CL-18_06_07
+-----------------
+- Added parameter "Closed Loop Sensitivity" to experiment preferences
+
+ASC500CL-18_04_09
+-----------------
+- "Move To Home" action for path mode fixed
+
+ASC500CL-18_03_27
+-----------------
+- "Move To Home" action for path mode now executes a "retract" if z feedback is active
+- closed loop fixed
+
+ASC500CL-18_02_21
+-----------------
+- Crosslink fixed
+- Additional parameter "PLL" for dual pass mode
+- Q control parameters added to parameter file
+
+ASC500CL-18_02_14
+-----------------
+- Implemented handshake with Horiba Raman spectrometer
+
+ASC500CL-18_02_05
+-----------------
+- Bugfix: ADC6 didn't work properly
+
+ASC500CL-17_12_21
+-----------------
+- Bugfix: Displays for Z-Out(-inverted) incorrectly scaled after temperature change
+
+ASC500CL-17_12_18
+-----------------
+- Bugfix: In forward/backward spectroscopy, backward part isn't stored in CSV file
+- ASC500 Features (Z and AFM) optional
+
+ASC500CL-17_05_10
+-----------------
+- Bugfix: X-Y output limitation sets voltage to 0 in special case
+
+ASC500CL-17_01_13
+-----------------
+- Bugfix: Slope compensation now takes piezo transfer functions into account
+- Bugfix: Missing meta data in some saved data files
+- Bugfix: Daisy crashes when loading complex profiles
+- Bugfix: FFT display locked in invalid state after implausible inputs
+- Bugfix: Fix X=Y doesn't work when lines / columns are changed
+- Bugfix: Scanwidget buttons "home" and "maximize" consider unipolar setting
+- Again extended daisybase API
+
+ASC500CL-17_01_09
+-----------------
+- Scanner positioning with negative output voltages fixed
+- Z Feedback bug with inverted polarity fixed
+- Unit for counter signal fixed
+
+ASC500CL-16_10_25
+-----------------
+- Extended daisybase API
+- Extended data unit system (internal)
+
+ASC500CL-16_10_10
+-----------------
+- Selectable NSL port for coarse control
+
+ASC500CL-16_09_22
+-----------------
+- Extended headers of output files as interface to Gwiddyon
+
+ASC500CL-16_08_19
+-----------------
+- Bugfix: inhibit negative scan range by mouse drag in the scan widget
+- Bugfix: Path mode button usable when path is processed
+- "Gray out" scan speed edit box when scan is running
+- sensor position saved in parameter file
+
+ASC500CL-16_08_04
+-----------------
+- Bugfix: "Move Origin here" imprecise
+- Bugfix: output deactivate confirmed before scanner reaches voltage zero
+- Bugfix: inconsistent states in path mode (no motion but actions processed)
+- Bugfix: inhibit invalid move speed above 400 um/s
+- Bugfix: accept new value for I when dual pass scan is running
+- Bugfix: noise problem in dual pass scan
+- Bugfix: picking tool for new center fixed
+- Bugfix: inhibit activation of "dual pass" when scan is running

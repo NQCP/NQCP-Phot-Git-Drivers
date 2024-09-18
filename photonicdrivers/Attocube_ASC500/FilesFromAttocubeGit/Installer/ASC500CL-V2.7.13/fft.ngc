@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- FFT Filter and Display for Daisy -->
+<!-- $Id: fft.ngc,v 1.3 2016/04/26 12:58:34 trurl Exp $ -->
+<Panel Caption="Extra FFT" Datagroups="8" Icon="screencurve.xpm">
+    <View Dgroup="8" ChannelSelector="Restricted"  Caption="Extra Frequency Analysis"          X="0" Y="0" >
+        <Plugin Type="FFT Data Filter" Caption="FFT" >
+            <Option Name="FftSizeMax" Value="65536" />
+        </Plugin>
+        
+        <Plugin Type="Line Display 2"  Size="50" Caption="Extra FFT Display"  >
+            <Option Name="DisplayToolBar" Value="1" />
+        </Plugin>
+    </View>
+</Panel>

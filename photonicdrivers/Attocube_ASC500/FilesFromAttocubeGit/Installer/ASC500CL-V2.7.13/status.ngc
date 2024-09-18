@@ -1,0 +1,88 @@
+<Panel Caption="Global Status" Icon="debug.xpm">
+
+	<Widget   Type="Box"                                  X="0" Y="0"  Style="Flat" >
+		<Widget   Type="Box"      Caption="Outputs"           X="0" Y="0"  Style="Box" >
+			<Widget Type="Label" Caption="Output Status"      X="0" Y="0" Alignment="Left" />
+			<Widget Type="Led"   Caption=""                   X="1" Y="0" Address="0x140" Align="Right" />
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Scanner"       X="0" Y="1"  Style="Box" >
+			<Widget Type="Label" Caption="Scanner Status"     X="0" Y="1" Alignment="Left" />
+			<Widget Type="Led"   Caption=""                   X="1" Y="1" Width="1" Align="Right" Address="0x100"   Grey="0" Red="3" Green="1"  Tip="Scanner Status"/>
+			
+			<Widget Type="Label" Caption="Scanner Moving"     X="0" Y="2" Alignment="Left" />
+			<Widget Type="Led"   Caption=""                   X="1" Y="2" Width="1" Align="Right" Address="0x101"   Grey="0" Red="1" Green="-1" Tip="Scanner Moving" />
+			
+			<Widget Type="Label" Caption="Scanner Adjusting"  X="0" Y="3" Alignment="Left" />
+			<Widget Type="Led"   Caption=""                   X="1" Y="3" Width="1" Align="Right" Address="0x104"   Grey="0" Red="1" Green="-1" Tip="Scanner Adjusting" />
+		</Widget>
+			
+		<Widget   Type="Box"      Caption="Z Feedback"    X="0" Y="2"  Style="Box" >
+			<Widget Type="Label" Caption="Loop On"            X="0" Y="2" Alignment="Left" />
+			<Widget Type="Led"                                X="1" Y="2"  Address="96"   Grey="0" Red="-1" Green="1"  Align="Right" />
+			
+			<Widget Type="Label"  Caption="Clipping"          X="0" Y="3" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                  X="1" Y="3" Address="0x7C"  Grey="0" Red="1" Green="-1"  Align="Right"  />
+			
+			<Widget Type="Label"  Caption="Adjusting"         X="0" Y="4" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                  X="1" Y="4" Address="0x7D"  Grey="0" Red="1" Green="-1"  Align="Right"  />
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Amplitude Feedback" X="0" Y="3"  Style="Box" >
+			<Widget Type="Label" Caption="Loop On"            X="0" Y="0" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                  X="1" Y="0"  Address="0xE7" Index="0" Grey="0" Red="-1" Green="1" Align="Right" />
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Frequency Feedback" X="0" Y="4"  Style="Box" >
+			<Widget Type="Label"  Caption="Loop On"            X="0" Y="0" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                   X="1" Y="0"  Address="0xEB" Index="0" Grey="0" Red="-1" Green="1" Align="Right" />
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Generic Transfer 1" X="0" Y="5"  Style="Box" >
+			<Widget Type="Label"  Caption="On"                 X="0" Y="0" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                   X="1" Y="0"   Address="0x1C6" Index="0" Grey="0" Red="-1" Green="1"  Align="Right"/>
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Generic Transfer 2" X="0" Y="6"  Style="Box" >
+			<Widget Type="Label"  Caption="On"                 X="0" Y="0" Alignment="Left" />
+			<Widget Type="Led"    Caption=""                   X="1" Y="0"   Address="0x1C6" Index="1" Grey="0" Red="-1" Green="1" Align="Right" />
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Spectroscopy"       X="0" Y="7"  Style="Box" >
+            <Widget Type="Label"    Caption="Spec 1"           X="0" Y="0"  Alignment="Left"/>
+            <Widget Type="Led"      Caption=""                 X="1" Y="0"  Address="0x256" Index="0" Grey="0" Red="-1" Green="1" Align="Right" />
+			
+			<Widget Type="Label"    Caption="Spec 2"           X="0" Y="1"  Alignment="Left"/>
+			<Widget Type="Led"      Caption=""                 X="1" Y="1"  Address="0x256" Index="1" Grey="0" Red="-1" Green="1" Align="Right"/>
+			
+			<Widget Type="Label"    Caption="Spec 3"           X="0" Y="2"  Alignment="Left"/>
+			<Widget Type="Led"      Caption=""                 X="1" Y="2"  Address="0x256" Index="2" Grey="0" Red="-1" Green="1" Align="Right"/>
+			
+			<Widget Type="Label"    Caption="Resonance"        X="0" Y="3"  Alignment="Left"/>
+			<Widget Type="Led"      Caption=""                 X="1" Y="3"  Address="0x256" Index="3" Grey="0" Red="-1" Green="1" Align="Right"/>
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Auto Approach"          X="0" Y="8"  Style="Box" >
+			<Widget Type="Label"  Caption="Status"                     X="0" Y="0" Alignment="Left"/>
+			<Widget Type="Led"    Caption=""                           X="1" Y="0" Address="0x90" Grey="0" Red="-1" Green="1" Align="Right"/>
+			
+			<Widget Type="Label"  Caption="Coarse Stepping"            X="0" Y="1" Alignment="Left"/>
+			<Widget Type="Led"    Caption=""                           X="1" Y="1" Address="0xA6" Grey="0" Red="-1" Green="1" Align="Right"/>
+		</Widget>
+		
+		<Widget   Type="Box"      Caption="Path Mode"              X="0" Y="9"  Style="Box" >
+			<Widget Type="Label"  Caption="Ext. Trigger Waiting For Ack"  X="0" Y="1" Alignment="Left"/>
+			<Widget Type="Led"    Caption=""                              X="1" Y="1" Address="0x275" Index="0" Grey="0" Red="-1" Green="1" Align="Right"/>
+			
+			<Widget Type="Label"  Caption="Path Waiting For Ack"          X="0" Y="2" Alignment="Left"/>
+			<Widget Type="Led"    Caption=""                              X="1" Y="2" Address="0x267" Index="0" Grey="0" Red="-1" Green="1" Align="Right"/>
+		</Widget>
+		
+
+	</Widget>
+	
+	<!--
+	<Widget   Type="Box"      Caption=""                  X="0" Y="1"  Style="Flat" Height="10" />
+	<Widget   Type="Box"      Caption=""                  X="1" Y="1"  Style="Flat" Width="10"  />
+	-->
+</Panel>

@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Profile Height="1033" Width="1619" X="15" Y="1">
+  <Panel File="C:/Users/Attocube/Desktop/ASC500_Python_Control/Installer/ASC500CL-V2.7.13/asc.ngc"/>
+  <Persistence>
+    <Persist Addr="0x10" Index="0" Value="150000"/>
+    <Persist Addr="0x11" Index="0" Value="150000"/>
+    <Persist Addr="0x18" Index="0" Value="0"/>
+    <Persist Addr="0x1d" Index="0" Value="100"/>
+    <Persist Addr="0x2e" Index="0" Value="1"/>
+    <Persist Addr="0x2f" Index="0" Value="1"/>
+    <Persist Addr="0x31" Index="0" Value="3"/>
+    <Persist Addr="0x31" Index="1" Value="18"/>
+    <Persist Addr="0x31" Index="2" Value="13"/>
+    <Persist Addr="0x31" Index="3" Value="13"/>
+    <Persist Addr="0x31" Index="4" Value="13"/>
+    <Persist Addr="0x31" Index="5" Value="14"/>
+    <Persist Addr="0x31" Index="6" Value="5"/>
+    <Persist Addr="0x31" Index="7" Value="13"/>
+    <Persist Addr="0x31" Index="8" Value="5"/>
+    <Persist Addr="0x31" Index="9" Value="8"/>
+    <Persist Addr="0x31" Index="10" Value="13"/>
+    <Persist Addr="0x31" Index="11" Value="8"/>
+    <Persist Addr="0x31" Index="12" Value="13"/>
+    <Persist Addr="0x31" Index="13" Value="0"/>
+    <Persist Addr="0x32" Index="0" Value="16384"/>
+    <Persist Addr="0x32" Index="1" Value="16384"/>
+    <Persist Addr="0x32" Index="2" Value="16384"/>
+    <Persist Addr="0x32" Index="3" Value="32000"/>
+    <Persist Addr="0x32" Index="4" Value="2000"/>
+    <Persist Addr="0x32" Index="5" Value="2000"/>
+    <Persist Addr="0x32" Index="6" Value="16384"/>
+    <Persist Addr="0x32" Index="7" Value="0"/>
+    <Persist Addr="0x32" Index="8" Value="16384"/>
+    <Persist Addr="0x32" Index="9" Value="16384"/>
+    <Persist Addr="0x32" Index="10" Value="2000"/>
+    <Persist Addr="0x32" Index="11" Value="32000"/>
+    <Persist Addr="0x32" Index="12" Value="400"/>
+    <Persist Addr="0x32" Index="13" Value="400"/>
+    <Persist Addr="0x33" Index="3" Value="0"/>
+    <Persist Addr="0x33" Index="4" Value="9"/>
+    <Persist Addr="0x33" Index="5" Value="9"/>
+    <Persist Addr="0x35" Index="0" Value="1"/>
+    <Persist Addr="0x35" Index="1" Value="1"/>
+    <Persist Addr="0x35" Index="2" Value="1"/>
+    <Persist Addr="0x35" Index="3" Value="0"/>
+    <Persist Addr="0x35" Index="4" Value="0"/>
+    <Persist Addr="0x35" Index="5" Value="0"/>
+    <Persist Addr="0x35" Index="6" Value="1"/>
+    <Persist Addr="0x35" Index="7" Value="1"/>
+    <Persist Addr="0x35" Index="8" Value="1"/>
+    <Persist Addr="0x35" Index="9" Value="1"/>
+    <Persist Addr="0x35" Index="10" Value="1"/>
+    <Persist Addr="0x35" Index="11" Value="1"/>
+    <Persist Addr="0x35" Index="12" Value="1"/>
+    <Persist Addr="0x35" Index="13" Value="0"/>
+    <Persist Addr="0x3b" Index="0" Value="1"/>
+    <Persist Addr="0x3b" Index="1" Value="1"/>
+    <Persist Addr="0x3b" Index="2" Value="1"/>
+    <Persist Addr="0x3b" Index="3" Value="3"/>
+    <Persist Addr="0x3b" Index="4" Value="6"/>
+    <Persist Addr="0x3b" Index="5" Value="6"/>
+    <Persist Addr="0x3b" Index="6" Value="1"/>
+    <Persist Addr="0x3b" Index="7" Value="9"/>
+    <Persist Addr="0x3b" Index="8" Value="7"/>
+    <Persist Addr="0x3b" Index="9" Value="0"/>
+    <Persist Addr="0x3b" Index="10" Value="7"/>
+    <Persist Addr="0x3b" Index="11" Value="3"/>
+    <Persist Addr="0x3b" Index="12" Value="8"/>
+    <Persist Addr="0x3b" Index="13" Value="0"/>
+    <Persist Addr="0x40" Index="0" Value="0"/>
+    <Persist Addr="0x40" Index="1" Value="0"/>
+    <Persist Addr="0x40" Index="2" Value="0"/>
+    <Persist Addr="0x40" Index="3" Value="0"/>
+    <Persist Addr="0x40" Index="4" Value="0"/>
+    <Persist Addr="0x40" Index="5" Value="0"/>
+    <Persist Addr="0x41" Index="0" Value="0"/>
+    <Persist Addr="0x41" Index="1" Value="0"/>
+    <Persist Addr="0x41" Index="2" Value="0"/>
+    <Persist Addr="0x41" Index="3" Value="0"/>
+    <Persist Addr="0x41" Index="4" Value="0"/>
+    <Persist Addr="0x41" Index="5" Value="0"/>
+    <Persist Addr="0x42" Index="0" Value="0"/>
+    <Persist Addr="0x42" Index="1" Value="0"/>
+    <Persist Addr="0x42" Index="2" Value="0"/>
+    <Persist Addr="0x42" Index="3" Value="0"/>
+    <Persist Addr="0x42" Index="4" Value="0"/>
+    <Persist Addr="0x42" Index="5" Value="0"/>
+    <Persist Addr="0x52" Index="0" Value="0"/>
+    <Persist Addr="0x53" Index="0" Value="0"/>
+    <Persist Addr="0x5d" Index="0" Value="0"/>
+    <Persist Addr="0x62" Index="0" Value="13"/>
+    <Persist Addr="0x63" Index="0" Value="20121960"/>
+    <Persist Addr="0x68" Index="0" Value="1"/>
+    <Persist Addr="0x6b" Index="0" Value="571"/>
+    <Persist Addr="0x6c" Index="0" Value="1756"/>
+    <Persist Addr="0x6f" Index="0" Value="0"/>
+    <Persist Addr="0x77" Index="0" Value="0"/>
+    <Persist Addr="0x77" Index="1" Value="0"/>
+    <Persist Addr="0x77" Index="2" Value="50000"/>
+    <Persist Addr="0x77" Index="3" Value="0"/>
+    <Persist Addr="0x77" Index="4" Value="0"/>
+    <Persist Addr="0x78" Index="0" Value="0"/>
+    <Persist Addr="0x78" Index="1" Value="0"/>
+    <Persist Addr="0x78" Index="2" Value="2982618"/>
+    <Persist Addr="0x78" Index="3" Value="0"/>
+    <Persist Addr="0x78" Index="4" Value="0"/>
+    <Persist Addr="0x7b" Index="0" Value="0"/>
+    <Persist Addr="0x7b" Index="1" Value="0"/>
+    <Persist Addr="0x7b" Index="2" Value="20000"/>
+    <Persist Addr="0x7b" Index="3" Value="0"/>
+    <Persist Addr="0x7b" Index="4" Value="0"/>
+    <Persist Addr="0x7f" Index="0" Value="5"/>
+    <Persist Addr="0x80" Index="0" Value="0"/>
+    <Persist Addr="0x80" Index="1" Value="0"/>
+    <Persist Addr="0x80" Index="2" Value="0"/>
+    <Persist Addr="0x80" Index="3" Value="0"/>
+    <Persist Addr="0x83" Index="0" Value="2"/>
+    <Persist Addr="0x83" Index="1" Value="0"/>
+    <Persist Addr="0x83" Index="2" Value="0"/>
+    <Persist Addr="0x83" Index="3" Value="0"/>
+    <Persist Addr="0x83" Index="24" Value="4"/>
+    <Persist Addr="0x83" Index="26" Value="1"/>
+    <Persist Addr="0x83" Index="27" Value="3"/>
+    <Persist Addr="0x87" Index="0" Value="257690"/>
+    <Persist Addr="0x89" Index="0" Value="257690"/>
+    <Persist Addr="0x8c" Index="0" Value="1"/>
+    <Persist Addr="0x8c" Index="1" Value="1"/>
+    <Persist Addr="0x8c" Index="2" Value="1"/>
+    <Persist Addr="0x8c" Index="3" Value="1"/>
+    <Persist Addr="0x91" Index="0" Value="20121960"/>
+    <Persist Addr="0x92" Index="0" Value="512"/>
+    <Persist Addr="0x9a" Index="0" Value="0"/>
+    <Persist Addr="0x9b" Index="0" Value="2"/>
+    <Persist Addr="0x9c" Index="0" Value="10000"/>
+    <Persist Addr="0x9d" Index="0" Value="1"/>
+    <Persist Addr="0x9e" Index="0" Value="1"/>
+    <Persist Addr="0xa0" Index="0" Value="2"/>
+    <Persist Addr="0xa1" Index="0" Value="1"/>
+    <Persist Addr="0xa2" Index="0" Value="0"/>
+    <Persist Addr="0xa3" Index="0" Value="0"/>
+    <Persist Addr="0xa8" Index="0" Value="3"/>
+    <Persist Addr="0xa9" Index="0" Value="0"/>
+    <Persist Addr="0xaa" Index="0" Value="0"/>
+    <Persist Addr="0xab" Index="0" Value="0"/>
+    <Persist Addr="0xb6" Index="0" Value="0"/>
+    <Persist Addr="0xc1" Index="0" Value="0"/>
+    <Persist Addr="0xc7" Index="0" Value="39880000"/>
+    <Persist Addr="0xc8" Index="0" Value="39906432"/>
+    <Persist Addr="0xc9" Index="0" Value="0"/>
+    <Persist Addr="0xca" Index="0" Value="0"/>
+    <Persist Addr="0xcb" Index="0" Value="0"/>
+    <Persist Addr="0xd0" Index="0" Value="0"/>
+    <Persist Addr="0xd1" Index="0" Value="0"/>
+    <Persist Addr="0xd4" Index="0" Value="0"/>
+    <Persist Addr="0xdb" Index="0" Value="39940000"/>
+    <Persist Addr="0xe0" Index="0" Value="1311"/>
+    <Persist Addr="0xe1" Index="0" Value="266486821"/>
+    <Persist Addr="0xe3" Index="0" Value="0"/>
+    <Persist Addr="0xe4" Index="0" Value="2"/>
+    <Persist Addr="0xe5" Index="0" Value="1"/>
+    <Persist Addr="0xe6" Index="0" Value="1"/>
+    <Persist Addr="0xeb" Index="0" Value="0"/>
+    <Persist Addr="0xef" Index="0" Value="0"/>
+    <Persist Addr="0xf4" Index="0" Value="600000"/>
+    <Persist Addr="0xf6" Index="0" Value="1"/>
+    <Persist Addr="0xf7" Index="0" Value="0"/>
+    <Persist Addr="0xf9" Index="0" Value="806"/>
+    <Persist Addr="0xfa" Index="0" Value="14"/>
+    <Persist Addr="0xfe" Index="0" Value="3"/>
+    <Persist Addr="0xff" Index="0" Value="3"/>
+    <Persist Addr="0x107" Index="0" Value="20000"/>
+    <Persist Addr="0x132" Index="0" Value="0"/>
+    <Persist Addr="0x137" Index="0" Value="0"/>
+    <Persist Addr="0x139" Index="0" Value="0"/>
+    <Persist Addr="0x13b" Index="0" Value="0"/>
+    <Persist Addr="0x13c" Index="0" Value="0"/>
+    <Persist Addr="0x141" Index="0" Value="0"/>
+    <Persist Addr="0x148" Index="0" Value="0"/>
+    <Persist Addr="0x1c5" Index="0" Value="8"/>
+    <Persist Addr="0x1c5" Index="1" Value="8"/>
+    <Persist Addr="0x1c7" Index="0" Value="0"/>
+    <Persist Addr="0x1c7" Index="1" Value="0"/>
+    <Persist Addr="0x1c8" Index="0" Value="0"/>
+    <Persist Addr="0x1c8" Index="1" Value="0"/>
+    <Persist Addr="0x1cd" Index="0" Value="0"/>
+    <Persist Addr="0x1cd" Index="1" Value="1"/>
+    <Persist Addr="0x1ce" Index="0" Value="0"/>
+    <Persist Addr="0x1e0" Index="3" Value="0"/>
+    <Persist Addr="0x1e0" Index="4" Value="0"/>
+    <Persist Addr="0x1f7" Index="0" Value="1"/>
+    <Persist Addr="0x1fe" Index="0" Value="0"/>
+    <Persist Addr="0x210" Index="0" Value="0"/>
+    <Persist Addr="0x211" Index="0" Value="0"/>
+    <Persist Addr="0x213" Index="0" Value="0"/>
+    <Persist Addr="0x214" Index="0" Value="0"/>
+    <Persist Addr="0x214" Index="1" Value="0"/>
+    <Persist Addr="0x214" Index="2" Value="0"/>
+    <Persist Addr="0x214" Index="3" Value="0"/>
+    <Persist Addr="0x215" Index="0" Value="0"/>
+    <Persist Addr="0x215" Index="1" Value="0"/>
+    <Persist Addr="0x215" Index="2" Value="0"/>
+    <Persist Addr="0x215" Index="3" Value="0"/>
+    <Persist Addr="0x216" Index="0" Value="0"/>
+    <Persist Addr="0x218" Index="0" Value="0"/>
+    <Persist Addr="0x219" Index="0" Value="0"/>
+    <Persist Addr="0x21a" Index="0" Value="0"/>
+    <Persist Addr="0x21b" Index="0" Value="0"/>
+    <Persist Addr="0x21c" Index="0" Value="0"/>
+    <Persist Addr="0x222" Index="0" Value="0"/>
+    <Persist Addr="0x223" Index="0" Value="0"/>
+    <Persist Addr="0x224" Index="0" Value="0"/>
+    <Persist Addr="0x225" Index="0" Value="0"/>
+    <Persist Addr="0x226" Index="0" Value="0"/>
+    <Persist Addr="0x228" Index="0" Value="0"/>
+    <Persist Addr="0x229" Index="0" Value="0"/>
+    <Persist Addr="0x22a" Index="0" Value="0"/>
+    <Persist Addr="0x22b" Index="0" Value="0"/>
+    <Persist Addr="0x22c" Index="0" Value="0"/>
+    <Persist Addr="0x22d" Index="0" Value="0"/>
+    <Persist Addr="0x230" Index="0" Value="0"/>
+    <Persist Addr="0x231" Index="0" Value="180000"/>
+    <Persist Addr="0x232" Index="0" Value="930"/>
+    <Persist Addr="0x250" Index="1" Value="0"/>
+    <Persist Addr="0x250" Index="2" Value="0"/>
+    <Persist Addr="0x250" Index="3" Value="10000000"/>
+    <Persist Addr="0x251" Index="1" Value="0"/>
+    <Persist Addr="0x251" Index="2" Value="0"/>
+    <Persist Addr="0x251" Index="3" Value="50000000"/>
+    <Persist Addr="0x252" Index="0" Value="466"/>
+    <Persist Addr="0x252" Index="1" Value="1000"/>
+    <Persist Addr="0x252" Index="2" Value="1000"/>
+    <Persist Addr="0x252" Index="3" Value="5155"/>
+    <Persist Addr="0x253" Index="0" Value="32000"/>
+    <Persist Addr="0x253" Index="1" Value="800"/>
+    <Persist Addr="0x253" Index="2" Value="800"/>
+    <Persist Addr="0x253" Index="3" Value="2000"/>
+    <Persist Addr="0x255" Index="0" Value="8"/>
+    <Persist Addr="0x255" Index="1" Value="0"/>
+    <Persist Addr="0x255" Index="2" Value="0"/>
+    <Persist Addr="0x255" Index="3" Value="0"/>
+    <Persist Addr="0x257" Index="0" Value="26"/>
+    <Persist Addr="0x257" Index="1" Value="-1"/>
+    <Persist Addr="0x257" Index="2" Value="-1"/>
+    <Persist Addr="0x257" Index="3" Value="24"/>
+    <Persist Addr="0x258" Index="0" Value="8"/>
+    <Persist Addr="0x258" Index="1" Value="0"/>
+    <Persist Addr="0x258" Index="2" Value="0"/>
+    <Persist Addr="0x258" Index="3" Value="0"/>
+    <Persist Addr="0x259" Index="0" Value="0"/>
+    <Persist Addr="0x259" Index="1" Value="0"/>
+    <Persist Addr="0x259" Index="2" Value="0"/>
+    <Persist Addr="0x259" Index="3" Value="0"/>
+    <Persist Addr="0x25a" Index="0" Value="13"/>
+    <Persist Addr="0x25a" Index="1" Value="0"/>
+    <Persist Addr="0x25a" Index="2" Value="0"/>
+    <Persist Addr="0x25a" Index="3" Value="0"/>
+    <Persist Addr="0x25b" Index="0" Value="8384150"/>
+    <Persist Addr="0x25b" Index="1" Value="0"/>
+    <Persist Addr="0x25b" Index="2" Value="0"/>
+    <Persist Addr="0x25b" Index="3" Value="0"/>
+    <Persist Addr="0x25c" Index="0" Value="1"/>
+    <Persist Addr="0x25c" Index="1" Value="0"/>
+    <Persist Addr="0x25c" Index="2" Value="0"/>
+    <Persist Addr="0x25c" Index="3" Value="0"/>
+    <Persist Addr="0x25d" Index="0" Value="1"/>
+    <Persist Addr="0x25d" Index="1" Value="0"/>
+    <Persist Addr="0x25d" Index="2" Value="0"/>
+    <Persist Addr="0x25d" Index="3" Value="0"/>
+    <Persist Addr="0x25e" Index="0" Value="0"/>
+    <Persist Addr="0x25e" Index="1" Value="0"/>
+    <Persist Addr="0x25e" Index="2" Value="0"/>
+    <Persist Addr="0x260" Index="0" Value="0"/>
+    <Persist Addr="0x266" Index="0" Value="0"/>
+    <Persist Addr="0x268" Index="0" Value="1"/>
+    <Persist Addr="0x268" Index="1" Value="0"/>
+    <Persist Addr="0x268" Index="2" Value="0"/>
+    <Persist Addr="0x268" Index="3" Value="0"/>
+    <Persist Addr="0x269" Index="0" Value="0"/>
+    <Persist Addr="0x269" Index="1" Value="0"/>
+    <Persist Addr="0x269" Index="2" Value="0"/>
+    <Persist Addr="0x269" Index="3" Value="0"/>
+    <Persist Addr="0x26a" Index="0" Value="0"/>
+    <Persist Addr="0x26a" Index="1" Value="0"/>
+    <Persist Addr="0x26a" Index="2" Value="0"/>
+    <Persist Addr="0x26a" Index="3" Value="0"/>
+    <Persist Addr="0x26b" Index="0" Value="3"/>
+    <Persist Addr="0x271" Index="0" Value="1000"/>
+    <Persist Addr="0x272" Index="0" Value="1"/>
+    <Persist Addr="0x276" Index="0" Value="1"/>
+    <Persist Addr="0x277" Index="0" Value="0"/>
+    <Persist Addr="0x278" Index="0" Value="0"/>
+    <Persist Addr="0x280" Index="0" Value="200"/>
+    <Persist Addr="0x280" Index="1" Value="200"/>
+    <Persist Addr="0x280" Index="2" Value="200"/>
+    <Persist Addr="0x280" Index="3" Value="1"/>
+    <Persist Addr="0x280" Index="4" Value="1"/>
+    <Persist Addr="0x280" Index="5" Value="1"/>
+    <Persist Addr="0x280" Index="6" Value="1"/>
+    <Persist Addr="0x281" Index="0" Value="20"/>
+    <Persist Addr="0x281" Index="1" Value="20"/>
+    <Persist Addr="0x281" Index="2" Value="20"/>
+    <Persist Addr="0x281" Index="3" Value="0"/>
+    <Persist Addr="0x281" Index="4" Value="0"/>
+    <Persist Addr="0x281" Index="5" Value="0"/>
+    <Persist Addr="0x281" Index="6" Value="0"/>
+    <Persist Addr="0x284" Index="0" Value="2"/>
+    <Persist Addr="0x284" Index="1" Value="2"/>
+    <Persist Addr="0x284" Index="2" Value="2"/>
+    <Persist Addr="0x284" Index="3" Value="0"/>
+    <Persist Addr="0x284" Index="4" Value="0"/>
+    <Persist Addr="0x284" Index="5" Value="0"/>
+    <Persist Addr="0x284" Index="6" Value="0"/>
+    <Persist Addr="0x289" Index="0" Value="0"/>
+    <Persist Addr="0x289" Index="1" Value="0"/>
+    <Persist Addr="0x289" Index="2" Value="0"/>
+    <Persist Addr="0x289" Index="3" Value="0"/>
+    <Persist Addr="0x289" Index="4" Value="0"/>
+    <Persist Addr="0x289" Index="5" Value="0"/>
+    <Persist Addr="0x289" Index="6" Value="0"/>
+    <Persist Addr="0x2d7" Index="0" Value="-3021509"/>
+    <Persist Addr="0x2d8" Index="0" Value="-2917357"/>
+    <Persist Addr="0x2e4" Index="0" Value="0"/>
+    <Persist Addr="0x2f9" Index="0" Value="0"/>
+    <Persist Addr="0x2fa" Index="0" Value="0"/>
+    <Persist Addr="0x30e" Index="0" Value="10"/>
+    <Persist Addr="0x310" Index="0" Value="0"/>
+    <Persist Addr="0x350" Index="0" Value="0"/>
+    <Persist Addr="0x380" Index="0" Value="0"/>
+    <Persist Addr="0x383" Index="0" Value="1"/>
+    <Persist Addr="0x1003" Index="0" Value="100"/>
+    <Persist Addr="0x1006" Index="0" Value="0"/>
+    <Persist Addr="0x100b" Index="0" Value="1000"/>
+    <Persist Addr="0x1010" Index="0" Value="0"/>
+    <Persist Addr="0x1011" Index="0" Value="157286"/>
+    <Persist Addr="0x1011" Index="1" Value="393215"/>
+    <Persist Addr="0x1012" Index="0" Value="2000000"/>
+    <Persist Addr="0x1012" Index="1" Value="2000000"/>
+    <Persist Addr="0x1015" Index="0" Value="0"/>
+    <Persist Addr="0x1020" Index="0" Value="20000"/>
+    <Persist Addr="0x1021" Index="0" Value="3000"/>
+    <Persist Addr="0x1024" Index="0" Value="9829"/>
+    <Persist Addr="0x1024" Index="1" Value="24574"/>
+    <Persist Addr="0x1025" Index="0" Value="9829"/>
+    <Persist Addr="0x1025" Index="1" Value="24574"/>
+    <Persist Addr="0x1026" Index="0" Value="3000000"/>
+    <Persist Addr="0x1026" Index="1" Value="1500000"/>
+    <Persist Addr="0x1027" Index="0" Value="3000000"/>
+    <Persist Addr="0x1027" Index="1" Value="1500000"/>
+    <Persist Addr="0x102d" Index="0" Value="320768"/>
+    <Persist Addr="0x102e" Index="0" Value="50000"/>
+    <Persist Addr="0x1031" Index="0" Value="293150"/>
+    <Persist Addr="0x1034" Index="0" Value="300000"/>
+    <Persist Addr="0x1034" Index="1" Value="4000"/>
+    <Persist Addr="0x1035" Index="0" Value="1056898"/>
+    <Persist Addr="0x1039" Index="0" Value="0"/>
+    <Persist Addr="0x103a" Index="0" Value="0"/>
+    <Persist Addr="0x103b" Index="0" Value="96"/>
+    <Persist Addr="0x103c" Index="0" Value="96"/>
+    <Persist Addr="0x1040" Index="0" Value="1000000"/>
+    <Persist Addr="0x1040" Index="1" Value="1000000"/>
+    <Persist Addr="0x1040" Index="2" Value="1000000"/>
+    <Persist Addr="0x1040" Index="3" Value="1000000"/>
+    <Persist Addr="0x1040" Index="4" Value="1000000"/>
+    <Persist Addr="0x1040" Index="5" Value="1000000"/>
+    <Persist Addr="0x1040" Index="6" Value="1000000"/>
+    <Persist Addr="0x1040" Index="7" Value="1000000"/>
+    <Persist Addr="0x1040" Index="20" Value="1000000"/>
+    <Persist Addr="0x1040" Index="21" Value="1000000"/>
+    <Persist Addr="0x1041" Index="0" Value="0"/>
+    <Persist Addr="0x1041" Index="1" Value="0"/>
+    <Persist Addr="0x1041" Index="2" Value="0"/>
+    <Persist Addr="0x1041" Index="3" Value="0"/>
+    <Persist Addr="0x1041" Index="4" Value="0"/>
+    <Persist Addr="0x1041" Index="5" Value="0"/>
+    <Persist Addr="0x1041" Index="6" Value="0"/>
+    <Persist Addr="0x1041" Index="7" Value="0"/>
+    <Persist Addr="0x1041" Index="20" Value="0"/>
+    <Persist Addr="0x1041" Index="21" Value="0"/>
+    <Persist Addr="0x1042" Index="0" Value="1000000"/>
+    <Persist Addr="0x1042" Index="1" Value="1000000"/>
+    <Persist Addr="0x1042" Index="2" Value="1000000"/>
+    <Persist Addr="0x1042" Index="3" Value="1000000"/>
+    <Persist Addr="0x1042" Index="4" Value="1000000"/>
+    <Persist Addr="0x1042" Index="5" Value="1000000"/>
+    <Persist Addr="0x1042" Index="6" Value="1000000"/>
+    <Persist Addr="0x1042" Index="7" Value="1000000"/>
+    <Persist Addr="0x1042" Index="20" Value="1000000"/>
+    <Persist Addr="0x1042" Index="21" Value="1000000"/>
+    <Persist Addr="0x1043" Index="0" Value="0"/>
+    <Persist Addr="0x1043" Index="1" Value="0"/>
+    <Persist Addr="0x1043" Index="2" Value="0"/>
+    <Persist Addr="0x1043" Index="3" Value="56800"/>
+    <Persist Addr="0x1043" Index="4" Value="56280"/>
+    <Persist Addr="0x1043" Index="5" Value="54340"/>
+    <Persist Addr="0x1043" Index="6" Value="0"/>
+    <Persist Addr="0x1043" Index="7" Value="0"/>
+    <Persist Addr="0x1043" Index="20" Value="0"/>
+    <Persist Addr="0x1043" Index="21" Value="0"/>
+    <Persist Addr="0x1044" Index="0" Value="640"/>
+    <Persist Addr="0x1044" Index="1" Value="640"/>
+    <Persist Addr="0x1044" Index="2" Value="3455"/>
+    <Persist Addr="0x1044" Index="3" Value="640"/>
+    <Persist Addr="0x1044" Index="4" Value="640"/>
+    <Persist Addr="0x1044" Index="5" Value="640"/>
+    <Persist Addr="0x1044" Index="6" Value="128"/>
+    <Persist Addr="0x1044" Index="7" Value="128"/>
+    <Persist Addr="0x1044" Index="20" Value="640"/>
+    <Persist Addr="0x1044" Index="21" Value="640"/>
+    <Persist Addr="0x1067" Index="0" Value="0"/>
+    <Persist Addr="0x10a3" Index="0" Value="5000"/>
+    <Persist Addr="0x10a4" Index="0" Value="1050000"/>
+    <Persist Addr="0x10a5" Index="0" Value="200000"/>
+    <Persist Addr="0x10a6" Index="0" Value="1000000"/>
+    <Persist Addr="0x10a7" Index="0" Value="85000"/>
+    <Persist Addr="0x10a8" Index="0" Value="7560000"/>
+    <Persist Addr="0x10b0" Index="0" Value="0"/>
+    <Persist Addr="0x10b1" Index="0" Value="0"/>
+    <Persist Addr="0x10b2" Index="0" Value="0"/>
+    <Persist Addr="0x10b7" Index="0" Value="0"/>
+    <Persist Addr="0x10b9" Index="0" Value="0"/>
+    <Persist Addr="0x10ba" Index="0" Value="2000000"/>
+    <Persist Addr="0x10bb" Index="0" Value="0"/>
+    <Persist Addr="0x10c0" Index="0" Value="50000"/>
+    <Persist Addr="0x10c2" Index="0" Value="0"/>
+    <Persist Addr="0x10d0" Index="0" Value="0"/>
+    <Persist Addr="0x10d0" Index="1" Value="0"/>
+    <Persist Addr="0x10d1" Index="0" Value="0"/>
+    <Persist Addr="0x10d1" Index="1" Value="0"/>
+    <Persist Addr="0x10d2" Index="0" Value="0"/>
+    <Persist Addr="0x10d2" Index="1" Value="0"/>
+    <Persist Addr="0x10d4" Index="0" Value="0"/>
+    <Persist Addr="0x10d4" Index="1" Value="0"/>
+    <Persist Addr="0x10d6" Index="0" Value="0"/>
+    <Persist Addr="0x10d6" Index="1" Value="0"/>
+    <Persist Addr="0x10d7" Index="0" Value="0"/>
+    <Persist Addr="0x10d7" Index="1" Value="0"/>
+    <Persist Addr="0x10d8" Index="0" Value="499893"/>
+    <Persist Addr="0x10d8" Index="1" Value="0"/>
+    <Persist Addr="0x10db" Index="3" Value="0"/>
+    <Persist Addr="0x10db" Index="4" Value="0"/>
+    <Persist Addr="0x10dc" Index="3" Value="0"/>
+    <Persist Addr="0x10dc" Index="4" Value="0"/>
+    <Persist Addr="0x10dd" Index="0" Value="10000000"/>
+    <Persist Addr="0x10dd" Index="1" Value="0"/>
+    <Persist Addr="0x10dd" Index="2" Value="0"/>
+    <Persist Addr="0x10dd" Index="3" Value="0"/>
+    <Persist Addr="0x10df" Index="0" Value="0"/>
+    <Persist Addr="0x10df" Index="1" Value="0"/>
+    <Persist Addr="0x10df" Index="2" Value="0"/>
+    <Persist Addr="0x10df" Index="3" Value="0"/>
+    <Persist Addr="0x10df" Index="4" Value="0"/>
+    <Persist Addr="0x10f0" Index="0" Value="4194"/>
+    <Persist Addr="0x10f1" Index="0" Value="0"/>
+    <Persist Addr="0x10f2" Index="0" Value="0"/>
+    <Persist Addr="0x10f5" Index="0" Value="0"/>
+    <Persist Addr="0x10f5" Index="1" Value="0"/>
+    <Persist Addr="0x10f5" Index="2" Value="0"/>
+    <Persist Addr="0x10f5" Index="3" Value="0"/>
+    <Persist Addr="0x1500" Index="0" Value="979860"/>
+    <Persist Addr="0x1500" Index="1" Value="0"/>
+    <Persist Addr="0x1500" Index="2" Value="0"/>
+    <Persist Addr="0x1500" Index="3" Value="39880000"/>
+    <Persist Addr="0x1501" Index="0" Value="1050000"/>
+    <Persist Addr="0x1501" Index="1" Value="1000"/>
+    <Persist Addr="0x1501" Index="2" Value="1000"/>
+    <Persist Addr="0x1501" Index="3" Value="39940000"/>
+    <Persist Addr="0x1502" Index="0" Value="-1"/>
+    <Persist Addr="0x1502" Index="1" Value="-1"/>
+    <Persist Addr="0x1502" Index="2" Value="-1"/>
+    <Persist Addr="0x160c" Index="0" Value="0"/>
+    <Persist Addr="0x160d" Index="0" Value="0"/>
+  </Persistence>
+  <Aliases>
+    <Alias Group="Input" Key="ADC1" Value="Intensity"/>
+    <Alias Group="Input" Key="ADC2" Value=""/>
+    <Alias Group="Input" Key="ADC3" Value=""/>
+    <Alias Group="Input" Key="ADC4" Value=""/>
+    <Alias Group="Input" Key="ADC5" Value=""/>
+    <Alias Group="Input" Key="ADC6" Value=""/>
+    <Alias Group="Output" Key="DAC 1" Value=""/>
+    <Alias Group="Output" Key="DAC 2" Value=""/>
+    <Alias Group="Output" Key="DAC 3" Value=""/>
+    <Alias Group="Output" Key="DAC 4" Value=""/>
+    <Alias Group="Internal" Key="Z out" Value=""/>
+    <Alias Group="Internal" Key="Z out inv" Value=""/>
+    <Alias Group="Internal" Key="HF 1" Value=""/>
+    <Alias Group="Internal" Key="HF 1 df" Value=""/>
+    <Alias Group="Internal" Key="HF 1 Out" Value=""/>
+    <Alias Group="Internal" Key="HF 1 Ampl" Value=""/>
+    <Alias Group="Internal" Key="HF 1 Phase" Value=""/>
+    <Alias Group="Internal" Key="LF Lockin Ampl" Value=""/>
+    <Alias Group="Internal" Key="LF Lockin Phase" Value=""/>
+    <Alias Group="Internal" Key="Counter" Value=""/>
+    <Alias Group="Internal" Key="Drift RB X" Value=""/>
+    <Alias Group="Internal" Key="Drift RB Y" Value=""/>
+    <Alias Group="Resources" Key="Spec 1" Value="Z Spec"/>
+    <Alias Group="Resources" Key="Spec 2" Value=""/>
+    <Alias Group="Resources" Key="Spec 3" Value=""/>
+    <Alias Group="Coarse" Key="Axis 1" Value=""/>
+    <Alias Group="Coarse" Key="Axis 2" Value=""/>
+    <Alias Group="Coarse" Key="Axis 3" Value=""/>
+    <Alias Group="Coarse" Key="Axis 4" Value=""/>
+    <Alias Group="Coarse" Key="Axis 5" Value=""/>
+    <Alias Group="Coarse" Key="Axis 6" Value=""/>
+    <Alias Group="Coarse" Key="Axis 7" Value=""/>
+  </Aliases>
+  <Settings>
+    <Setting Name="SnapshotName" Owner="Channel_0" Value="ADC4"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_0" Value="5"/>
+    <Setting Name="SnapshotName" Owner="Channel_1" Value="ZoutInv"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_1" Value="5"/>
+    <Setting Name="SnapshotName" Owner="Channel_2" Value="HF1Amp"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_2" Value="5"/>
+    <Setting Name="SnapshotName" Owner="Channel_3" Value="amplitude"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_3" Value="11"/>
+    <Setting Name="SnapshotName" Owner="Channel_4" Value="ca_1"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_4" Value="11"/>
+    <Setting Name="SnapshotName" Owner="Channel_5" Value="ca_2"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_5" Value="11"/>
+    <Setting Name="SnapshotName" Owner="Channel_6" Value="ADC6"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_6" Value="5"/>
+    <Setting Name="SnapshotName" Owner="Channel_7" Value="sosp_1"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_7" Value="3"/>
+    <Setting Name="SnapshotName" Owner="Channel_8" Value="ln_2"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_8" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Channel_9" Value="HF1df"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_9" Value="0"/>
+    <Setting Name="SnapshotName" Owner="Channel_10" Value="ln_1"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_10" Value="17"/>
+    <Setting Name="SnapshotName" Owner="Channel_11" Value="df"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_11" Value="11"/>
+    <Setting Name="SnapshotName" Owner="Channel_12" Value="ln_2"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_12" Value="9"/>
+    <Setting Name="SnapshotName" Owner="Channel_13" Value="ca_3"/>
+    <Setting Name="SnapshotTypes" Owner="Channel_13" Value="0"/>
+    <Setting Name="SnapshotName" Owner="Parameters" Value="Parameters"/>
+    <Setting Name="SnapshotTypes" Owner="Parameters" Value="255"/>
+    <Setting Name="Tab0" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab0/Feedback Clocks" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab0/Feedback Clocks" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab0/Feedback Clocks" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab0/Feedback Clocks" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab0/Scanner" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab0/Scanner" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab0/Scanner" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab0/Scanner" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab0/Counter" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab0/Counter" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab0/Counter" Value="2"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab0/Counter" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab0/AFM" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab0/AFM" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab0/AFM" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab0/AFM" Value="1"/>
+    <Setting Name="Tab1" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab1/Scanner Limits and Scaling" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab1/Scanner Limits and Scaling" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab1/Scanner Limits and Scaling" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab1/Scanner Limits and Scaling" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab1/DAC Limits" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab1/DAC Limits" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab1/DAC Limits" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab1/DAC Limits" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab1/Readback Voltages" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab1/Readback Voltages" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab1/Readback Voltages" Value="2"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab1/Readback Voltages" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab1/Expert Settings" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab1/Expert Settings" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab1/Expert Settings" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab1/Expert Settings" Value="1"/>
+    <Setting Name="Tab2" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab2/Scanner Ctrl" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab2/Scanner Ctrl" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab2/Scanner Ctrl" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab2/Scanner Ctrl" Value="1"/>
+    <Setting Name="GeometryH" Owner="Scanner Control" Value="0"/>
+    <Setting Name="Attached" Owner="Scanner Control" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab2/Step Scanner Ctrl" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab2/Step Scanner Ctrl" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab2/Step Scanner Ctrl" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab2/Step Scanner Ctrl" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab2/Litho" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab2/Litho" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab2/Litho" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab2/Litho" Value="1"/>
+    <Setting Name="GeometryH" Owner="Scanner Control" Value="0"/>
+    <Setting Name="Attached" Owner="Scanner Control" Value="1"/>
+    <Setting Name="AbsStep" Owner="Xedit-6b-0" Value="0.01"/>
+    <Setting Name="StepIsRel" Owner="Xedit-6b-0" Value="0"/>
+    <Setting Name="AbsStep" Owner="Xedit-6c-0" Value="0.01"/>
+    <Setting Name="StepIsRel" Owner="Xedit-6c-0" Value="0"/>
+    <Setting Name="Tab3" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab3/Frame/Line Views" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab3/Frame/Line Views" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab3/Frame/Line Views" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab3/Frame/Line Views" Value="1"/>
+    <Setting Name="Tab4" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab4/Frame View" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab4/Frame View" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab4/Frame View" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab4/Frame View" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="AFM-LeftFrame" Value="2"/>
+    <Setting Name="Magnification" Owner="AFM-LeftFrame" Value="3"/>
+    <Setting Name="ScanDirection" Owner="AFM-LeftFrame" Value="1"/>
+    <Setting Name="ShowSelTools" Owner="AFM-LeftFrame" Value="1"/>
+    <Setting Name="GeometryH" Owner="AFM-LeftFrame" Value="0"/>
+    <Setting Name="Attached" Owner="AFM-LeftFrame" Value="1"/>
+    <Setting Name="SnapshotName" Owner="AFM-LeftFrame" Value="AFM-LeftFrame"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab4/Line View" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab4/Line View" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab4/Line View" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab4/Line View" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="AFM-LeftLine" Value="1"/>
+    <Setting Name="GeometryH" Owner="AFM-LeftLine" Value="0"/>
+    <Setting Name="Attached" Owner="AFM-LeftLine" Value="1"/>
+    <Setting Name="SnapshotName" Owner="AFM-LeftLine" Value="AFM-LeftLine"/>
+    <Setting Name="Tab5" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab5/Frame View" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab5/Frame View" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab5/Frame View" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab5/Frame View" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="AFM-RightFrame" Value="1"/>
+    <Setting Name="Magnification" Owner="AFM-RightFrame" Value="3"/>
+    <Setting Name="ColorCoding" Owner="AFM-RightFrame" Value="Grayscale"/>
+    <Setting Name="ScanDirection" Owner="AFM-RightFrame" Value="1"/>
+    <Setting Name="ShowSelTools" Owner="AFM-RightFrame" Value="1"/>
+    <Setting Name="GeometryH" Owner="AFM-RightFrame" Value="0"/>
+    <Setting Name="Attached" Owner="AFM-RightFrame" Value="1"/>
+    <Setting Name="SnapshotName" Owner="AFM-RightFrame" Value="AFM-RightFrame"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab5/Line View" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab5/Line View" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab5/Line View" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab5/Line View" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="AFM-RightLine" Value="1"/>
+    <Setting Name="GeometryH" Owner="AFM-RightLine" Value="0"/>
+    <Setting Name="Attached" Owner="AFM-RightLine" Value="1"/>
+    <Setting Name="SnapshotName" Owner="AFM-RightLine" Value="AFM-RightLine"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab3/Step Scanner" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab3/Step Scanner" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab3/Step Scanner" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab3/Step Scanner" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="StepScanFrame" Value="-1"/>
+    <Setting Name="Magnification" Owner="StepScanFrame" Value="1"/>
+    <Setting Name="ScanDirection" Owner="StepScanFrame" Value="1"/>
+    <Setting Name="ShowSelTools" Owner="StepScanFrame" Value="0"/>
+    <Setting Name="GeometryH" Owner="StepScanFrame" Value="0"/>
+    <Setting Name="Attached" Owner="StepScanFrame" Value="1"/>
+    <Setting Name="SnapshotName" Owner="StepScanFrame" Value="StepScanFrame"/>
+    <Setting Name="SnapshotTypes" Owner="StepScanFrame" Value="255"/>
+    <Setting Name="ChannelNumber" Owner="StepScanLine" Value="-1"/>
+    <Setting Name="GeometryH" Owner="StepScanLine" Value="0"/>
+    <Setting Name="Attached" Owner="StepScanLine" Value="1"/>
+    <Setting Name="SnapshotName" Owner="StepScanLine" Value="StepScanLine"/>
+    <Setting Name="SnapshotTypes" Owner="StepScanLine" Value="255"/>
+    <Setting Name="Tab6" Owner="Main Control" Value="3"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/PLL" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/PLL" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/PLL" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/PLL" Value="1"/>
+    <Setting Name="AbsStep" Owner="Xedit-c8-0" Value="0.2"/>
+    <Setting Name="StepIsRel" Owner="Xedit-c8-0" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/LF Lockin" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/LF Lockin" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/LF Lockin" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/LF Lockin" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Lever Excitation" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Lever Excitation" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Lever Excitation" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Lever Excitation" Value="1"/>
+    <Setting Name="AbsStep" Owner="Xedit-c8-0" Value="0.2"/>
+    <Setting Name="StepIsRel" Owner="Xedit-c8-0" Value="0"/>
+    <Setting Name="StepIsRel" Owner="Xedit-232-0" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Coarse" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Coarse" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Coarse" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Coarse" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Coarse" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Coarse" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Coarse" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Coarse" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Autoapproach" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Autoapproach" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Autoapproach" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Autoapproach" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Path" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Path" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Path" Value="2"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Path" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Dual pass" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Dual pass" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Dual pass" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Dual pass" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Crosslink" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Crosslink" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Crosslink" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Crosslink" Value="0"/>
+    <Setting Name="Tab7" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab7/PI Feedback" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab7/PI Feedback" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab7/PI Feedback" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab7/PI Feedback" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab7/Linear" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab7/Linear" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab7/Linear" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab7/Linear" Value="1"/>
+    <Setting Name="Tab8" Owner="Main Control" Value="0"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab8/PI Feedback" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab8/PI Feedback" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab8/PI Feedback" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab8/PI Feedback" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab8/Linear" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab8/Linear" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab8/Linear" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab8/Linear" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/DAC Outputs" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/DAC Outputs" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/DAC Outputs" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/DAC Outputs" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab6/Scan" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab6/Scan" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab6/Scan" Value="4"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab6/Scan" Value="0"/>
+    <Setting Name="Tab9" Owner="Main Control" Value="1"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Resonance" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Resonance" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Resonance" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Resonance" Value="1"/>
+    <Setting Name="GeometryX" Owner="Calibration Amplitude" Value="-8"/>
+    <Setting Name="GeometryY" Owner="Calibration Amplitude" Value="-8"/>
+    <Setting Name="GeometryH" Owner="Calibration Amplitude" Value="1377"/>
+    <Setting Name="GeometryW" Owner="Calibration Amplitude" Value="2560"/>
+    <Setting Name="Attached" Owner="Calibration Amplitude" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Calibration Amplitude" Value="Calibration Amplitude"/>
+    <Setting Name="GeometryH" Owner="Calibration Phase" Value="0"/>
+    <Setting Name="Attached" Owner="Calibration Phase" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Calibration Phase" Value="Calibration Phase"/>
+    <Setting Name="GeometryX" Owner="Main Control/Tab9/Line View" Value="472"/>
+    <Setting Name="GeometryY" Owner="Main Control/Tab9/Line View" Value="754"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Line View" Value="222"/>
+    <Setting Name="GeometryW" Owner="Main Control/Tab9/Line View" Value="385"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Line View" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Line View" Value="0"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Line View" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="Line View" Value="10"/>
+    <Setting Name="GeometryH" Owner="Line View" Value="0"/>
+    <Setting Name="Attached" Owner="Line View" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Line View" Value="Line View"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Frequency Analysis" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Frequency Analysis" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Frequency Analysis" Value="1"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Frequency Analysis" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="Frequency Analysis" Value="12"/>
+    <Setting Name="WindowFunction" Owner="FFT" Value="0"/>
+    <Setting Name="Average" Owner="FFT" Value="2"/>
+    <Setting Name="YScaling" Owner="FFT" Value="1"/>
+    <Setting Name="MinFrequency" Owner="FFT" Value="0"/>
+    <Setting Name="MaxFrequency" Owner="FFT" Value="500"/>
+    <Setting Name="SqrtHzEnable" Owner="FFT" Value="2"/>
+    <Setting Name="GeometryH" Owner="FFT Display" Value="0"/>
+    <Setting Name="Attached" Owner="FFT Display" Value="1"/>
+    <Setting Name="SnapshotName" Owner="FFT Display" Value="FFT Display"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Z Spec" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Z Spec" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Z Spec" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Z Spec" Value="1"/>
+    <Setting Name="GeometryH" Owner="Z Spec" Value="0"/>
+    <Setting Name="Attached" Owner="Z Spec" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Z Spec" Value="Z Spec"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Spec 2" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Spec 2" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Spec 2" Value="3"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Spec 2" Value="0"/>
+    <Setting Name="GeometryH" Owner="Spec 2" Value="0"/>
+    <Setting Name="Attached" Owner="Spec 2" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Spec 2" Value="Spec 2"/>
+    <Setting Name="SnapshotTypes" Owner="Spec 2" Value="255"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Spec 3" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Spec 3" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Spec 3" Value="4"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Spec 3" Value="0"/>
+    <Setting Name="GeometryH" Owner="Spec 3" Value="0"/>
+    <Setting Name="Attached" Owner="Spec 3" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Spec 3" Value="Spec 3"/>
+    <Setting Name="SnapshotTypes" Owner="Spec 3" Value="255"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/Soft Spec" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/Soft Spec" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/Soft Spec" Value="5"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/Soft Spec" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="Soft Spectroscopy" Value="7"/>
+    <Setting Name="GeometryH" Owner="Soft Spectroscopy" Value="0"/>
+    <Setting Name="Attached" Owner="Soft Spectroscopy" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Soft Spectroscopy" Value="Soft Spectroscopy"/>
+    <Setting Name="GeometryH" Owner="Main Control/Tab9/CL Contouring Error" Value="0"/>
+    <Setting Name="Attached" Owner="Main Control/Tab9/CL Contouring Error" Value="1"/>
+    <Setting Name="TabPosition" Owner="Main Control/Tab9/CL Contouring Error" Value="6"/>
+    <Setting Name="TabPresent" Owner="Main Control/Tab9/CL Contouring Error" Value="1"/>
+    <Setting Name="ChannelNumber" Owner="Scan Correlation View" Value="-1"/>
+    <Setting Name="GeometryH" Owner="Scan_Correlation_View" Value="0"/>
+    <Setting Name="Attached" Owner="Scan_Correlation_View" Value="1"/>
+    <Setting Name="SnapshotName" Owner="Scan_Correlation_View" Value="Scan_Correlation_View"/>
+    <Setting Name="SnapshotTypes" Owner="Scan_Correlation_View" Value="255"/>
+  </Settings>
+  <SavePresets/>
+</Profile>

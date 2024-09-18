@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Four scan frame and line views for Daisy -->
+<!-- $Id: quad_frame_line.ngc,v 1.2 2011/02/21 16:47:32 trurl Exp $ -->
+<Panel Caption="Quad Scan Frame/Line View" Datagroups="1 2 10" Icon="scanner.xpm">
+
+  <Widget Type="Tabs"                               X="0" Y="0"  >
+    <Tab Name="Frame View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Frame View 1"   X="0" Y="0" >
+        <Plugin Type="Underground Filter"/>
+        <Plugin Type="Frame Display" Caption="Scan Frame View 1">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="1" />
+            <Option Name="DisplayGridButton" Value="1" />
+        </Plugin>
+      </View>
+    </Tab>
+    <Tab Name="Line View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Line View 1"    X="0" Y="0" >
+        <Plugin Type="Scan Direction Filter"/>
+        <Plugin Type="Line Display" Caption="Scan Line View 1">
+            <Option Name="StoreLocal" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+  </Widget>
+  
+  <Widget Type="Tabs"                               X="1" Y="0"  >
+    <Tab Name="Frame View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Frame View 2"   X="0" Y="0" >
+        <Plugin Type="Underground Filter"/>
+        <Plugin Type="Frame Display" Caption="Scan Frame View 2">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="1" />
+            <Option Name="DisplayGridButton" Value="1" />
+        </Plugin>
+      </View>
+    </Tab>
+    <Tab Name="Line View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Line View 2"    X="0" Y="0" >
+        <Plugin Type="Scan Direction Filter"/>
+        <Plugin Type="Line Display" Caption="Scan Line View 2">
+            <Option Name="StoreLocal" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+  </Widget>
+  
+  <Widget Type="Tabs"                               X="0" Y="1"  >
+    <Tab Name="Frame View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Frame View 3"   X="0" Y="0" >
+        <Plugin Type="Underground Filter"/>
+        <Plugin Type="Frame Display" Caption="Scan Frame View 3">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="1" />
+            <Option Name="DisplayGridButton" Value="1" />
+        </Plugin>
+      </View>
+    </Tab>
+    <Tab Name="Line View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Line View 3"    X="0" Y="0" >
+        <Plugin Type="Scan Direction Filter"/>
+        <Plugin Type="Line Display" Caption="Scan Line View 3">
+            <Option Name="StoreLocal" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+  </Widget>
+  
+  <Widget Type="Tabs"                               X="1" Y="1"  >
+    <Tab Name="Frame View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Frame View 4"   X="0" Y="0" >
+        <Plugin Type="Underground Filter"/>
+        <Plugin Type="Frame Display" Caption="Scan Frame View 4">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="1" />
+            <Option Name="DisplayGridButton" Value="1" />
+        </Plugin>
+      </View>
+    </Tab>
+    <Tab Name="Line View" Margin="0" >
+      <View Dgroup="1"    Caption="Scan Line View 4"    X="0" Y="0" >
+        <Plugin Type="Scan Direction Filter"/>
+        <Plugin Type="Line Display" Caption="Scan Line View 4">
+            <Option Name="StoreLocal" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+  </Widget>
+
+</Panel>

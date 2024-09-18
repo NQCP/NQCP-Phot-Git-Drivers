@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- N-Hands Product Spec for ASC500 -->
+<!-- $Id: asc500cl.nps,v 1.15.4.10 2021/09/27 14:23:39 trurl Exp $ -->
+<Productspec Code="0x2000" Caption="ASC500 SPM Controller CL">
+
+  <!-- Controller Properties -->
+  <Controller DataChannels="14" HasAfmLockin="1" HasScanner="1" IndexedPermData="0" HasSwSerNo="0">
+    <Variant Code="0x1300" Caption="asc500cl"/>
+	<Variant Code="0x1400" Caption="asc500cl"/>
+  </Controller>
+
+  <!-- Server & Booting -->
+  <Server Name="daisysrv" Port="7000">
+    <Boot>
+      <File Target="DSP1"        Name="spmctrl_dsp1.ldr"    Address="0x164" Mandatory="1" BootTime="2"/>
+      <File Target="Master FPGA" Name="ncore_spmc.bit"      Address="0x160" Mandatory="1" BootTime="16"/>
+      <File Target="DSP2"        Name="spmctrl_dsp2.ldr"    Address="0x165" Mandatory="1" BootTime="3"/>
+      <File Target="AFM FPGA"    Name="afm_top_v2.bit"      Address="0x161" Mandatory="0" BootTime="40"/>
+      <File Target="DSP-AFM"     Name="spmctrl_dsp_afm.ldr" Address="0x200" Mandatory="0" BootTime="3"/>
+    </Boot>
+    <Init>
+      <Param Addr="0x0141" Value="0"/>
+    </Init>
+    <Expect>
+      <Param Addr="0x0140" Value="0"/>
+    </Expect>
+  </Server>
+
+  <!-- Data Channels & Groups -->
+  <Data>
+    <Signals>
+      <Signal  Id="0"  Name="ADC1"            Type="10"/>
+      <Signal  Id="1"  Name="ADC2"            Type="10"/>
+      <Signal  Id="2"  Name="ADC3"            Type="10"/>
+      <Signal  Id="3"  Name="ADC4"            Type="10"/>
+      <Signal  Id="4"  Name="ADC5"            Type="10"/>
+      <Signal  Id="5"  Name="ADC6"            Type="10"/>
+      <Signal  Id="20" Name="ADC7"            Type="11"  Condition="==(EightAdc,1)"/>
+      <Signal  Id="21" Name="ADC8"            Type="11"  Condition="==(EightAdc,1)"/>
+      <Signal  Id="9"  Name="Z out"           Type="12"/>
+      <Signal  Id="18" Name="Z out inv"       Type="12"/>
+      <Signal  Id="12" Name="HF 1"            Type="15"/>
+      <Signal  Id="8"  Name="HF 1 df"         Type="13"/>
+      <Signal  Id="7"  Name="HF 1 Out"        Type="14"/>
+      <Signal  Id="13" Name="HF 1 Ampl"       Type="16"  Condition="==(KPFMXY,0)"/>
+      <Signal  Id="13" Name="HF 1 X"          Type="16"  Condition="!=(KPFMXY,0)"/>
+      <Signal  Id="14" Name="HF 1 Phase"      Type="17"  Condition="==(KPFMXY,0)"/>
+      <Signal  Id="14" Name="HF 1 Y"          Type="17"  Condition="!=(KPFMXY,0)"/>
+      <Signal  Id="16" Name="LF Lockin Ampl"  Type="19"/>
+      <Signal  Id="17" Name="LF Lockin Phase" Type="20"/>
+      <Signal  Id="23" Name="Counter"         Type="21"/>
+      <Signal  Id="29" Name="Crosslink 1"     Type="22"  Condition="!=(KPFM,0)"/>
+      <Signal  Id="30" Name="Crosslink 2"     Type="22"  Condition="!=(KPFM,0)"/>
+      <Signal  Id="31" Name="PosX"            Type="23"/>
+      <Signal  Id="32" Name="PosY"            Type="23"/>
+    </Signals>
+    <Triggers>
+      <Trigger Id="0"  Name="Disabled"        Type="0"/>
+      <Trigger Id="1"  Name="Scan"            Type="1"/>
+      <Trigger Id="2"  Name="Line"            Type="2"/>
+      <Trigger Id="3"  Name="Spec1"           Type="3"/>
+      <Trigger Id="4"  Name="Spec2"           Type="3"/>
+      <Trigger Id="5"  Name="Spec3"           Type="3"/>
+      <Trigger Id="6"  Name="Cal"             Type="3"/>
+      <Trigger Id="7"  Name="Trigger"         Type="4"/>
+      <Trigger Id="8"  Name="Every"           Type="5"/>
+      <Trigger Id="9"  Name="SoftSpec"        Type="6"/>
+      <Trigger Id="13" Name="Dual Pass"       Type="1"/>
+      <Trigger Id="16" Name="Step Scan"       Type="8"/>
+    </Triggers>
+    <Groups>
+      <Group  Id="0"  Name="Disabled"  Abbrev="DIS"   Trigger="0"  ChannelDescr="Name"   Formats=""
+              Properties="HidePage"                          />
+      <Group  Id="1"  Name="Scan"      Abbrev="SC"    Trigger="1"  ChannelDescr="Signal" Formats="Ascii Bin"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="2"  Name="Dual Pass"  Abbrev="2L"   Trigger="13" ChannelDescr="Signal" Formats="Ascii Bin"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="3"  Name="Spec 1"    Abbrev="S1"    Trigger="3"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="4"  Name="Spec 2"    Abbrev="S2"    Trigger="4"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="5"  Name="Spec 3"    Abbrev="S3"    Trigger="5"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="6"  Name="Resonance" Abbrev="CA"    Trigger="6"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="7"  Name="Line"      Abbrev="LN"    Trigger="2"  ChannelDescr="Name"   Formats=""
+              Properties="StoreContinous StoreLocal StoreRetrigger ShowSource ShowAverage ShowSampleTime ShowStream"/>
+      <Group  Id="8"  Name="FFT"       Abbrev="FFT"   Trigger="2"  ChannelDescr="Name"   Formats=""
+              Properties="StoreLocal StoreRetrigger ShowSource ShowSampleTime ShowAverage ShowStream"/>
+      <Group  Id="9"  Name="Soft Spec" Abbrev="SOSP"  Trigger="9"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="StoreFrame StoreGroup ShowChannels"/>
+      <Group  Id="10" Name="Step Scan" Abbrev="STSC"  Trigger="16" ChannelDescr="Signal" Formats="Ascii Bin"
+              Properties="StoreFrame StoreGroup ShowChannels"      Condition="==(StepScan,1)"/>
+      <Group  Id="11" Name="Trigger"   Abbrev="TR"    Trigger="7"  ChannelDescr="Signal" Formats="Ascii"
+              Properties="HidePage StoreFrame ShowSource"    />
+      <Group  Id="12" Name="Every"     Abbrev="Every" Trigger="8"  ChannelDescr="Name"   Formats=""
+              Properties="HidePage StoreContinous StoreLocal StoreRetrigger ShowSource ShowStream"/>
+      <Group  Id="13" Name="ContErr"   Abbrev="CErr"  Trigger="1"  ChannelDescr="Signal" Formats=""
+              Properties="StoreLocal StoreRetrigger ShowChannels"  Condition="ClLoop"/>
+    </Groups>
+  </Data>
+
+  <!-- GUI settings -->
+  <GuiSettings ParameterSnapshot="1" ProgramVersion="2.7.12"/>
+
+  <!-- Conditions for conditional GUI Elements -->
+  <Conditions>
+    <Condition Name="HwType"    Address="0x167" Index="0" Default="0"/>
+    <Condition Name="EightAdc"  Address="0x185" Index="0" Default="0"/>
+    <Condition Name="Litho"     Address="0x1FA" Index="0" Default="0"/>
+    <Condition Name="ClLoop"    Address="0x1FC" Index="0" Default="0"/>
+    <Condition Name="Horiba"    Address="0x1FD" Index="0" Default="0"/>
+    <Condition Name="StepScan"  Address="0x1FB" Index="0" Default="0"/>
+    <Condition Name="KPFM"      Address="0x158" Index="0" Default="0"/>
+    <Condition Name="AFM"       Address="0x15B" Index="0" Default="0"/>
+    <Condition Name="ZFeedback" Address="0x15A" Index="0" Default="0"/>
+    <Condition Name="CoarseDev" Address="0x0A8" Index="0" Default="0"/>
+    <Condition Name="KPFMXY"    Address="0x157" Index="0" Default="0"/>
+    <Condition Name="OutActive" Address="0x140" Index="0" Default="0"/>
+    <Condition Name="ScanRun"   Address="0x101" Index="0" Default="0"/>
+    <Condition Name="LoopOn"    Address="0x060" Index="0" Default="0"/>
+  </Conditions>
+
+  <!-- String Constants -->
+  <Strings>
+    <String Name="SignalNamesReduced" KeyAddress="0x0157" KeyIndex="0">
+      <Variant Key="0" Text="ADC1:ADC2:ADC3:ADC4:ADC5:ADC6:HF 1 df=8:HF 1 Ampl=13:HF 1 Phase=14:LF Lockin Ampl=16:LF Lockin Phase=17:Counter=23"/>
+      <Variant Key="1" Text="ADC1:ADC2:ADC3:ADC4:ADC5:ADC6:HF 1 df=8:HF 1 X=13:HF 1 Y=14:LF Lockin Ampl=16:LF Lockin Phase=17:Counter=23"/>
+    </String>
+  </Strings>
+
+</Productspec>

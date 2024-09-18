@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: setpointmod.ngm,v 1.1 2012/01/16 18:21:33 trurl Exp $ -->
+<!-- Widget zur Einstellung der Setpoint-Mudulation für Regler Nr. P0
+     Parameter: P0 = Reglernummer, Index in Adresse 0x77 0x78 0x79 0x7B 0x10DF
+                P1 = Adresse für Einheit des Setpoint
+                P2 = Index für Einheit des Setpoint      -->
+<Module>
+  <Widget Type="Label"  Caption="Setpoint Mod."         X="0" Y="0" Font=":Bold" />
+  <Widget Type="Combo"  Caption=""                      X="1" Y="0" Address="0x79" Index="$P0$" Choices="Off:Periodic Rectangle:LF Lock In" />
+	
+  <Widget Type="Box"    Caption="Periodic Rectangle"    X="0" Y="1" Width="2" >
+    <Widget Type="Label"  Caption="Period"                X="0" Y="0" />
+    <Widget Type="Xedit"  Caption=""                      X="1" Y="0" Unit="s" Prefix="u" Address="0x77" Index="$P0$" Min="0" Max="1310700." Scale="0.05" Persist="1" />
+    <Widget Type="Label"  Caption="Value"                 X="0" Y="1"  />
+    <!-- Nur für den Z-Regler steht die Anzeigemethode mit der "richtigen" Granularität zur Verfügung -->
+    <Widget Type="Xedit"  Caption=""                      X="1" Y="1" Address="0x78" Index="$P0$" Scale="1" Persist="1" Accuracy="10" Condition="==(P0,0)" >
+      <Connect Name="Unit"   Address="0x1051" />
+      <Connect Name="Scale"  Address="0x1055" />
+      <Connect Name="Offset" Address="0x1056" />
+    </Widget>
+    <Widget Type="Xedit"  Caption=""                      X="1" Y="1" Address="0x7B" Index="$P0$" Scale="10000" Persist="1" Condition="!=(P0,0)" >
+      <Connect Name="Unit"   Address="$P1$" Index="$P2$" />
+    </Widget>
+  </Widget>
+                      
+  <Widget Type="Box"    Caption="LF Lock In"            X="0" Y="2" Width="2" >
+    <Widget Type="Label"  Caption="Scale / [V]"           X="0" Y="0" />
+    <Widget Type="Xedit"  Caption=""                      X="1" Y="0"   Address="0x10DF" Index="$P0$" Scale="10000" Persist="1" >
+      <Connect Name="Unit"   Address="$P1$" Index="$P2$" />
+    </Widget>
+  </Widget>
+</Module>

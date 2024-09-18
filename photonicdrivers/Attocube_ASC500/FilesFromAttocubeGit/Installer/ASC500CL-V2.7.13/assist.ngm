@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: assist.ngm,v 1.1 2012/02/17 17:21:51 trurl Exp $ -->
+<!-- Assistance-Tab, keine Parameter -->
+<Module>
+  <Tab Name="Assist"  >
+    <Dialog Caption="Interferometer tabs"  X="0" Y="0" Modal="0" Popup="Button" Tip="Interferometer Adjust" Width="1" >
+      <Widget Type="Tabs"                              X="0" Y="0" >
+        <Tab Name="Prepare"  >
+          <Widget Type="Label" Caption="Used Ressources:"                 Rich="0" X="0" Y="0" Align="Left" />
+          <Widget Type="Label" Caption="Spect 1"                          Rich="0" X="0" Y="1" Align="Left"/>
+          <Widget Type="Label" Caption="DAC 1 for IF distance piezo"      Rich="0" X="0" Y="2" Align="Left"/>
+          <Widget Type="Label" Caption="ADC1 for intensity"              Rich="0" X="0" Y="3" Align="Left"/>
+          <Widget Type="Label" Caption="Crosslink 1 for distance adjust"  Rich="0" X="0" Y="3" Align="Left"/>
+                 
+          <Widget Type="Box"      Caption=""                                       X="0" Y="9" Style="Flat"   >
+            <Widget Type="Button"   Caption="Prepare"                               X="1" Y="0" Toggle="0"  Data="1"  Address="0x257" Index="0" >   <!-- DAC 0 als Stellgroesse auswaehlen -->
+<!--                 <Secondary Address="0x258" Index="0" Data="0"  />                                                                                   <!-- Repeat = 0 -->
+<!--                 <Secondary Address="0x252" Index="0" Data="1000"  />                                                                                <!-- Data Points = 0 -->
+<!--                 <Secondary Address="0x259" Index="0" Data="0"  />                                                                                   <!-- Fwd/Bkwd = Fwd -->
+<!--                 <Secondary Address="0x253" Index="0" Data="10"  />                                                                                  <!-- Data Point Avg. Time = 25us -->
+<!--                 <Secondary Address="0x255" Index="0" Data="10"  />                                                                                  <!-- Delay Per Data Point = 25us -->
+<!--                 <Secondary Address="0x268" Index="0" Data="0"  />                                                                                   <!-- Wait Start = 0ms -->
+<!--                 <Secondary Address="0x269" Index="0" Data="0"  />                                                                                   <!-- Wait Finish = 0ms -->
+<!--                 <Secondary Address="0x26A" Index="0" Data="0"  />                                                                                   <!-- Loop Off = 0 -->
+<!--                 <Secondary Address="0x25D" Index="0" Data="0"  />                                                                                   <!-- Limiter active = 0 -->
+<!--                 <Secondary Address="0x1E0" Index="0" Data="0"  />                                                                                   <!-- Transfer function = PI -->
+<!--                 <Secondary Address="0x1C8" Index="0" Data="0"  />                                                                                   <!-- Input Channel = ADC1/Intensity -->
+<!--                 <Secondary Address="0x1CD" Index="0" Data="0"  />                                                                                   <!-- Output Channel = DAC1 -->
+            </Widget>
+            <Widget Type="Box"      Caption=""                                      X="2" Y="9" Style="Flat"  Width="10" /> 
+          </Widget>
+                            
+          <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+        </Tab>
+                        
+        <Tab Name="Response Curve"  >
+          <Widget Type="Box"    Style="Flat"                             X="0" Y="0"   >  
+            <Widget Type="Box"      Caption=""                         X="0" Y="0" Style="Flat"   >
+              <Widget Type="Label" Caption="Press start button to measure"       X="0" Y="0" Align="Left" Rich="0"  />
+              <Widget Type="Label" Caption="intensity vs. distance,"       X="0" Y="1" Align="Left" Rich="0"  />
+              <Widget Type="Label" Caption="then select min, max and"       X="0" Y="2" Align="Left" Rich="0"  />
+              <Widget Type="Label" Caption="setpoint with tool buttons."       X="0" Y="3" Align="Left" Rich="0"  />
+              <Widget Type="Label" Caption=""                            X="0" Y="5" Align="Left" />
+            </Widget>
+                                
+            <Widget Type="Box"      Caption=""                         X="0" Y="1" Style="Flat"   >     
+              <Widget Type="Label"    Caption="Start"                X="0" Y="1" Alignment="Left"/>
+              <Widget Type="Xedit"    Caption=""                     X="1" Y="1" Unit="V" Prefix=" " Address="0x1500" Index="0"   Scale="1000." Accuracy="10"  Persist="1" >
+                <Connect Name="Unit"        Address="0x1502" Index="0" />
+              </Widget>
+                                    
+            </Widget>
+            <Widget Type="Box"      Caption=""                         X="0" Y="2" Style="Flat"   >
+              <Widget Type="Label"    Caption="End"                  X="0" Y="0" Alignment="Left"/>
+              <Widget Type="Xedit"    Caption=""                     X="1" Y="0" Unit="V" Prefix=" " Address="0x1501" Index="0"   Scale="1000." Accuracy="10" Persist="1" >
+                <Connect Name="Unit"        Address="0x1502" Index="0" />
+              </Widget>
+            </Widget>
+            
+            <Widget Type="Box"      Caption=""                         X="0" Y="3" Style="Flat"   >
+              <Widget Type="Label"    Caption="Status:"              X="0" Y="0"  Alignment="Left VCenter"/>
+              <Widget Type="Led"      Caption=""                     X="1" Y="0"  Address="0x256" Index="0" Grey="0" Red="-1" Green="1" />
+              <Widget Type="Button"   Caption="Start"                X="2" Y="0" Toggle="1"  Data="1"  Address="0x256" Index="0" />
+            </Widget>
+            
+            <Widget Type="Label" Caption=""                            X="0" Y="4" Align="Left" />
+            
+            <Widget Type="Box"    Style="Flat"                         X="0" Y="5"   >  
+              <Widget Type="Label"  Caption="Min"                   X="0" Y="0"  Alignment="Left"  />
+              <Widget Type="Xedit"  Caption=""                              X="1" Y="0"   Address="0x10D7" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+              
+              <Widget Type="Label"  Caption="Max"                   X="0" Y="1"  Alignment="Left"  />
+              <Widget Type="Xedit"  Caption=""                              X="1" Y="1"   Address="0x10D8" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+              
+              <Widget Type="Label"  Caption="Setpoint"              X="0" Y="2"  Alignment="Left"              />
+              <Widget Type="Xedit"  Caption=""                      X="1" Y="2"   Address="0x10D2" Index="0"    Scale="10000." Persist="1" >
+                <Connect Name="Unit"        Address="0x10D5" Index="0" />
+              </Widget>
+            </Widget>
+            
+            
+            <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+          </Widget>
+          
+          <View Dgroup="3"    Caption="IfAdjust"           X="1" Y="0" >
+            <Plugin Type="Line Display" Size="50" Caption="IfAdjust" >
+              <Option Name="selectpointyaddress"      Value="0x10D2" />
+              <Option Name="selectpointyindex"        Value="0" />
+              <Option Name="SelectRangeStartAddress" Value="0x10D7" />
+              <Option Name="SelectRangeStartIndex"   Value="0" />
+              <Option Name="SelectRangeEndAddress"   Value="0x10D8" />
+              <Option Name="SelectRangeEndIndex"     Value="0" />
+              <Option Name="DisplaySelectButtons"    Value="1" />
+              <Option Name="selectyscale"            Value="10000." />
+              <Option Name="selectrangexscale"       Value="1." />
+            </Plugin>
+          </View>
+        </Tab>
+        
+        <Tab Name="Calculating Parameter"  >
+          <Widget Type="Box"    Style="Flat"  X="0" Y="0"   >  
+            <Widget Type="Label" Caption="Please select min, max"                 Rich="0" X="0" Y="0" Align="Left" />
+            <Widget Type="Label" Caption="and setpoint with"                      Rich="0" X="0" Y="1" Align="Left" />
+            <Widget Type="Label" Caption="tool buttons."                          Rich="0" X="0" Y="3" Align="Left" />
+            <Widget Type="Label" Caption=""                                                   X="0" Y="4" Align="Left" />
+            
+            <Widget Type="Box"    Style="Flat"                                                X="0" Y="5"   >  
+              <Widget Type="Label"  Caption="Min"                   X="0" Y="0"  Alignment="Left"  />
+              <Widget Type="Xedit"  Caption=""                              X="1" Y="0"   Address="0x10D7" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+              
+              <Widget Type="Label"  Caption="Max"                   X="0" Y="1"  Alignment="Left"  />
+              <Widget Type="Xedit"  Caption=""                              X="1" Y="1"   Address="0x10D8" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+              
+              <Widget Type="Label"  Caption="Setpoint"              X="0" Y="2"  Alignment="Left"              />
+              <Widget Type="Xedit"  Caption=""                      X="1" Y="2"   Address="0x10D2" Index="0"    Scale="10000." Persist="1" >
+                <Connect Name="Unit"        Address="0x10D5" Index="0" />
+              </Widget>
+              
+              <Widget Type="Label"  Caption="Wavelength"            X="0" Y="4"  Alignment="Left"  />
+              <Widget Type="Xedit"  Caption=""                              X="1" Y="4"   Address="0x10D7" Index="0"   Unit="m" Prefix="p"    Scale="1." Persist="1" />
+              
+              <Widget Type="Button"   Caption="Calculate"           X="0" Y="5" Toggle="0"  Data="1"  Address="0x256" Index="0" />
+              
+              <Widget Type="Label"   Caption="Gain [Unit/V]" X="0" Y="6" Alignment="Left" />
+              <Widget Type="Xedit"   Caption=""             X="1" Y="6" Unit="" Prefix="X" Address="0x1042" Index="3"  Scale="1000000." Persist="1" />
+              <Widget Type="Label"   Caption="Offset"       X="0" Y="7" Alignment="Left"/>
+              <Widget Type="Xedit"   Caption=""             X="1" Y="7" Unit="V" Prefix="m" Address="0x1043" Index="3"  Scale="1000." Persist="1" />
+              <Widget Type="Label"   Caption="Unit"         X="0" Y="8" Alignment="Left"/>
+              <Widget Type="Combo"   Caption=""             X="1" Y="8" Address="0x1044" Index="3" Choices="mm:um:nm:pm:V:mV:uv:nV:MHz:kHz:Hz:mHz:s:ms:us:ns:A:mA:uA:nA:[cos]:[dB]=24:W=32:mW=33:uW=34:nW=35" Persist="1"/>                                    
+            </Widget>
+            
+            <Widget Type="Box"    Style="Flat"                                                X="0" Y="6"   >  
+              <Widget Type="Check"     Caption="Enable"             X="0" Y="0"   Address="0x1C6" Index="0" />
+              <Widget Type="Led"       Caption=""                   X="1" Y="0"   Address="0x1C6" Index="0" Grey="0" Red="-1" Green="1" />
+            </Widget>
+            
+            <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+            
+          </Widget>
+          
+          <View Dgroup="3"    Caption="IfAdjust"           X="1" Y="0" >
+            <Plugin Type="Line Display" Size="50" Caption="IfAdjust" >
+              <Option Name="DisplaySelectButtons"    Value="0" />
+              <Option Name="displaytoolbar"          Value="0" />
+            </Plugin>
+          </View>
+        </Tab>
+        
+        <Tab Name="Conclusion"  >
+        </Tab>
+      </Widget>
+    </Dialog>
+    
+    
+    <Dialog Caption="Interferometer Adjust"  X="0" Y="0" Modal="0" Popup="Button" Tip="Interferometer Adjust" Width="1" >
+      <Widget Type="Box" Style="Flat"                         X="0" Y="0" Width="3" >
+        <View Dgroup="3"    Caption="IfAdjust"           X="1" Y="0" >
+          <Plugin Type="Line Display" Size="50" Caption="IfAdjust" >
+            <Option Name="selectpointyaddress"      Value="0x10D2" />
+            <Option Name="selectpointyindex"        Value="0" />
+            <Option Name="SelectRangeStartAddress" Value="0x10D7" />
+            <Option Name="SelectRangeStartIndex"   Value="0" />
+            <Option Name="SelectRangeEndAddress"   Value="0x10D8" />
+            <Option Name="SelectRangeEndIndex"     Value="0" />
+            <Option Name="DisplaySelectButtons"    Value="1" />
+            <Option Name="selectyscale"            Value="10000." />
+            <Option Name="selectrangexscale"       Value="1." />
+          </Plugin>
+        </View>
+      </Widget>
+      
+      <Widget Type="Box"    Caption="Prepare"                X="0" Y="1"   >  
+        <Widget Type="Label" Caption="Used Ressources:"                 Rich="0" X="0" Y="0" Align="Left" />
+        <Widget Type="Label" Caption="Spec 1"                           Rich="0" X="0" Y="1" Align="Left"/>
+        <Widget Type="Label" Caption="DAC 1 for IF distance piezo"      Rich="0" X="0" Y="2" Align="Left"/>
+        <Widget Type="Label" Caption="ADC1 for intensity"              Rich="0" X="0" Y="3" Align="Left"/>
+        <Widget Type="Label" Caption="Crosslink 1 for distance adjust"  Rich="0" X="0" Y="3" Align="Left"/>
+        
+        <Widget Type="Box"      Caption=""                                       X="0" Y="9" Style="Flat"   >
+          <Widget Type="Button"   Caption="Prepare"                               X="1" Y="0" Toggle="0"  Data="1"  Address="0x257" Index="0" >   <!-- DAC 0 als Stellgroesse auswaehlen -->
+<!--               <Secondary Address="0x258" Index="0" Data="0"  />                                                                                   <!-- Repeat = 0 -->
+<!--               <Secondary Address="0x252" Index="0" Data="1000"  />                                                                                <!-- Data Points = 0 -->
+<!--               <Secondary Address="0x259" Index="0" Data="0"  />                                                                                   <!-- Fwd/Bkwd = Fwd -->
+<!--               <Secondary Address="0x253" Index="0" Data="10"  />                                                                                  <!-- Data Point Avg. Time = 25us -->
+<!--               <Secondary Address="0x255" Index="0" Data="10"  />                                                                                  <!-- Delay Per Data Point = 25us -->
+<!--               <Secondary Address="0x268" Index="0" Data="0"  />                                                                                   <!-- Wait Start = 0ms -->
+<!--               <Secondary Address="0x269" Index="0" Data="0"  />                                                                                   <!-- Wait Finish = 0ms -->
+<!--               <Secondary Address="0x26A" Index="0" Data="0"  />                                                                                   <!-- Loop Off = 0 -->
+<!--               <Secondary Address="0x25D" Index="0" Data="0"  />                                                                                   <!-- Limiter active = 0 -->
+<!--               <Secondary Address="0x1E0" Index="0" Data="0"  />                                                                                   <!-- Transfer function = PI -->
+<!--               <Secondary Address="0x1C8" Index="0" Data="0"  />                                                                                   <!-- Input Channel = ADC1/Intensity -->
+<!--               <Secondary Address="0x1CD" Index="0" Data="0"  />                                                                                   <!-- Output Channel = DAC1 -->
+          </Widget>
+          <Widget Type="Box"      Caption=""                                      X="2" Y="9" Style="Flat"  Width="10" /> 
+        </Widget>
+        
+        <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+      </Widget>
+      
+      <Widget Type="Box"    Caption="Response Curve"                             X="1" Y="1"   >  
+        <Widget Type="Box"      Caption=""                         X="0" Y="0" Style="Flat"   >
+          <Widget Type="Label" Caption="Press start button to measure"       X="0" Y="0" Align="Left" Rich="0"  />
+          <Widget Type="Label" Caption="intensity vs. distance,"       X="0" Y="1" Align="Left" Rich="0"  />
+          <Widget Type="Label" Caption="then select min, max and"       X="0" Y="2" Align="Left" Rich="0"  />
+          <Widget Type="Label" Caption="setpoint with tool buttons."       X="0" Y="3" Align="Left" Rich="0"  />
+          <Widget Type="Label" Caption=""                            X="0" Y="5" Align="Left" />
+        </Widget>
+        
+        <Widget Type="Box"      Caption=""                         X="0" Y="1" Style="Flat"   >     
+          <Widget Type="Label"    Caption="Start"                X="0" Y="1" Alignment="Left"/>
+          <Widget Type="Xedit"    Caption=""                     X="1" Y="1" Unit="V" Prefix=" " Address="0x1500" Index="0"   Scale="1000." Accuracy="10"  Persist="1" >
+            <Connect Name="Unit"        Address="0x1502" Index="0" />
+          </Widget>
+          
+        </Widget>
+        <Widget Type="Box"      Caption=""                         X="0" Y="2" Style="Flat"   >
+          <Widget Type="Label"    Caption="End"                  X="0" Y="0" Alignment="Left"/>
+          <Widget Type="Xedit"    Caption=""                     X="1" Y="0" Unit="V" Prefix=" " Address="0x1501" Index="0"   Scale="1000." Accuracy="10" Persist="1" >
+            <Connect Name="Unit"        Address="0x1502" Index="0" />
+          </Widget>
+        </Widget>
+        
+        <Widget Type="Box"      Caption=""                         X="0" Y="3" Style="Flat"   >
+          <Widget Type="Label"    Caption="Status:"              X="0" Y="0"  Alignment="Left VCenter"/>
+          <Widget Type="Led"      Caption=""                     X="1" Y="0"  Address="0x256" Index="0" Grey="0" Red="-1" Green="1" />
+          <Widget Type="Button"   Caption="Start"                X="2" Y="0" Toggle="1"  Data="1"  Address="0x256" Index="0" />
+        </Widget>
+        
+        <Widget Type="Label" Caption=""                            X="0" Y="4" Align="Left" />
+        
+        <Widget Type="Box"    Style="Flat"                         X="0" Y="5"   >  
+          <Widget Type="Label"  Caption="Min"                   X="0" Y="0"  Alignment="Left"  />
+          <Widget Type="Xedit"  Caption=""                              X="1" Y="0"   Address="0x10D7" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+          
+          <Widget Type="Label"  Caption="Max"                   X="0" Y="1"  Alignment="Left"  />
+          <Widget Type="Xedit"  Caption=""                              X="1" Y="1"   Address="0x10D8" Index="0"   Unit="V" Prefix=" "    Scale="1000000." Persist="1" />
+          
+          <Widget Type="Label"  Caption="Setpoint"              X="0" Y="2"  Alignment="Left"              />
+          <Widget Type="Xedit"  Caption=""                      X="1" Y="2"   Address="0x10D2" Index="0"    Scale="10000." Persist="1" >
+            <Connect Name="Unit"        Address="0x10D5" Index="0" />
+          </Widget>
+        </Widget>
+        
+      </Widget>
+      
+      
+      <Widget Type="Box"    Caption="Calculate"                             X="2" Y="1"   >  
+        <Widget Type="Label" Caption="Please enter wavelength of"             Rich="0" X="0" Y="0" Align="Left" />
+        <Widget Type="Label" Caption="laser and press button to"              Rich="0" X="0" Y="1" Align="Left" />
+        <Widget Type="Label" Caption="calculate the transfer function."       Rich="0" X="0" Y="3" Align="Left" />
+        <Widget Type="Label" Caption=""                                                X="0" Y="4" Align="Left" />
+        
+        <Widget Type="Box"    Style="Flat"                                                X="0" Y="5"   >  
+          <Widget Type="Label"  Caption="Wavelength"            X="0" Y="4"  Alignment="Left"  />
+          <Widget Type="Xedit"  Caption=""                              X="1" Y="4"   Address="0x10D7" Index="0"   Unit="m" Prefix="p"    Scale="1." Persist="1" />
+          
+          <Widget Type="Button"   Caption="Calculate"           X="0" Y="5" Toggle="0"  Data="1"  Address="0x256" Index="0" />
+          
+          <Widget Type="Label"   Caption="Gain [Unit/V]" X="0" Y="6" Alignment="Left" />
+          <Widget Type="Xedit"   Caption=""             X="1" Y="6" Unit="" Prefix="X" Address="0x1042" Index="3"  Scale="1000000." Persist="1" />
+          <Widget Type="Label"   Caption="Offset"       X="0" Y="7" Alignment="Left"/>
+          <Widget Type="Xedit"   Caption=""             X="1" Y="7" Unit="V" Prefix="m" Address="0x1043" Index="3"  Scale="1000." Persist="1" />
+          <Widget Type="Label"   Caption="Unit"         X="0" Y="8" Alignment="Left"/>
+          <Widget Type="Combo"   Caption=""             X="1" Y="8" Address="0x1044" Index="3" Choices="mm:um:nm:pm:V:mV:uv:nV:MHz:kHz:Hz:mHz:s:ms:us:ns:A:mA:uA:nA:[cos]:[dB]=24:W=32:mW=33:uW=34:nW=35" Persist="1"/>                                    
+        </Widget>
+        
+        <Widget Type="Box"    Style="Flat"                                                X="0" Y="6"   >  
+          <Widget Type="Check"     Caption="Enable distance feedback"             X="0" Y="0"   Address="0x1C6" Index="0" />
+          <Widget Type="Led"       Caption=""                   X="1" Y="0"   Address="0x1C6" Index="0" Grey="0" Red="-1" Green="1" />
+        </Widget>
+        
+        <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+      </Widget>
+      
+    </Dialog>
+    
+    <Widget Type="Box" Style="Flat" Height="10"          X="0" Y="10" />
+    <Widget Type="Box" Style="Flat" Width="10"           X="1" Y="0" />
+  </Tab>
+</Module>
