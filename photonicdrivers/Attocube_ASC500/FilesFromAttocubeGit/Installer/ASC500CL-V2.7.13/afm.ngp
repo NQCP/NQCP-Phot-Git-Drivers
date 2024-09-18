@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Profile>
+  <Panel File="asc.ngc"/>
+  <Persistence>
+    <Persist Addr="0x10" Index="0" Value="2000000"/>
+    <Persist Addr="0x11" Index="0" Value="2000000"/>
+    <Persist Addr="0x18" Index="0" Value="0"/>
+    <Persist Addr="0x1d" Index="0" Value="260"/>
+    <Persist Addr="0x2e" Index="0" Value="1"/>
+    <Persist Addr="0x2f" Index="0" Value="0"/>
+    <Persist Addr="0x31" Index="0" Value="0"/>
+    <Persist Addr="0x31" Index="1" Value="1"/>
+    <Persist Addr="0x31" Index="3" Value="0"/>
+    <Persist Addr="0x31" Index="4" Value="13"/>
+    <Persist Addr="0x31" Index="5" Value="14"/>
+    <Persist Addr="0x31" Index="10" Value="0"/>
+    <Persist Addr="0x31" Index="12" Value="0"/>
+    <Persist Addr="0x33" Index="3" Value="0"/>
+    <Persist Addr="0x33" Index="4" Value="9"/>
+    <Persist Addr="0x33" Index="5" Value="9"/>
+    <Persist Addr="0x35" Index="0" Value="1"/>
+    <Persist Addr="0x35" Index="1" Value="1"/>
+    <Persist Addr="0x35" Index="10" Value="1"/>
+    <Persist Addr="0x35" Index="12" Value="1"/>
+    <Persist Addr="0x3B" Index="0" Value="1"/>
+    <Persist Addr="0x3B" Index="1" Value="1"/>
+    <Persist Addr="0x3B" Index="3" Value="3"/>
+    <Persist Addr="0x3B" Index="4" Value="6"/>
+    <Persist Addr="0x3B" Index="5" Value="6"/>
+    <Persist Addr="0x40" Index="0" Value="0"/>
+    <Persist Addr="0x40" Index="1" Value="0"/>
+    <Persist Addr="0x40" Index="2" Value="0"/>
+    <Persist Addr="0x40" Index="3" Value="0"/>
+    <Persist Addr="0x40" Index="4" Value="0"/>
+    <Persist Addr="0x40" Index="5" Value="0"/>
+    <Persist Addr="0x41" Index="0" Value="0"/>
+    <Persist Addr="0x41" Index="1" Value="0"/>
+    <Persist Addr="0x41" Index="2" Value="0"/>
+    <Persist Addr="0x41" Index="3" Value="0"/>
+    <Persist Addr="0x41" Index="4" Value="0"/>
+    <Persist Addr="0x41" Index="5" Value="0"/>
+    <Persist Addr="0x42" Index="0" Value="0"/>
+    <Persist Addr="0x42" Index="1" Value="0"/>
+    <Persist Addr="0x42" Index="2" Value="0"/>
+    <Persist Addr="0x42" Index="3" Value="0"/>
+    <Persist Addr="0x42" Index="4" Value="0"/>
+    <Persist Addr="0x42" Index="5" Value="0"/>
+    <Persist Addr="0x5d" Index="0" Value="0"/>
+    <Persist Addr="0x62" Index="0" Value="0"/>
+    <Persist Addr="0x68" Index="0" Value="0"/>
+    <Persist Addr="0x6b" Index="0" Value="0"/>
+    <Persist Addr="0x6c" Index="0" Value="0"/>
+    <Persist Addr="0x6f" Index="0" Value="0"/>
+    <Persist Addr="0x77" Index="0" Value="0"/>
+    <Persist Addr="0x77" Index="1" Value="0"/>
+    <Persist Addr="0x77" Index="2" Value="0"/>
+    <Persist Addr="0x77" Index="3" Value="0"/>
+    <Persist Addr="0x77" Index="4" Value="0"/>
+    <Persist Addr="0x7b" Index="0" Value="0"/>
+    <Persist Addr="0x7b" Index="1" Value="0"/>
+    <Persist Addr="0x7b" Index="2" Value="0"/>
+    <Persist Addr="0x7b" Index="3" Value="0"/>
+    <Persist Addr="0x7b" Index="4" Value="0"/>
+    <Persist Addr="0x7f" Index="0" Value="3"/>
+    <Persist Addr="0x80" Index="0" Value="0"/>
+    <Persist Addr="0x80" Index="1" Value="0"/>
+    <Persist Addr="0x80" Index="2" Value="0"/>
+    <Persist Addr="0x80" Index="3" Value="0"/>
+    <Persist Addr="0x83" Index="0" Value="2"/>
+    <Persist Addr="0x83" Index="1" Value="0"/>
+    <Persist Addr="0x83" Index="2" Value="0"/>
+    <Persist Addr="0x83" Index="3" Value="0"/>
+    <Persist Addr="0x83" Index="24" Value="4"/>
+    <Persist Addr="0x83" Index="26" Value="1"/>
+    <Persist Addr="0x83" Index="27" Value="3"/>
+    <Persist Addr="0x87" Index="0" Value="257690"/>
+    <Persist Addr="0x89" Index="0" Value="257690"/>
+    <Persist Addr="0x92" Index="0" Value="0"/>
+    <Persist Addr="0x9a" Index="0" Value="0"/>
+    <Persist Addr="0x9b" Index="0" Value="2"/>
+    <Persist Addr="0x9c" Index="0" Value="10000"/>
+    <Persist Addr="0x9d" Index="0" Value="1"/>
+    <Persist Addr="0x9e" Index="0" Value="0"/>
+    <Persist Addr="0xa0" Index="0" Value="1"/>
+    <Persist Addr="0xa1" Index="0" Value="1"/>
+    <Persist Addr="0xa2" Index="0" Value="0"/>
+    <Persist Addr="0xa3" Index="0" Value="0"/>
+    <Persist Addr="0xa8" Index="0" Value="0"/>
+    <Persist Addr="0xa9" Index="0" Value="0"/>
+    <Persist Addr="0xaa" Index="0" Value="0"/>
+    <Persist Addr="0xab" Index="0" Value="0"/>
+    <Persist Addr="0xc1" Index="0" Value="0"/>
+    <Persist Addr="0xc7" Index="0" Value="10000000"/>
+    <Persist Addr="0xc9" Index="0" Value="0"/>
+    <Persist Addr="0xca" Index="0" Value="0"/>
+    <Persist Addr="0xcb" Index="0" Value="0"/>
+    <Persist Addr="0xd0" Index="0" Value="0"/>
+    <Persist Addr="0xd1" Index="0" Value="0"/>
+    <Persist Addr="0xd4" Index="0" Value="0"/>
+    <Persist Addr="0xdb" Index="0" Value="50000000"/>
+    <Persist Addr="0xe0" Index="0" Value="16384"/>
+    <Persist Addr="0xe1" Index="0" Value="0"/>
+    <Persist Addr="0xe3" Index="0" Value="0"/>
+    <Persist Addr="0xe4" Index="0" Value="2"/>
+    <Persist Addr="0xe5" Index="0" Value="1"/>
+    <Persist Addr="0xe6" Index="0" Value="1"/>
+    <Persist Addr="0xeb" Index="0" Value="0"/>
+    <Persist Addr="0xef" Index="0" Value="0"/>
+    <Persist Addr="0xf4" Index="0" Value="0"/>
+    <Persist Addr="0xf6" Index="0" Value="0"/>
+    <Persist Addr="0xf7" Index="0" Value="0"/>
+    <Persist Addr="0xf9" Index="0" Value="0"/>
+    <Persist Addr="0xfa" Index="0" Value="14"/>
+    <Persist Addr="0xfe" Index="0" Value="3"/>
+    <Persist Addr="0xff" Index="0" Value="3"/>
+    <Persist Addr="0x132" Index="0" Value="0"/>
+    <Persist Addr="0x137" Index="0" Value="0"/>
+    <Persist Addr="0x139" Index="0" Value="0"/>
+    <Persist Addr="0x13b" Index="0" Value="0"/>
+    <Persist Addr="0x13c" Index="0" Value="0"/>
+    <Persist Addr="0x141" Index="0" Value="0"/>
+    <Persist Addr="0x1c5" Index="0" Value="8"/>
+    <Persist Addr="0x1c5" Index="1" Value="8"/>
+    <Persist Addr="0x1c7" Index="0" Value="0"/>
+    <Persist Addr="0x1c7" Index="1" Value="0"/>
+    <Persist Addr="0x1c8" Index="0" Value="0"/>
+    <Persist Addr="0x1c8" Index="1" Value="0"/>
+    <Persist Addr="0x1cd" Index="0" Value="0"/>
+    <Persist Addr="0x1cd" Index="1" Value="1"/>
+    <Persist Addr="0x1ce" Index="0" Value="0"/>
+    <Persist Addr="0x1e0" Index="3" Value="0"/>
+    <Persist Addr="0x1e0" Index="4" Value="0"/>
+	<Persist Addr="0x1F7" Index="0" Value="1"/>
+    <Persist Addr="0x210" Index="0" Value="0"/>
+    <Persist Addr="0x211" Index="0" Value="0"/>
+    <Persist Addr="0x213" Index="0" Value="0"/>
+    <Persist Addr="0x214" Index="0" Value="0"/>
+    <Persist Addr="0x214" Index="1" Value="0"/>
+    <Persist Addr="0x214" Index="2" Value="0"/>
+    <Persist Addr="0x214" Index="3" Value="0"/>
+    <Persist Addr="0x215" Index="0" Value="0"/>
+    <Persist Addr="0x215" Index="1" Value="0"/>
+    <Persist Addr="0x215" Index="2" Value="0"/>
+    <Persist Addr="0x215" Index="3" Value="0"/>
+    <Persist Addr="0x216" Index="0" Value="0"/>
+    <Persist Addr="0x218" Index="0" Value="0"/>
+    <Persist Addr="0x219" Index="0" Value="0"/>
+    <Persist Addr="0x21a" Index="0" Value="0"/>
+    <Persist Addr="0x21b" Index="0" Value="0"/>
+    <Persist Addr="0x21c" Index="0" Value="0"/>
+    <Persist Addr="0x230" Index="0" Value="0"/>
+    <Persist Addr="0x231" Index="0" Value="0"/>
+    <Persist Addr="0x232" Index="0" Value="0"/>
+    <Persist Addr="0x250" Index="1" Value="0"/>
+    <Persist Addr="0x250" Index="2" Value="0"/>
+    <Persist Addr="0x250" Index="3" Value="10000000"/>
+    <Persist Addr="0x251" Index="1" Value="0"/>
+    <Persist Addr="0x251" Index="2" Value="0"/>
+    <Persist Addr="0x251" Index="3" Value="50000000"/>
+    <Persist Addr="0x252" Index="0" Value="1000"/>
+    <Persist Addr="0x252" Index="1" Value="1000"/>
+    <Persist Addr="0x252" Index="2" Value="1000"/>
+    <Persist Addr="0x252" Index="3" Value="1000"/>
+    <Persist Addr="0x253" Index="0" Value="800"/>
+    <Persist Addr="0x253" Index="1" Value="800"/>
+    <Persist Addr="0x253" Index="2" Value="800"/>
+    <Persist Addr="0x253" Index="3" Value="1000"/>
+    <Persist Addr="0x255" Index="0" Value="0"/>
+    <Persist Addr="0x255" Index="1" Value="0"/>
+    <Persist Addr="0x255" Index="2" Value="0"/>
+    <Persist Addr="0x255" Index="3" Value="0"/>
+    <Persist Addr="0x257" Index="0" Value="-1"/>
+    <Persist Addr="0x257" Index="1" Value="-1"/>
+    <Persist Addr="0x257" Index="2" Value="-1"/>
+    <Persist Addr="0x258" Index="0" Value="0"/>
+    <Persist Addr="0x258" Index="1" Value="0"/>
+    <Persist Addr="0x258" Index="2" Value="0"/>
+    <Persist Addr="0x258" Index="3" Value="0"/>
+    <Persist Addr="0x259" Index="0" Value="0"/>
+    <Persist Addr="0x259" Index="1" Value="0"/>
+    <Persist Addr="0x259" Index="2" Value="0"/>
+    <Persist Addr="0x259" Index="3" Value="0"/>
+    <Persist Addr="0x25a" Index="0" Value="0"/>
+    <Persist Addr="0x25a" Index="1" Value="0"/>
+    <Persist Addr="0x25a" Index="2" Value="0"/>
+    <Persist Addr="0x25c" Index="0" Value="0"/>
+    <Persist Addr="0x25c" Index="1" Value="0"/>
+    <Persist Addr="0x25c" Index="2" Value="0"/>
+    <Persist Addr="0x25d" Index="0" Value="0"/>
+    <Persist Addr="0x25d" Index="1" Value="0"/>
+    <Persist Addr="0x25d" Index="2" Value="0"/>
+    <Persist Addr="0x25e" Index="0" Value="0"/>
+    <Persist Addr="0x25e" Index="1" Value="0"/>
+    <Persist Addr="0x25e" Index="2" Value="0"/>
+    <Persist Addr="0x260" Index="0" Value="0"/>
+    <Persist Addr="0x266" Index="0" Value="0"/>
+    <Persist Addr="0x268" Index="0" Value="0"/>
+    <Persist Addr="0x268" Index="1" Value="0"/>
+    <Persist Addr="0x268" Index="2" Value="0"/>
+    <Persist Addr="0x268" Index="3" Value="0"/>
+    <Persist Addr="0x269" Index="0" Value="0"/>
+    <Persist Addr="0x269" Index="1" Value="0"/>
+    <Persist Addr="0x269" Index="2" Value="0"/>
+    <Persist Addr="0x269" Index="3" Value="0"/>
+    <Persist Addr="0x26a" Index="0" Value="0"/>
+    <Persist Addr="0x26a" Index="1" Value="0"/>
+    <Persist Addr="0x26a" Index="2" Value="0"/>
+    <Persist Addr="0x26a" Index="3" Value="0"/>
+    <Persist Addr="0x26b" Index="0" Value="3"/>
+    <Persist Addr="0x271" Index="0" Value="1000"/>
+    <Persist Addr="0x272" Index="0" Value="1"/>
+    <Persist Addr="0x276" Index="0" Value="1"/>
+    <Persist Addr="0x280" Index="0" Value="200"/>
+    <Persist Addr="0x280" Index="1" Value="200"/>
+    <Persist Addr="0x280" Index="2" Value="200"/>
+    <Persist Addr="0x281" Index="0" Value="20"/>
+    <Persist Addr="0x281" Index="1" Value="20"/>
+    <Persist Addr="0x281" Index="2" Value="20"/>
+    <Persist Addr="0x284" Index="0" Value="2"/>
+    <Persist Addr="0x284" Index="1" Value="2"/>
+    <Persist Addr="0x284" Index="2" Value="2"/>
+    <Persist Addr="0x289" Index="0" Value="0"/>
+    <Persist Addr="0x289" Index="1" Value="0"/>
+    <Persist Addr="0x289" Index="2" Value="0"/>
+    <Persist Addr="0x310" Index="0" Value="0"/>
+    <Persist Addr="0x380" Index="0" Value="0"/>
+    <Persist Addr="0x383" Index="0" Value="1"/>
+    <Persist Addr="0x1003" Index="0" Value="260"/>
+    <Persist Addr="0x1006" Index="0" Value="1"/>
+    <Persist Addr="0x100b" Index="0" Value="5000"/>
+    <Persist Addr="0x1011" Index="0" Value="209715"/>
+    <Persist Addr="0x1011" Index="1" Value="209715"/>
+    <Persist Addr="0x1012" Index="0" Value="40000000"/>
+    <Persist Addr="0x1012" Index="1" Value="40000000"/>
+    <Persist Addr="0x1010" Index="0" Value="0"/>
+    <Persist Addr="0x1020" Index="0" Value="2000"/>
+    <Persist Addr="0x1021" Index="0" Value="1000"/>
+    <Persist Addr="0x1024" Index="0" Value="13107"/>
+    <Persist Addr="0x1024" Index="1" Value="13107"/>
+    <Persist Addr="0x1025" Index="0" Value="13107"/>
+    <Persist Addr="0x1025" Index="1" Value="13107"/>
+    <Persist Addr="0x1026" Index="0" Value="4000000"/>
+    <Persist Addr="0x1026" Index="1" Value="4000000"/>
+    <Persist Addr="0x1027" Index="0" Value="4000000"/>
+    <Persist Addr="0x1027" Index="1" Value="4000000"/>
+    <Persist Addr="0x102e" Index="0" Value="50000"/>
+    <Persist Addr="0x1031" Index="0" Value="293150"/>
+    <Persist Addr="0x1034" Index="0" Value="300000"/>
+    <Persist Addr="0x1034" Index="1" Value="4000"/>
+    <Persist Addr="0x103b" Index="0" Value="96"/>
+    <Persist Addr="0x103c" Index="0" Value="96"/>
+    <Persist Addr="0x1040" Index="0" Value="1000000"/>
+    <Persist Addr="0x1040" Index="1" Value="1000000"/>
+    <Persist Addr="0x1040" Index="2" Value="1000000"/>
+    <Persist Addr="0x1040" Index="3" Value="1000000"/>
+    <Persist Addr="0x1040" Index="4" Value="1000000"/>
+    <Persist Addr="0x1040" Index="5" Value="1000000"/>
+    <Persist Addr="0x1040" Index="20" Value="1000000"/>
+    <Persist Addr="0x1040" Index="21" Value="1000000"/>
+    <Persist Addr="0x1041" Index="0" Value="0"/>
+    <Persist Addr="0x1041" Index="1" Value="0"/>
+    <Persist Addr="0x1041" Index="2" Value="0"/>
+    <Persist Addr="0x1041" Index="3" Value="0"/>
+    <Persist Addr="0x1041" Index="4" Value="0"/>
+    <Persist Addr="0x1041" Index="5" Value="0"/>
+    <Persist Addr="0x1041" Index="20" Value="0"/>
+    <Persist Addr="0x1041" Index="21" Value="0"/>
+    <Persist Addr="0x1042" Index="0" Value="1000000"/>
+    <Persist Addr="0x1042" Index="1" Value="1000000"/>
+    <Persist Addr="0x1042" Index="2" Value="1000000"/>
+    <Persist Addr="0x1042" Index="3" Value="1000000"/>
+    <Persist Addr="0x1042" Index="4" Value="1000000"/>
+    <Persist Addr="0x1042" Index="5" Value="1000000"/>
+    <Persist Addr="0x1042" Index="20" Value="1000000"/>
+    <Persist Addr="0x1042" Index="21" Value="1000000"/>
+    <Persist Addr="0x1043" Index="0" Value="0"/>
+    <Persist Addr="0x1043" Index="1" Value="0"/>
+    <Persist Addr="0x1043" Index="2" Value="0"/>
+    <Persist Addr="0x1043" Index="3" Value="0"/>
+    <Persist Addr="0x1043" Index="4" Value="0"/>
+    <Persist Addr="0x1043" Index="5" Value="0"/>
+    <Persist Addr="0x1043" Index="20" Value="0"/>
+    <Persist Addr="0x1043" Index="21" Value="0"/>
+    <Persist Addr="0x1044" Index="0" Value="0x280"/>
+    <Persist Addr="0x1044" Index="1" Value="0x280"/>
+    <Persist Addr="0x1044" Index="2" Value="0x280"/>
+    <Persist Addr="0x1044" Index="3" Value="0x280"/>
+    <Persist Addr="0x1044" Index="4" Value="0x280"/>
+    <Persist Addr="0x1044" Index="5" Value="0x280"/>
+    <Persist Addr="0x1044" Index="20" Value="0x280"/>
+    <Persist Addr="0x1044" Index="21" Value="0x280"/>
+    <Persist Addr="0x10a3" Index="0" Value="0"/>
+    <Persist Addr="0x10a4" Index="0" Value="0"/>
+    <Persist Addr="0x10a5" Index="0" Value="0"/>
+    <Persist Addr="0x10a6" Index="0" Value="0"/>
+    <Persist Addr="0x10a7" Index="0" Value="0"/>
+    <Persist Addr="0x10a8" Index="0" Value="0"/>
+    <Persist Addr="0x10B9" Index="0" Value="0"/>
+    <Persist Addr="0x10BA" Index="0" Value="40000000"/>
+    <Persist Addr="0x10b0" Index="0" Value="0"/>
+    <Persist Addr="0x10b1" Index="0" Value="0"/>
+    <Persist Addr="0x10b2" Index="0" Value="0"/>
+    <Persist Addr="0x10b7" Index="0" Value="0"/>
+    <Persist Addr="0x10c0" Index="0" Value="0"/>
+    <Persist Addr="0x10c2" Index="0" Value="0"/>
+    <Persist Addr="0x10d0" Index="0" Value="0"/>
+    <Persist Addr="0x10d0" Index="1" Value="0"/>
+    <Persist Addr="0x10d1" Index="0" Value="0"/>
+    <Persist Addr="0x10d1" Index="1" Value="0"/>
+    <Persist Addr="0x10d2" Index="0" Value="0"/>
+    <Persist Addr="0x10d2" Index="1" Value="0"/>
+    <Persist Addr="0x10d4" Index="0" Value="0"/>
+    <Persist Addr="0x10d4" Index="1" Value="0"/>
+    <Persist Addr="0x10d6" Index="0" Value="0"/>
+    <Persist Addr="0x10d6" Index="1" Value="0"/>
+    <Persist Addr="0x10d7" Index="0" Value="0"/>
+    <Persist Addr="0x10d7" Index="1" Value="0"/>
+    <Persist Addr="0x10d8" Index="0" Value="0"/>
+    <Persist Addr="0x10d8" Index="1" Value="0"/>
+    <Persist Addr="0x10dc" Index="3" Value="0"/>
+    <Persist Addr="0x10dc" Index="4" Value="0"/>
+    <Persist Addr="0x10dd" Index="0" Value="10000000"/>
+    <Persist Addr="0x10f0" Index="0" Value="0"/>
+    <Persist Addr="0x10f1" Index="0" Value="0"/>
+    <Persist Addr="0x10f2" Index="0" Value="0"/>
+    <Persist Addr="0x1501" Index="0" Value="1000"/>
+    <Persist Addr="0x1501" Index="1" Value="1000"/>
+    <Persist Addr="0x1501" Index="2" Value="1000"/>
+    <Persist Addr="0x1502" Index="0" Value="-1"/>
+    <Persist Addr="0x1502" Index="1" Value="-1"/>
+    <Persist Addr="0x1502" Index="2" Value="-1"/>
+  </Persistence>
+  <Aliases>
+    <Alias Key="ADC1" Value="Intensity" Group="Input"/>
+    <Alias Key="ADC2" Value="" Group="Input"/>
+    <Alias Key="ADC3" Value="" Group="Input"/>
+    <Alias Key="ADC4" Value="" Group="Input"/>
+    <Alias Key="ADC5" Value="" Group="Input"/>
+    <Alias Key="ADC6" Value="" Group="Input"/>
+    <Alias Key="DAC 1" Value="" Group="Output"/>
+    <Alias Key="DAC 2" Value="" Group="Output"/>
+    <Alias Key="DAC 3" Value="" Group="Output"/>
+    <Alias Key="DAC 4" Value="" Group="Output"/>
+    <Alias Key="Z out" Value="" Group="Internal"/>
+    <Alias Key="Z out inv" Value="" Group="Internal"/>
+    <Alias Key="HF 1" Value="" Group="Internal"/>
+    <Alias Key="HF 1 df" Value="" Group="Internal"/>
+    <Alias Key="HF 1 Out" Value="" Group="Internal"/>
+    <Alias Key="HF 1 Ampl" Value="" Group="Internal"/>
+    <Alias Key="HF 1 Phase" Value="" Group="Internal"/>
+    <Alias Key="LF Lockin Ampl" Value="" Group="Internal"/>
+    <Alias Key="LF Lockin Phase" Value="" Group="Internal"/>
+    <Alias Key="Counter" Value="" Group="Internal"/>
+    <Alias Key="Drift RB X" Value="" Group="Internal"/>
+    <Alias Key="Drift RB Y" Value="" Group="Internal"/>
+    <Alias Key="Spec 1" Value="" Group="Resources"/>
+    <Alias Key="Spec 2" Value="" Group="Resources"/>
+    <Alias Key="Spec 3" Value="" Group="Resources"/>
+	<Alias Key="Axis 1" Value="" Group="Coarse"/>
+	<Alias Key="Axis 2" Value="" Group="Coarse"/>
+	<Alias Key="Axis 3" Value="" Group="Coarse"/>
+	<Alias Key="Axis 4" Value="" Group="Coarse"/>
+	<Alias Key="Axis 5" Value="" Group="Coarse"/>
+	<Alias Key="Axis 6" Value="" Group="Coarse"/>
+	<Alias Key="Axis 7" Value="" Group="Coarse"/>
+  </Aliases>
+  <Settings>
+    <Setting Name="WindowFunction" Owner="FFT Data Filter" Value="0"/>
+    <Setting Name="Average" Owner="FFT Data Filter" Value="1"/>
+    <Setting Name="YScaling" Owner="FFT Data Filter" Value="0"/>
+    <Setting Name="MinFrequency" Owner="FFT Data Filter" Value="0"/>
+    <Setting Name="MaxFrequency" Owner="FFT Data Filter" Value="20000"/>
+    <Setting Name="SqrtHzEnable" Owner="FFT Data Filter" Value=""/>
+  </Settings>
+</Profile>

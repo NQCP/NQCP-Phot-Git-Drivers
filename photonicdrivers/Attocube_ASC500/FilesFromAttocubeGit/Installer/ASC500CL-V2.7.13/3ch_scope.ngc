@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Three Channel Oscilloscope for Daisy -->
+<!-- $Id: 3ch_scope.ngc,v 1.7 2016/04/26 12:58:34 trurl Exp $ -->
+<Panel Caption="3 Channel Oscilloscope" Icon="screencurve.xpm" Datagroups="1 2 10 7">
+  <View Caption="Input Red"  ChannelSelector="Restricted" X="0" Y="0" TriggerSnapshotButtons="Hide" LeftAlign="1" >
+    <Plugin Type="Scan Direction Filter" />
+    <Plugin Caption="Channel 1" Type="Oscilloscope Data Filter"/>
+    <Plugin Type="Fork">
+      <Option Name="Target" Value="4Ch_Union"/>
+    </Plugin>
+  </View>
+  
+  <View Caption="Input Green"  ChannelSelector="Restricted" TriggerSnapshotButtons="Hide" X="0" Y="1"LeftAlign="1" >
+    <Plugin Type="Scan Direction Filter"/>
+    <Plugin Caption="Channel 2" Type="Oscilloscope Data Filter"/>
+    <Plugin Type="Fork">
+      <Option Name="Target" Value="4Ch_Union"/>
+    </Plugin>
+  </View>
+  
+  <!-- Achtung: Die Speicher-Buttons müssen in dieser View sichtbar sein,
+                weil hier auch das Display ist. -->
+  <View Caption="Input White"  ChannelSelector="Restricted" X="0" Y="2" Height="10" LeftAlign="1">
+    <Plugin Type="Scan Direction Filter"/>
+    <Plugin Caption="Channel 3" Type="Oscilloscope Data Filter"/>
+    <Plugin Caption="4Ch_Union" Type="Union">
+      <Option Name="Mode" Value="Multiline"/>
+    </Plugin>
+    <Plugin Caption="4Ch_Display" Type="Line Display 2">
+        <Option Name="FixedYScale" Value="10" />
+        <Option Name="LeftAlign"   Value="0"  />
+    </Plugin>
+  </View>
+</Panel>

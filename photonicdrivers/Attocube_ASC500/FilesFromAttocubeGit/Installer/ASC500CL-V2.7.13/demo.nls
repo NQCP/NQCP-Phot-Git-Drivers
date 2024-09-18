@@ -1,0 +1,50 @@
+<!-- N-Hands Shape Description for Litography for ASC500 -->
+<!-- $Id: demo.nls,v 1.5 2010/11/19 19:18:21 trurl Exp $ -->
+
+<!-- Only one shapefile node per file is accepted;
+     it may contain a set of shape objects.
+-->
+
+<ShapeFile Version="2">
+  
+  <!-- Shape object of type polygon. Attributes:
+       Spacing:   Spacing of the filling pattern in nm (Default: 1)
+       Speed:     Scan speed in lithography mode in nm/s (Default: 1000)
+       PosSpeed:  Positioning speed when approaching the lithography area (Default: 10000)
+       Beam:      Beam on (1) or off (0) when scanning (Default: 1)
+       Handshake: Stop for handshake with external device before scanning (Default: 0)
+  -->
+  <Polygon Spacing="20" Speed="200" PosSpeed="1000">
+    <!-- The polygon is defined by a sequence of vertices.
+         It has to be convex; results are undefined otherwise.
+         Coordinates are relative, i.e. the origin can be moved and the
+         coordinate system can be rotated later. Attributes:
+         X:   X coordinate in nm (mandatory)
+         Y:   Y coordinate in nm (mandatory)
+    -->
+    <Vertex X="1000"   Y="2000"/>
+    <Vertex X="2000"   Y="2000"/>
+    <Vertex X="1850"   Y="1000"/>
+  </Polygon>
+
+
+  <!-- Default values can be omitted    -->
+  <Polygon Spacing="50" Speed="400">
+    <Vertex X="5000"  Y="2200"/>
+    <Vertex X="5000"  Y="3500"/>
+    <Vertex X="-500"  Y="3500"/>
+    <Vertex X="-500"  Y="2200"/>
+  </Polygon>
+
+
+  <!-- Shape object of type Point. Attributes:
+       X:         X coordinate in nm (mandatory)
+       Y:         Y coordinate in nm (mandatory)
+       PosSpeed:  Positioning speed when approaching the lithography point (Default: 10000)
+       Wait:      Wait time in ms after reaching the point (Default: 0)
+       Beam:      Beam on (1) or off (0) during the wait time (Default: 1)
+                  Beam is always off when approaching or leaving the point.
+  -->
+  <Point X="-1000" Y="1500" PosSpeed="10000" Beam="1" Wait="150" />
+
+</ShapeFile>
