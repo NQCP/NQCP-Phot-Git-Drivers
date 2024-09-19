@@ -15,7 +15,11 @@ laser = Picus_Driver(_resource_manager=rm,_port=port,_connectionMethod="pyvisa")
 laser.connect()
 
 print("Enable state: " + str(laser.getEnabledState()))
+laser.setEnabledState(True)
+print("Enable state: " + str(laser.getEnabledState()))
 print("Wavelength: " + str(laser.getWavelength()))
-print(laser.is_connected())
+
+laser.setEnabledState(False)
+print("Enable state: " + str(laser.getEnabledState()))
 
 laser.disconnect()

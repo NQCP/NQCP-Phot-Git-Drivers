@@ -58,15 +58,22 @@ class Picus_Driver(Connectable):
         return float(self._read())
     
     def setEnabledState(self, state: bool) -> None:
-        self._write("Laser:Enable" + str(int(state)))
+        self._write("Laser:Enable " + str(int(state)))
+        sleep(0.5)
+        print(self._read())
 
     def setWavelength(self, wavelength_nm: float) -> None:
-        self._write("Laser:Wavelength" + str(wavelength_nm))
+        self._write("Laser:Wavelength " + str(wavelength_nm))
 
 
 #################################### PRIVATE METHODS ###########################################
 
     def _write(self,command: str) -> None:
+
+        print("command and type: ")
+        print(command)
+        print(type(command))
+
         if self.connectionType == "pyvisa":
             self.connection.write(command)
             
@@ -88,5 +95,12 @@ class Picus_Driver(Connectable):
 
         else:
             print("No connection method defined")
+
+        print("read respone: ")
+        print(response)
+
+        if response == "CMDERR":
+            print("read failed. setting response to empty")
+            response = ""
 
         return response
