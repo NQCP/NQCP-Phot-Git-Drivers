@@ -16,5 +16,6 @@ laser.connect()
 
 print("Enable state: " + str(laser.getEnabledState()))
 print("Wavelength: " + str(laser.getWavelength()))
+print(laser.is_connected())
 
 laser.disconnect()

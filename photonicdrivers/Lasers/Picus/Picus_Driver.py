@@ -2,7 +2,9 @@ import pyvisa
 from serial import Serial
 from time import sleep
 
-class Picus_Driver():
+from photonicdrivers.Abstract.Connectable import Connectable
+
+class Picus_Driver(Connectable):
 
     def __init__(self, _resource_manager: pyvisa.ResourceManager=None, _port: str=None, _connectionMethod=None) -> None:
         self.resource_manager = _resource_manager
@@ -39,6 +41,13 @@ class Picus_Driver():
     def disconnect(self):
         # both the pyvisa and serial libraries have "close" command
         self.connection.close()
+
+    def is_connected(self) -> bool:
+        return bool(self.getRuntimeAmplifier())
+        
+    def getRuntimeAmplifier(self):
+        self._write("Measure:Runtime:Amplifier?")
+        return self._read()
 
     def getEnabledState(self) -> bool:
         self._write("Laser:Enable?")
