@@ -1,5 +1,5 @@
 import pyvisa
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_PM100D_Driver import Thorlabs_PM100D_driver
+from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_PM100D_Driver import Thorlabs_PM100D_Driver
 
 
 print("hello")
@@ -21,12 +21,12 @@ for idx, resource in enumerate(available_resources, start=1):
 print("hello")
 
 # Open a VISA instrument connection
-powerMeter = Thorlabs_PM100D_driver("USB0::0x1313::0x807A::M01044633::INSTR")
+powerMeter = Thorlabs_PM100D_Driver("USB0::0x1313::0x807A::M01044633::INSTR")
 
 powerMeter.connect()
-print(powerMeter.get_detector_power())
-print(powerMeter.get_power_meter_wavelength())
-print(powerMeter.get_units())
+print(powerMeter.get_power())
+print(powerMeter.get_wavelength())
+print(powerMeter.get_power_unit())
 print(powerMeter.get_averaging())
 powerMeter.disconnect()
 

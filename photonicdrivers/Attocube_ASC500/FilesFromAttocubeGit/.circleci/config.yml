@@ -1,0 +1,48 @@
+version: 2.1
+jobs:
+  pack-asc:
+    docker:
+     - image: alpine:latest
+    steps:
+      - checkout
+      - run:
+          command: |
+              apk update && apk add zip ca-certificates
+              mkdir -p build
+              zip asc500.zip asc500_base.py asc500_const.py asc500_example_01.py
+              mv *.zip build
+      - persist_to_workspace:
+          root: .
+          paths:
+           - build
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.12
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/build
+workflows:
+  version: 2
+  pack-tagged:
+    jobs:
+      - pack-asc:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+
+      - publish-github-release:
+          context: github_publish
+          requires:
+            - pack-asc
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$/

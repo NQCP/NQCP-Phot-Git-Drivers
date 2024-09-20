@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Panel Name="Measurement Control" Icon="channels.xpm">
+
+  <Widget Type="Label" Caption="Channel"     X="0" Y="0" Align="Right Bottom" Width="1" />
+  <Widget Type="Label" Caption="DGroup"      X="1" Y="0" Align="Left  Bottom" Width="2" />
+  <Widget Type="Label" Caption="Trigger"     X="3" Y="0" Align="Left  Bottom" Width="2" />
+  <Widget Type="Label" Caption="Signal"      X="5" Y="0" Align="Left  Bottom" Width="2" />
+  <Widget Type="Label" Caption="Sample Time" X="7" Y="0" Align="Left  Bottom" Width="2" Rich="0" />
+  <Widget Type="Label" Caption="Average"     X="9" Y="0" Align="Left  Bottom" Width="1" />
+
+  <Macro Type="Repeater" Count="$ChannelCount$" >
+
+    <Widget Type="Label" Caption="$Counter$"   X="0" Y="$+(Counter,2)$"  Width="1" Align="Right Bottom" />
+    <Widget Type="Combo" Caption=""            X="1" Y="$+(Counter,2)$"  Width="2" Address="0x3b" Index="$Counter$" Choices="$DgroupNames$" />
+    <Widget Type="Combo" Caption=""            X="3" Y="$+(Counter,2)$"  Width="2" Address="0x30" Index="$Counter$" Choices="$TriggerNames$" />
+    <Widget Type="Combo" Caption=""            X="5" Y="$+(Counter,2)$"  Width="2" Address="0x31" Index="$Counter$" Choices="$SignalNames$"     />
+    <Widget Type="Xedit" Caption=""            X="7" Y="$+(Counter,2)$"  Width="2" Address="0x32" Index="$Counter$" Max="163835" Min="2.5" Prefix="u" Scale="0.4" Unit="s" />
+    <Widget Type="Check" Caption=""            X="9" Y="$+(Counter,2)$"  Width="1" Address="0x35" Index="$Counter$" />
+
+  </Macro>
+
+  <Widget Type="Label" Caption=""            X="0" Y="15" Height="3" />
+
+</Panel>

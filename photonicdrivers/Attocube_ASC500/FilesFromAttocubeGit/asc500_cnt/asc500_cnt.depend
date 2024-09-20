@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1588961167 source:c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\example500_counter.cpp
+	<cmath>
+	<cstdio>
+	<cassert>
+	<string>
+	"metadata.h"
+	"daisybase.h"
+	"daisydata.h"
+	"asc500.h"
+	<windows.h>
+
+1587587174 c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\metadata.h
+	"daisydecl.h"
+
+1587587174 c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\daisydecl.h
+	<inttypes.h>
+
+1587587174 c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\daisybase.h
+	"daisydecl.h"
+	"metadata.h"
+
+1587587174 c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\daisydata.h
+	"daisydecl.h"
+	"daisybase.h"
+
+1587672883 c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\asc500.h
+
+1589044560 source:c:\users\schaecl\documents\github\asc500_python_control\asc500_cnt\example500_counter_clean.cpp
+	<cmath>
+	<cstdio>
+	<cassert>
+	<string>
+	"metadata.h"
+	"daisybase.h"
+	"daisydata.h"
+	"asc500.h"
+	<windows.h>
+

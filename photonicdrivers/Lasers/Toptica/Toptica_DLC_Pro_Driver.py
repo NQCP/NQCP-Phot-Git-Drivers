@@ -1,6 +1,6 @@
 import toptica.lasersdk.dlcpro.v3_0_1 as toptica
-
-class Toptica_DLC_PRO_Driver:
+from photonicdrivers.Abstract.Connectable import Connectable
+class Toptica_DLC_PRO_Driver(Connectable):
     """
     A driver class for controlling a Toptica CTL950 laser via the Toptica DLC pro laser controller.
 
@@ -19,12 +19,6 @@ class Toptica_DLC_PRO_Driver:
         self.ip_address = ip_address
         self.laser_controller = toptica.DLCpro(toptica.NetworkConnection(self.ip_address))
 
-    def __del__(self):
-        """
-        Destructor method that ensures the connection to the laser controller is closed when the object is deleted.
-        """
-        self.disconnect()
-
     def connect(self):
         """
         Opens the connection to the laser controller.
@@ -36,6 +30,14 @@ class Toptica_DLC_PRO_Driver:
         Closes the connection to the laser controller.
         """
         self.laser_controller.close()
+
+    def is_connected(self):
+        try:
+            return self.laser_controller.serial_number.get() is not None
+        except ConnectionError:
+            return False
+        except Exception:
+            return False
 
     ###### SHALLOW SCAN ######
 

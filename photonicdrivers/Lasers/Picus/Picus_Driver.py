@@ -1,7 +1,10 @@
 import pyvisa
 from serial import Serial
+from time import sleep
 
-class Picus_Driver():
+from photonicdrivers.Abstract.Connectable import Connectable
+
+class Picus_Driver(Connectable):
 
     def __init__(self, _resource_manager: pyvisa.ResourceManager=None, _port: str=None, _connectionMethod=None) -> None:
         self.resource_manager = _resource_manager
@@ -24,14 +27,27 @@ class Picus_Driver():
     def connect(self):
         if self.connectionType == "pyvisa":
             self.connection = self.resource_manager.open_resource(self.port)
-            print("Successfully connected to Picos laser")
+            self.connection.read_termination = self.termination_character
+            self.connection.write_termination = self.termination_character
+            print("Successfully connected to Picus laser via pyvisa using port: " + self.port)
+
         elif self.connectionType == "serial":
-            self.connection = Serial(port='COM5', timeout = 3)
+            self.connection = Serial(port=self.port, timeout = 3)
+            print("Successfully connected to Picus laser via serial using port: " + self.port)    
+
         else:
             print("No connection method defined")
 
     def disconnect(self):
+        # both the pyvisa and serial libraries have "close" command
         self.connection.close()
+
+    def is_connected(self) -> bool:
+        return bool(self.getRuntimeAmplifier())
+        
+    def getRuntimeAmplifier(self):
+        self._write("Measure:Runtime:Amplifier?")
+        return self._read()
 
     def getEnabledState(self) -> bool:
         self._write("Laser:Enable?")
@@ -42,36 +58,49 @@ class Picus_Driver():
         return float(self._read())
     
     def setEnabledState(self, state: bool) -> None:
-        self._write("Laser:Enable" + str(int(state)))
+        self._write("Laser:Enable " + str(int(state)))
+        sleep(0.5)
+        print(self._read())
 
     def setWavelength(self, wavelength_nm: float) -> None:
-        self._write("Laser:Wavelength" + str(wavelength_nm))
+        self._write("Laser:Wavelength " + str(wavelength_nm))
 
 
 #################################### PRIVATE METHODS ###########################################
 
     def _write(self,command: str) -> None:
-        cmd = command + self.termination_character
-        # print(cmd)
+
+        print("command and type: ")
+        print(command)
+        print(type(command))
 
         if self.connectionType == "pyvisa":
-            self.write(cmd)
+            self.connection.write(command)
+            
         elif self.connectionType == "serial":
-            self.connection.write(cmd.encode())
+            command = command + self.termination_character
+            self.connection.write(command.encode())
         else:
-            print("No connection method defined")
-        
+            print("No connection method defined")        
 
     def _read(self) -> str:
-        # response = self.powerMeter.read()
-        # response = response.replace('\n', '').replace('\r', '')
         response = None
 
         if self.connectionType == "pyvisa":
-            self.connection.read()
+            response = self.connection.read()
+            response = response.replace('\n', '').replace('\r', '')
+
         elif self.connectionType == "serial":
             response = self.connection.readline().decode()
+
         else:
             print("No connection method defined")
+
+        print("read respone: ")
+        print(response)
+
+        if response == "CMDERR":
+            print("read failed. setting response to empty")
+            response = ""
 
         return response

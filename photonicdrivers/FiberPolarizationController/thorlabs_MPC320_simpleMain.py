@@ -1,8 +1,8 @@
 
 
-from photonicdrivers.FiberPolarizationController.Thorlabs_MPC320_driver import Thorlabs_MPC320_Serial
+from photonicdrivers.FiberPolarizationController.Thorlabs_MPC320_driver import Thorlabs_MPC320_Driver
 serial_number = "38449564"
-polarization_controller = Thorlabs_MPC320_Serial(serial_number)
+polarization_controller = Thorlabs_MPC320_Driver(serial_number)
 polarization_controller.connect()
 polarization_controller.set_position_0(100)
 polarization_controller.set_position_1(90)

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Scan frame and line view for Daisy -->
+<!-- $Id: frame_line.ngc,v 1.2 2011/02/21 16:47:31 trurl Exp $ -->
+<Panel Caption="Scan Frame/Line View" Datagroups="1 2 10" Icon="scanner.xpm">
+  <Widget Type="Tabs"                               X="0" Y="0"  >
+    <Tab Name="Frame View" Margin="0" >
+      <View Dgroup="1"    Caption="Extra Scan Frame View"   X="0" Y="0" >
+        <Plugin Type="Underground Filter"/>
+        <Plugin Type="Frame Display" Caption="Extra Scan Frame View">
+            <Option Name="size"   Value="260" />
+            <Option Name="DisplayPathButton" Value="1" />
+            <Option Name="DisplayGridButton" Value="1" />
+        </Plugin>
+      </View>
+    </Tab>
+    <Tab Name="Line View" Margin="0" >
+      <View Dgroup="1"    Caption="Extra Scan Line View"    X="0" Y="0" >
+        <Plugin Type="Scan Direction Filter"/>
+        <Plugin Type="Line Display" Caption="Extra Scan Line View">
+            <Option Name="StoreLocal" Value="1"/>
+        </Plugin>
+      </View>
+    </Tab>
+  </Widget>
+
+</Panel>
