@@ -27,7 +27,7 @@ class CryomechCompressor_Driver:
         data_flag, brd = self._breakdownReplyData(data)
    
 
-        return brd['Coolant In Temp'],brd['Coolant Out Temp'],brd['Oil Temp'],brd['Helium Temp'], brd['Low Pressure'], brd['High Pressure'], brd['Delta Pressure Average'], brd['Motor Current']
+        return data_flag, brd['Coolant In Temp'],brd['Coolant Out Temp'],brd['Oil Temp'],brd['Helium Temp'], brd['Low Pressure'], brd['High Pressure'], brd['Delta Pressure Average'], brd['Motor Current']
 
 
   ##################### LOW LEVEL SOURCE METHODS ###########################
@@ -288,3 +288,4 @@ class CryomechCompressor_Driver:
             )
 
         return data_flag, data
+
