@@ -14,6 +14,7 @@ class Picus_Driver(Connectable):
         self.parity = "None"
         self.stop_bits = 1
         self.termination_character = "\n"
+        self.timeout_ms = 5000        
 
         self.connectionType = _connectionMethod
         self.connection = None
@@ -29,10 +30,11 @@ class Picus_Driver(Connectable):
             self.connection = self.resource_manager.open_resource(self.port)
             self.connection.read_termination = self.termination_character
             self.connection.write_termination = self.termination_character
+            self.connection.timeout = self.timeout_ms
             print("Successfully connected to Picus laser via pyvisa using port: " + self.port)
 
         elif self.connectionType == "serial":
-            self.connection = Serial(port=self.port, timeout = 3)
+            self.connection = Serial(port=self.port, timeout = self.timeout_ms)
             print("Successfully connected to Picus laser via serial using port: " + self.port)    
 
         else:
@@ -45,35 +47,38 @@ class Picus_Driver(Connectable):
     def is_connected(self) -> bool:
         return bool(self.getRuntimeAmplifier())
         
-    def getRuntimeAmplifier(self):
-        self._write("Measure:Runtime:Amplifier?")
-        return self._read()
+    def getRuntimeAmplifier(self) -> str:
+        command = "Measure:Runtime:Amplifier?"
+        response = self._query(command)
+        return response
 
     def getEnabledState(self) -> bool:
-        self._write("Laser:Enable?")
-        return bool(int(self._read()))
+        command = "Laser:Enable?"
+        response = self._query(command)
+        return bool(int(response))
     
     def getWavelength(self) -> float:
-        self._write("Laser:Wavelength?")
-        return float(self._read())
+        command = "Laser:Wavelength?"
+        response = self._query(command)
+        return float(response)
     
     def setEnabledState(self, state: bool) -> None:
-        self._write("Laser:Enable " + str(int(state)))
-        sleep(0.5)
-        print(self._read())
+        command = "Laser:Enable " + str(int(state))
+        response = self._query(command)
+        if response != "ACK":
+            print("The command '" + command + "' failed. Respone was: " + response)
 
     def setWavelength(self, wavelength_nm: float) -> None:
-        self._write("Laser:Wavelength " + str(wavelength_nm))
+        command = "Laser:Wavelength " + str(wavelength_nm)
+        response = self._query(command)
+        if response != "ACK":
+            print("The command '" + command + "' failed. Respone was: " + response)
+        
 
 
 #################################### PRIVATE METHODS ###########################################
 
-    def _write(self,command: str) -> None:
-
-        print("command and type: ")
-        print(command)
-        print(type(command))
-
+    def _write(self, command: str) -> None:
         if self.connectionType == "pyvisa":
             self.connection.write(command)
             
@@ -92,15 +97,14 @@ class Picus_Driver(Connectable):
 
         elif self.connectionType == "serial":
             response = self.connection.readline().decode()
+            response = response.replace('\n', '').replace('\r', '')
 
         else:
             print("No connection method defined")
 
-        print("read respone: ")
-        print(response)
-
-        if response == "CMDERR":
-            print("read failed. setting response to empty")
-            response = ""
-
+        return response
+    
+    def _query(self, command: str) -> str:
+        self._write(command)
+        response = self._read()
         return response
