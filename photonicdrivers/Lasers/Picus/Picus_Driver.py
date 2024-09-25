@@ -62,17 +62,19 @@ class Picus_Driver(Connectable):
         response = self._query(command)
         return float(response)
     
-    def setEnabledState(self, state: bool) -> None:
+    def setEnabledState(self, state: bool) -> str:
         command = "Laser:Enable " + str(int(state))
         response = self._query(command)
         if response != "ACK":
             print("The command '" + command + "' failed. Respone was: " + response)
+        return response
 
     def setWavelength(self, wavelength_nm: float) -> None:
         command = "Laser:Wavelength " + str(wavelength_nm)
         response = self._query(command)
         if response != "ACK":
             print("The command '" + command + "' failed. Respone was: " + response)
+        return response
         
 
 
