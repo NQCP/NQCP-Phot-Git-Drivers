@@ -1,5 +1,6 @@
-from Andor_Newton import Andor_Newton
-from Andor_Kymera import Andor_Kymera
+
+from photonicdrivers.Spectrographs.Andor_Kymera import Andor_Kymera
+from photonicdrivers.Spectrographs.Andor_Newton import Andor_Newton
 import matplotlib.pyplot as plt
 import numpy as np
 from instruments.Implementations.Toptica_CTL950 import Toptica_CTL950
@@ -27,7 +28,6 @@ class Andor_Spectrograph():
 class Image_Plotter():
 
     def plot_image(image, calibration = None):
-
         plt.figure()
         plt.imshow(image, cmap='gray', aspect='auto')
         plt.colorbar()  # Add a colorbar to show the mapping of values to colors
