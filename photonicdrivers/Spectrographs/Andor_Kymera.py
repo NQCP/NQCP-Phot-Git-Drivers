@@ -1,9 +1,11 @@
 import sys
 import time
-from pyAndorSpectrograph.spectrograph import ATSpectrograph
-from photonicdrivers.utils.Range import Range
+
 sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
 sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
+from pyAndorSpectrograph.spectrograph import ATSpectrograph
+from photonicdrivers.utils.Range import Range
+
 
 class Andor_Kymera():
     def __init__(self) -> None:
@@ -14,6 +16,13 @@ class Andor_Kymera():
         message = self.spectrograph.Initialize("")
         print("Function Initialize returned {}".format(self.spectrograph.GetFunctionReturnDescription(message, 64)[1]))
 
+    def get_serial_number(self):
+        (message, serial_number) = self.spectrograph.GetSerialNumber(self.device_index, maxSerialStrLen=20)
+        return serial_number
+    
+    def get_id(self):
+        return self.get_serial_number()
+    
     def get_grating(self):
         (message, grating) = self.spectrograph.GetGrating(self.device_index)
         return grating
@@ -36,4 +45,11 @@ class Andor_Kymera():
     def disconnect(self):
         pass
 
-
+    def is_connected(self):
+        return bool(self.get_center_wavelength())
+    
+    def get_settings(self):
+        return {
+            "grating": self.get_grating(),
+            "center_wavelength": self.get_center_wavelength()
+        }

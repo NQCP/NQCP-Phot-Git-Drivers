@@ -25,9 +25,16 @@ class Andor_Newton:
         self.camera.SetReadMode(4)
         self.camera.SetImage(1,1,1,self.num_pixel_x,1,self.num_pixel_y)
         self.camera.SetAcquisitionMode(codes.Acquisition_Mode.SINGLE_SCAN)
+        self.set_temperature(-70)
+        self.cooler_on()
+        self.set_exposure_time_s(0.1)
 
     def set_exposure_time_s(self, exposure_time_s):
         self.camera.SetExposureTime(exposure_time_s)
+
+    def get_exposure_time_s(self):
+        (message, exposure_time) = self.camera.GetMaximumExposure()
+        return exposure_time
 
     def get_image(self):
         self.camera.PrepareAcquisition()
@@ -50,9 +57,17 @@ class Andor_Newton:
 
     def set_temperature(self, temperature_celsius):
         self.camera.SetTemperature(temperature_celsius)
-        
+
+    def get_temperature(self):
+        (message, temperature) = self.camera.GetTemperature()
+        return temperature
+
     def get_serial_number(self):
-        return self.camera.GetCameraSerialNumber()
+        (message, serial_number) = self.camera.GetCameraSerialNumber()
+        return serial_number
+    
+    def get_id(self):
+        return self.get_serial_number()
 
     def get_gain_range(self):
         (message, min_gain, max_gain) = self.camera.GetEMGainRange()
@@ -64,7 +79,6 @@ class Andor_Newton:
         """
         (message, gain) = self.camera.GetEMCCDGain()
         return gain
-    
 
     def set_gain(self, gain):
         gain_range = self.get_gain_range()
@@ -75,5 +89,15 @@ class Andor_Newton:
 
     def disconnect(self):
         pass
+    
+    def is_connected(self):
+        return bool(self.get_serial_number())
         
+    def get_settings(self):
+        return {
+            "id": self.get_serial_number(),
+            "temperature": self.get_temperature(),
+            "gain": self.get_gain(),
+            "exposure_time": self.get_exposure_time_s()
+        }
 

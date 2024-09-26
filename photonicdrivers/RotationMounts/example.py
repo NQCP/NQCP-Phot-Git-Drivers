@@ -145,5 +145,4 @@ QWP915c.set_angle(90)
 HWP915c = ElliptecRotationStage(serial_connection=serial_connection, offset=-8529, address=2)
 HWP915c.set_angle(0)
 
-
 serial_connection.close()

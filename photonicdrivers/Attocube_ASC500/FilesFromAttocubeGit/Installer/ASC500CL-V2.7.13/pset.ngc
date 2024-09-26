@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: pset.ngc,v 1.1 2016/04/07 17:53:25 trurl Exp $ -->
+<Panel Name="Pset" Icon="debug.xpm" >
+
+  <Widget Type="Box" Style="Flat"     X="0" Y="0" Align="Top Left" >
+    <Widget Type="Script" Caption=""    X="0" Y="0" Width="2" ValueBox="1" >
+      <!--<Connect Name="FpgaAddress"  Address="3" Index="0" />-->
+      <Connect Name="FpgaPT"       Address="3" Index="4" />
+      <Connect Name="FpgaPI"       Address="3" Index="5" />
+      <Connect Name="FpgaPN"       Address="3" Index="6" />
+      <Connect Name="FpgaValue"    Address="3" Index="7" />
+      <Connect Name="FpgaCommand"  Address="3" Index="8" />
+      <Connect Name="CommitVal"    Address="3" Index="10" />
+      <Connect Name="CommitCmd"    Address="3" Index="9" />
+      <Connect Name="CommitGet"    Address="3" Index="11" />
+    </Widget>
+    <Widget Type="Label" X="0" Y="1"/>
+    <Macro Type="Repeater" Count="4">
+      <Widget Type="Script" Caption="" X="0" Y="$+(Counter,2)$" Width="2" ValueBox="1" File="0" >
+        <Connect Name="FpgaPT"       Address="3" Index="4" />
+        <Connect Name="FpgaPI"       Address="3" Index="5" />
+        <Connect Name="FpgaPN"       Address="3" Index="6" />
+        <Connect Name="FpgaValue"    Address="3" Index="7" />
+        <Connect Name="FpgaCommand"  Address="3" Index="8" />
+        <Connect Name="CommitVal"    Address="3" Index="10" />
+        <Connect Name="CommitCmd"    Address="3" Index="9" />
+        <Connect Name="CommitGet"    Address="3" Index="11" />
+      </Widget>
+    </Macro>
+    <Widget Type="Label" Caption="cmd answer dec" Display="Decimal" Address="0x3" Index="7"  X="0" Y="6" Alignment="Left"/>
+    <Widget Type="Label" Caption="hex"            Display="Hex"     Address="0x3" Index="7"  X="1" Y="6" Alignment="Left"/>
+  </Widget>
+
+</Panel>

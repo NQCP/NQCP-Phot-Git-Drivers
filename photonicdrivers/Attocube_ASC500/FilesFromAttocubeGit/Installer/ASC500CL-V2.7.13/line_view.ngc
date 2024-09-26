@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Line View for Daisy -->
+<!-- $Id: line_view.ngc,v 1.3 2016/04/26 12:58:34 trurl Exp $ -->
+<Panel Caption="Line View" Icon="screencurve.xpm" Datagroups="7">
+
+    <View Dgroup="7" ChannelSelector="Restricted"  Caption="Extra Line View"          X="0" Y="0" >
+        <Plugin Type="Line Display 2"  Caption="Extra Line View" Size="50" >
+            <Option Name="DisplayXRangeButtons" Value="1" />
+            <Option Name="DisplaySelectButtons" Value="0" />
+            <Option Name="SynthIndex" Value="1" />
+        </Plugin>
+    </View>
+</Panel>

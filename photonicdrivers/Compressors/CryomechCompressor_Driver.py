@@ -14,6 +14,22 @@ class CryomechCompressor_Driver:
         self.comm.connect((self.ip_address, self.port))
         self.comm.settimeout(timeout)
 
+
+ ##################### HIGH LEVEL SOURCE METHODS ###########################
+ # Get relevant parameters in one go to minimize communication
+
+    def get_data_lst(self):
+        """
+        Returns list of specified values (coolant in/out temp, oil/helium temp, low/high pressure, delta pressure average, motor current)
+        """
+        self.comm.sendall(self._buildRegistersQuery())
+        data = self.comm.recv(1024)
+        data_flag, brd = self._breakdownReplyData(data)
+   
+
+        return data_flag, brd['Coolant In Temp'],brd['Coolant Out Temp'],brd['Oil Temp'],brd['Helium Temp'], brd['Low Pressure'], brd['High Pressure'], brd['Delta Pressure Average'], brd['Motor Current']
+
+
   ##################### LOW LEVEL SOURCE METHODS ###########################
 
     def get_operating_state(self) -> str:
@@ -51,10 +67,7 @@ class CryomechCompressor_Driver:
 
     def get_high_pressure_average(self) -> float: #in psi
         return self._get_data('Low Pressure Average')
-    
-    def get_delta_pressure_average(self) -> float: #in psi
-        return self._get_data('Delta Pressure Average')
-    
+
     def get_delta_pressure_average(self) -> float: #in psi
         return self._get_data('Delta Pressure Average')
     
@@ -67,9 +80,10 @@ class CryomechCompressor_Driver:
 
     ##################### PRIVATE METHODS ###########################
 
+
     def _get_data(self,specific_data):
         """
-        Gets the raw data from the ptc and returns it in a usable format.
+        Gets the raw data from the compressor and returns it in a usable format.
         """
         self.comm.sendall(self._buildRegistersQuery())
         data = self.comm.recv(1024)

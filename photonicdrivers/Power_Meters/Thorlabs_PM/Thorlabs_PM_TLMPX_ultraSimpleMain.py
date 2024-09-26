@@ -1,9 +1,12 @@
 from datetime import datetime
 from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
-from TLPMX import TLPMX
+
 import time
 
+from TLPMX import TLPMX
 from TLPMX import TLPM_DEFAULT_CHANNEL
+
+
 
 # Find connected power meter devices.
 tlPM = TLPMX()
@@ -15,21 +18,22 @@ print("")
 
 resourceName = create_string_buffer(1024)
 
+
 for i in range(0, deviceCount.value):
     tlPM.getRsrcName(c_int(i), resourceName)
     print("Resource name of device", i, ":", c_char_p(resourceName.raw).value)
 print("")
 tlPM.close()
 
-# # Connect to last device.
-# tlPM = TLPMX()
-# tlPM.open(resourceName, c_bool(True), c_bool(True))
+# Connect to last device.
+tlPM = TLPMX()
+tlPM.open(resourceName, c_bool(True), c_bool(True))
 
-# message = create_string_buffer(1024)
-# tlPM.getCalibrationMsg(message,TLPM_DEFAULT_CHANNEL)
-# print("Connected to device", i)
-# print("Last calibration date: ",c_char_p(message.raw).value)
-# print("")
+message = create_string_buffer(1024)
+tlPM.getCalibrationMsg(message,TLPM_DEFAULT_CHANNEL)
+print("Connected to device", i)
+print("Last calibration date: ",c_char_p(message.raw).value)
+print("")
 
 # time.sleep(2)
 
@@ -47,20 +51,20 @@ tlPM.close()
 # # 1 -> dBm
 # tlPM.setPowerUnit(c_int16(0),TLPM_DEFAULT_CHANNEL)
 
-# # Take power measurements and save results to arrays.
-# power_measurements = []
-# times = []
-# count = 0
-# while count < 5:
-#     power =  c_double()
-#     tlPM.measPower(byref(power),TLPM_DEFAULT_CHANNEL)
-#     power_measurements.append(power.value)
-#     times.append(datetime.now())
-#     print(times[count], ":", power_measurements[count], "W")
-#     count+=1
-#     time.sleep(1)
-# print("")
+# Take power measurements and save results to arrays.
+power_measurements = []
+times = []
+count = 0
+while count < 5:
+    power =  c_double()
+    tlPM.measPower(byref(power),TLPM_DEFAULT_CHANNEL)
+    power_measurements.append(power.value)
+    times.append(datetime.now())
+    print(times[count], ":", power_measurements[count], "W")
+    count+=1
+    time.sleep(1)
+print("")
 
-# # Close power meter connection.
-# tlPM.close()
-# print('End program')
+# Close power meter connection.
+tlPM.close()
+print('End program')
