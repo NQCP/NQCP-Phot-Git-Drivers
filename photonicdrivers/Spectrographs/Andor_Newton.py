@@ -22,7 +22,7 @@ except:
 class Andor_Newton:
 
     def __init__(self) -> None:
-        self.camera = atmcd("C://Program Files/Andor SDK")
+        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
         self.num_pixel_y = 200
         self.num_pixel_x = 1600
 
@@ -53,7 +53,7 @@ class Andor_Newton:
     def get_trace(self):
         image = self.get_image()
         trace = np.sum(image, axis=0)
-        return trace
+        return trace.tolist()
 
     def cooler_on(self):
         self.camera.CoolerON()
@@ -94,7 +94,7 @@ class Andor_Newton:
             print("Gain out of range: " + gain_range)
 
     def disconnect(self):
-        pass
+        self.camera.AbortAcquisition()
     
     def is_connected(self):
         return bool(self.get_serial_number())
