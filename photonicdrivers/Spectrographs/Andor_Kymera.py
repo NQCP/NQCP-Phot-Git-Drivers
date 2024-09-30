@@ -5,11 +5,12 @@ sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
 sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
 from pyAndorSpectrograph.spectrograph import ATSpectrograph
 from photonicdrivers.utils.Range import Range
-
+import numpy as np
+from typing import Optional
 
 class Andor_Kymera():
     def __init__(self) -> None:
-        self.spectrograph = ATSpectrograph()
+        self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
         self.device_index = 0
 
     def connect(self):
@@ -29,10 +30,16 @@ class Andor_Kymera():
     
     def set_grating(self, grating):
         #1 broader, 2 narrower
-        (message, grating) = self.spectrograph.SetGrating(self.device_index, grating)
+        self.spectrograph.SetGrating(self.device_index, grating)
 
-    def get_wavelength_range(self):
+    def get_grating_wavelength_range(self, grating: Optional[int] = None):
+        if grating is None:
+            self.grating = self.get_grating()
         (message, min_wavelength, max_wavelength) = self.spectrograph.GetWavelengthLimits(self.device_index, self.get_grating())
+        return Range(min_wavelength, max_wavelength)
+    
+    def get_CCD_limit_range(self, grating: Optional[int] = None):
+        (message, min_wavelength, max_wavelength) = self.spectrograph.GetCCDLimits(device=self.device_index, port=1)
         return Range(min_wavelength, max_wavelength)
     
     def set_center_wavelength(self, wavelength):
@@ -41,10 +48,14 @@ class Andor_Kymera():
     def get_center_wavelength(self):
         (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
         return wavelength
+    
+    def get_wavelength_list(self):
+        range = self.get_wavelength_range()
+        return np.linspace(range.min, range.max, 1600).tolist()
 
     def disconnect(self):
-        pass
-
+        self.spectrograph.Close()
+        
     def is_connected(self):
         return bool(self.get_center_wavelength())
     
