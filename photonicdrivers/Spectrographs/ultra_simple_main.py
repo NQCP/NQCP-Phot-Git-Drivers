@@ -25,22 +25,29 @@ cam.SetImage(1,1,1,1600,1,200)
 ### SET ACQUISITION MODE ###
 ret = cam.SetAcquisitionMode(codes.Acquisition_Mode.SINGLE_SCAN)
 exposure_time = 0.5
+spc.SetGrating(device=0, grating=1)
+spc.SetWavelength(device=0, wavelength=940)
 ret = cam.SetExposureTime(exposure_time)
 ret = cam.PrepareAcquisition()
 ret = cam.StartAcquisition()
 ret = cam.WaitForAcquisition()
+
 
 ### COOL CAMERA ###
 ret = cam.CoolerON()
 ret = cam.SetTemperature(-65)
 ret, temperature = cam.GetTemperature()
 print(temperature)
-size = 200
+print("Get Number Pixel", spc.GetNumberPixels(device=0))
+print("Get Grating Info", spc.GetGratingInfo(device=0, Grating=1, maxBlazeStrLen= 12000))
+print("Spectrograph Center Wavelength", spc.GetWavelength(device=0))
 print("Camera Capabilities: ", cam.GetCapabilities())
 print("Available Cameras: ", cam.GetAvailableCameras())
 print("Current Camera: ", cam.GetCurrentCamera())
 print(spc.GetWavelengthLimits(device=0, Grating=1))
-print(spc.GetCalibration(device=0, NumberPixels=int(200)))
+print(spc.GetCalibration(device=0, NumberPixels=0))
+print(spc.GetPixelCalibrationCoefficients(device=0))
+
 ### GET IMAGE ###
 (ret, arr, validfirst, validlast) = cam.GetImages16(1,1, size=1600*200)
 
