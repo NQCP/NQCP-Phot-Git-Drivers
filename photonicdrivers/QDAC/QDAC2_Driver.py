@@ -15,8 +15,6 @@ class QDAC2_Driver(Connectable):
         self.port = _port_number
         self.timeout = 2 # seconds
         
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
         self.server_address = (self.ipAddress, self.port)
         
         self.terminationChar = "\n"
@@ -45,8 +43,11 @@ class QDAC2_Driver(Connectable):
     ##################### LOW LEVEL SYSTEM METHODS ###########################
 
     def get_product_ID(self) -> str:
-        response = self._query("*IDN?")
-        return response
+        try:
+            response = self._query("*IDN?")
+            return response
+        except:
+            return False
     
     def get_IP_address(self) -> str:
         response = self._query("syst:comm:lan:ipad?")
@@ -149,6 +150,8 @@ class QDAC2_Driver(Connectable):
         self.sock.close()
 
     def connect(self) -> None:
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout) # sets the timeout of the receive command in seconds. 
         self.sock.connect(self.server_address) 
 
     def is_connected(self) -> bool:
