@@ -45,7 +45,10 @@ class Picus_Driver(Connectable):
         self.connection.close()
 
     def is_connected(self) -> bool:
-        return bool(self.getRuntimeAmplifier())
+        try:
+            return bool(self.getRuntimeAmplifier())
+        except:
+            return False
         
     def getRuntimeAmplifier(self) -> str:
         command = "Measure:Runtime:Amplifier?"

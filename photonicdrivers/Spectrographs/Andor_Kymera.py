@@ -6,6 +6,8 @@ import numpy as np
 from typing import Optional
 
 try:
+    from typing import Optional
+    from photonicdrivers.utils.Range import Range
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
     from pyAndorSpectrograph.spectrograph import ATSpectrograph
@@ -36,16 +38,6 @@ class Andor_Kymera():
     def set_grating(self, grating):
         #1 broader, 2 narrower
         self.spectrograph.SetGrating(self.device_index, grating)
-
-    def get_grating_wavelength_range(self, grating: Optional[int] = None):
-        if grating is None:
-            self.grating = self.get_grating()
-        (message, min_wavelength, max_wavelength) = self.spectrograph.GetWavelengthLimits(self.device_index, self.get_grating())
-        return Range(min_wavelength, max_wavelength)
-    
-    def get_CCD_limit_range(self, grating: Optional[int] = None):
-        (message, min_wavelength, max_wavelength) = self.spectrograph.GetCCDLimits(device=self.device_index, port=1)
-        return Range(min_wavelength, max_wavelength)
     
     def set_center_wavelength(self, wavelength):
         self.spectrograph.SetWavelength(self.device_index, wavelength=wavelength)
@@ -53,7 +45,7 @@ class Andor_Kymera():
     def get_center_wavelength(self):
         (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
         return wavelength
-    
+
     def get_wavelength_list(self):
         range = self.get_wavelength_range()
         return np.linspace(range.min, range.max, 1600).tolist()

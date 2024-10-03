@@ -21,7 +21,11 @@ classifiers = [
 ]
 license = { text = "MIT" }
 requires-python = ">=3.9"
+<<<<<<< HEAD
 dependencies = ["numpy", "qcodes", "versioningit~=2.0.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "rpyc", "loguru", "pymeasure"]
+=======
+dependencies = ["numpy", "qcodes", "versioningit~=2.0.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "rpyc", "loguru","pylablib"]
+>>>>>>> edd64d2510216244967b51a8db42087d16105f07
 
 dynamic = ["version"]
 
@@ -66,6 +70,7 @@ docs = [
     "sphinx-rtd-theme>=1.0.0",
     "scipy>=1.7.0",
     "ipykernel",                 # examples using scipy
+    ""
 ]
 
 ci = ["photonicdrivers[test, docs]"]
