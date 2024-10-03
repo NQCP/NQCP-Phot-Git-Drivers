@@ -1,14 +1,10 @@
 import sys
 import time
 
-<<<<<<< HEAD
-sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
-sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
-from pyAndorSpectrograph.spectrograph import ATSpectrograph
 from photonicdrivers.utils.Range import Range
 import numpy as np
 from typing import Optional
-=======
+
 try:
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
@@ -16,7 +12,6 @@ try:
 except:
     print("Andor Solis is not installed ")
 
->>>>>>> f0c8139feea5f726588e4ce1b35780579ab715e3
 
 class Andor_Kymera():
     def __init__(self) -> None:
