@@ -1,7 +1,9 @@
 import sys
 import time
 
-import numpy as np 
+from photonicdrivers.utils.Range import Range
+import numpy as np
+from typing import Optional
 
 try:
     from typing import Optional
