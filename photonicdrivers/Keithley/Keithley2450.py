@@ -91,16 +91,6 @@ class Keithley2450:
         except socket.error as e:
             print(f"Socket error: {e}")
             return None
-    
-
-    def query(self, command):
-        """
-        Send a command and return the response.
-
-        :param command: SCPI command to send.
-        :return: Response from the Keithley 2450.
-        """
-        return self.send_command(command)
 
     def identify(self):
         """
@@ -115,32 +105,32 @@ class Keithley2450:
         """
         Measure voltage in Volts
         """
-        return device.query(":MEAS:VOLT?")
+        return self.query(":MEAS:VOLT?")
 
     def measure_current(self):
         """
         Measure current in Amps
         """
-        return device.query(":MEAS:CURR?")
+        return self.query(":MEAS:CURR?")
     
     def set_voltage(self,value):
         """
         Set output voltage in Volts
         """
-        device.write(f":SOUR:VOLT:LEV:IMM:AMPL {str(value)}")
+        self.write(f":SOUR:VOLT:LEV:IMM:AMPL {str(value)}")
 
     def set_current(self,value):
         """
         Set output current in Amps
         """
-        device.write(f":SOUR:CURR:LEV:IMM:AMPL {str(value)}")
+        self.write(f":SOUR:CURR:LEV:IMM:AMPL {str(value)}")
 
     def set_output(self, value):
         """
         Start/stop output
-        Value: Bool
+        Value: 0 (off) or 1 (on)
         """
-        self.write(f":OUTP:STAT: {value}")
+        self.write(f":OUTP:STAT {str(value)}")
 
 
 # Example usage:
