@@ -156,6 +156,22 @@ class QDAC2_Driver(Connectable):
 
     def is_connected(self) -> bool:
         return bool(self.get_product_ID())
+
+    def get_settings(self):
+        channels_dict = {}
+        # Loop over channels 1 through 10
+        for channel in range(1, 11):
+            # Convert channel number to string for usage in method calls
+            channel_str = str(channel)
+            
+            # Collect settings for each channel
+            channels_dict[str(channel_str)] = {
+                "voltage": self.get_voltage(channel_str),
+                "range": self.get_voltage_range(channel_str, ""),
+                "mode": self.get_voltage_mode(channel_str)
+            }
+        settings = {"channels": channels_dict}
+        return settings
     
     ##################### PRIVATE METHODS ###########################
 

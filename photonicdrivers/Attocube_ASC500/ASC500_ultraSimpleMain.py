@@ -10,5 +10,23 @@ dll_loc = dllPath + 'daisybase.dll'
 
 print(os.path.isfile(dll_loc))
 
+# asc500 = ASC500(binPath, dllPath)
 asc500 = ASC500(binPath, dllPath)
-# asc500 = ASC500Scanner(binPath, dllPath)
+
+print("Starting Server: ")
+asc500.base.startServer()
+
+print("Send Profile: ")
+asc500.base.sendProfile(binPath + 'afm.ngp')
+
+print("Set Data Enable: ")
+asc500.data.setDataEnable(1)
+
+print("Getting Scanner State: ")
+print(asc500.scanner.getScannerState())
+
+print("Getting Scanner Position: ")
+print(asc500.scanner.getPositionsXYZRel())
+
+print("Stopping Server: ")
+asc500.base.stopServer()
