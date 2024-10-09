@@ -8,12 +8,17 @@ amc.connect()
 x, y, z, v1, v2, v3 = amc.control.getPositionsAndVoltages()
 print((x,y,z))
 
-x = x + 50*1000
-# y = y + 120*1000
-z = 3_174_000 # nm
+x = x - 2*1000
+# y = y + -10*1000
+# z = 3_180_000 # nm
+# x = (4495702-1977418)*3/4+1977418
+# y = (2878946 - 2776193)*3/4+2776193
+
+
 
 
 # amc.control.MultiAxisPositioning(1, 1, 0, x, y, z)
-amc.control.MultiAxisPositioning(0, 0, 1, x, y, z)
+amc.control.MultiAxisPositioning(1, 1, 0, x, y, z)
 print(amc.control.getStatusMovingAllAxes())
+print((x,y,z))
 amc.close()
