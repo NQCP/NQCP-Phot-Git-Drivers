@@ -8,7 +8,7 @@ amc.connect()
 x, y, z, v1, v2, v3 = amc.control.getPositionsAndVoltages()
 print((x,y,z))
 
-x = x + -1*1000
+# x = x + -1*1000
 # y = y + -2*1000
 # z = 3_160_000 # nm
 # x = 1977418
