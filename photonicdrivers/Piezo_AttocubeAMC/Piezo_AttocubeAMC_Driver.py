@@ -1,6 +1,8 @@
 from photonicdrivers.AttocubeAPI import AMC
 from photonicdrivers.Abstract.Connectable import Connectable
 
+from time import sleep
+import numpy as np 
 
 class Piezo_AttocubeAMC_Driver(Connectable):
 
@@ -23,22 +25,33 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         self.amc.close()
 
     def is_connected(self) -> bool:
-        return True
+        return bool(self.get_device_type())
+    
+    def get_device_type(self):
+        return self.amc.description.getDeviceType()
+        
 
     def get_position(self) -> float | float | float:
         x, y, z, v1, v2, v3 = self.amc.control.getPositionsAndVoltages()
         return x, y, z
     
-    def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False) -> None:
+    def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False, wait_while_moving:bool=True) -> None:
         '''
         Moves the piezo to the position specified by x_nm, y_nm,z_nm
         '''
         if self.__check_position_limits(x_nm,y_nm,z_nm,move_x,move_y,move_z):
             self.amc.control.MultiAxisPositioning(int(move_x), int(move_y), int(move_z), x_nm, y_nm, z_nm)
+            if wait_while_moving:
+                stages_moving = True
+                while stages_moving:
+                    sleep(0.1)
+                    status = self.is_axis_moving
+                    stages_moving = np.any(status)
+
         else:
             print("Requested piezo position was outside the limits. Did not execute the move command.")
 
-    def set_position_relative(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False) -> None:
+    def set_position_relative(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False, wait_while_moving:bool=True) -> None:
         '''
         Moves the piezo with an amount specified by x_nm, y_nm,z_nm relative to the current position
         '''
@@ -46,8 +59,8 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         x = x0 + x_nm
         y = y0 + y_nm
         z = z0 + z_nm
-        if self.__check_position_limits(x,y,z,move_x,move_y,move_z):
-            self.amc.control.MultiAxisPositioning(int(move_x), int(move_y), int(move_z), x, y, z)
+
+        self.set_position(int(x), int(y), int(z), move_x, move_y, move_z, wait_while_moving)
 
     def is_axis_moving(self) -> bool | bool | bool:
         x_moving, y_moving, z_moving = self.amc.control.getStatusMovingAllAxes()
