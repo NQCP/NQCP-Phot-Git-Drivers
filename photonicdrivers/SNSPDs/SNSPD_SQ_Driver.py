@@ -15,10 +15,11 @@ class SNSPD_SQ_Driver(Connectable):
     def disconnect(self):        
         self.websq.close()
 
-    def is_connected(self):        
-        number_of_detectors = self.getNumberOfDetectors()
-        print("Checking connection by querying number of detectors: " + str(number_of_detectors))
-        return isinstance(number_of_detectors, int)
+    def is_connected(self):    
+        try:    
+            return self.websq.connected
+        except: 
+            return False
 
     def getNumberOfDetectors(self) -> int:
         return self.websq.get_number_of_detectors()
