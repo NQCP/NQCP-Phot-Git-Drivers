@@ -10,7 +10,7 @@ try:
     from photonicdrivers.utils.Range import Range
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
-    from pyAndorSpectrograph.spectrograph import ATSpectrograph
+    from pyAndorSpectrograph.spectrograph import ATSpectrograph # type: ignore
 except:
     print("Andor Solis is not installed ")
 
@@ -45,10 +45,6 @@ class Andor_Kymera():
     def get_center_wavelength(self):
         (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
         return wavelength
-
-    def get_wavelength_list(self):
-        range = self.get_wavelength_range()
-        return np.linspace(range.min, range.max, 1600).tolist()
 
     def disconnect(self):
         self.spectrograph.Close()
