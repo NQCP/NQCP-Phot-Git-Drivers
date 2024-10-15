@@ -3,7 +3,7 @@ from photonicdrivers.Spectrographs.Andor_Kymera import Andor_Kymera
 from photonicdrivers.Spectrographs.Andor_Newton import Andor_Newton
 import matplotlib.pyplot as plt
 import numpy as np
-from instruments.Implementations.Toptica_CTL950 import Toptica_CTL950
+from instruments.Implementations.Lasers.Toptica_CTL950 import Toptica_CTL950
 from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro_Driver import Toptica_DLC_PRO_Driver
 import time
 import datetime    
