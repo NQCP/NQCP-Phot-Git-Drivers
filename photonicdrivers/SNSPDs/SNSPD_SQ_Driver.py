@@ -1,6 +1,7 @@
 from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQControl
+from photonicdrivers.Abstract.Connectable import Connectable
 
-class SNSPD_SQ_Driver():
+class SNSPD_SQ_Driver(Connectable):
     def __init__(self,_ip_string: str, _control_port: int=12000, _counts_port: int=12345) -> None:
         self.ipAddress = _ip_string
         self.controlPort = _control_port
@@ -13,6 +14,11 @@ class SNSPD_SQ_Driver():
 
     def disconnect(self):        
         self.websq.close()
+
+    def is_connected(self):        
+        number_of_detectors = self.getNumberOfDetectors()
+        print("Checking connection by querying number of detectors: " + str(number_of_detectors))
+        return isinstance(number_of_detectors, int)
 
     def getNumberOfDetectors(self) -> int:
         return self.websq.get_number_of_detectors()
