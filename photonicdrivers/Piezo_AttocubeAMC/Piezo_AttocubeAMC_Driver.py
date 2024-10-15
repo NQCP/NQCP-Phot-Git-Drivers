@@ -25,7 +25,10 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         self.amc.close()
 
     def is_connected(self) -> bool:
-        return bool(self.get_device_type())
+        try:
+            return bool(self.get_device_type())
+        except:
+            return False
     
     def get_device_type(self):
         return self.amc.description.getDeviceType()

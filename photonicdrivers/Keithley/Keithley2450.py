@@ -43,6 +43,12 @@ class Keithley2450:
             self.socket = None
             print("Connection closed.")
 
+    def is_connected(self):
+        try:
+            return bool(self.identify())
+        except: 
+            return False
+
     def write(self, command):
         """
         Send an SCPI command to the Keithley 2450
