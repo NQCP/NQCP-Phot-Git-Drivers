@@ -30,6 +30,12 @@ class SNSPD_SQ_Driver():
         data = self.websq.acquire_cnts(numberOfMeasurements)
         print(data)
         return data
+    
+    def setMeasurementPeriod(self, integrationtime_ms:int) -> None:
+        self.websq.set_measurement_periode(integrationtime_ms)
+
+    def getMeasurementPeriod(self) -> float:
+        return self.websq.get_measurement_periode()
 
 
 
