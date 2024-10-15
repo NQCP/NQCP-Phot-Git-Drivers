@@ -46,10 +46,6 @@ class Andor_Kymera():
         (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
         return wavelength
 
-    def get_wavelength_list(self):
-        range = self.get_wavelength_range()
-        return np.linspace(range.min, range.max, 1600).tolist()
-
     def disconnect(self):
         self.spectrograph.Close()
         
