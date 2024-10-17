@@ -200,3 +200,6 @@ match = ["v*"]
 [tool.versioningit.onbuild]
 source-file = "photonicdrivers/_version.py"
 build-file = "photonicdrivers/_version.py"
+
+[tools.setuptools]
+py-modules=[]
