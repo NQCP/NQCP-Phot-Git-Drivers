@@ -43,7 +43,28 @@ class Keithley2450:
             self.socket = None
             print("Connection closed.")
 
-    def send_command(self, command):
+    def is_connected(self):
+        try:
+            return bool(self.identify())
+        except: 
+            return False
+
+    def write(self, command):
+        """
+        Send an SCPI command to the Keithley 2450
+
+        :param command: SCPI command to send.
+        """
+        if not self.socket:
+            raise RuntimeError("Not connected to the device.")
+        
+        try:
+            self.socket.sendall(command.encode('ascii') + b'\n')
+        except socket.error as e:
+            print(f"Socket error: {e}")
+            return None
+
+    def query(self, command):
         """
         Send an SCPI command to the Keithley 2450 and receive the response.
 
@@ -60,15 +81,22 @@ class Keithley2450:
         except socket.error as e:
             print(f"Socket error: {e}")
             return None
-
-    def query(self, command):
+    
+    def read(self):
         """
-        Send a command and return the response.
+        Receive a response from Keithley 2450
 
-        :param command: SCPI command to send.
         :return: Response from the Keithley 2450.
         """
-        return self.send_command(command)
+        if not self.socket:
+            raise RuntimeError("Not connected to the device.")
+        
+        try:
+            response = self.socket.recv(4096)  # Adjust buffer size if needed
+            return response.decode('ascii').strip()
+        except socket.error as e:
+            print(f"Socket error: {e}")
+            return None
 
     def identify(self):
         """
@@ -77,6 +105,39 @@ class Keithley2450:
         :return: Identification string.
         """
         return self.query("*IDN?")
+    
+
+    def measure_voltage(self):
+        """
+        Measure voltage in Volts
+        """
+        return self.query(":MEAS:VOLT?")
+
+    def measure_current(self):
+        """
+        Measure current in Amps
+        """
+        return self.query(":MEAS:CURR?")
+    
+    def set_voltage(self,value):
+        """
+        Set output voltage in Volts
+        """
+        self.write(f":SOUR:VOLT:LEV:IMM:AMPL {str(value)}")
+
+    def set_current(self,value):
+        """
+        Set output current in Amps
+        """
+        self.write(f":SOUR:CURR:LEV:IMM:AMPL {str(value)}")
+
+    def set_output(self, value):
+        """
+        Start/stop output
+        Value: 0 (off) or 1 (on)
+        """
+        self.write(f":OUTP:STAT {str(value)}")
+
 
 # Example usage:
 if __name__ == "__main__":
@@ -85,6 +146,7 @@ if __name__ == "__main__":
 
     try:
         device.connect()
+
         print("Identification:", device.identify())
     finally:
         device.disconnect()
