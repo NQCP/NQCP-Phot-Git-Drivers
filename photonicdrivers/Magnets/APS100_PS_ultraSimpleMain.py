@@ -1,13 +1,20 @@
 import serial
 import time
 
-# COM_PORT = 'COM4'
-# BAUD_RATE = 9600
+COM_PORT = 'COM4'
+BAUD_RATE = 115200
 
-# device = serial.Serial(COM_PORT, BAUD_RATE, timeout=1)
+
+# device = serial.Serial(COM_PORT, BAUD_RATE, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=1)
+device = serial.Serial(COM_PORT, BAUD_RATE, timeout=1)
 # device.write(b'*IDN?\n')
-# time.sleep(0.5)
+device.write(b'*IDN?;*ESE 12;*ESE?\n')
+
+time.sleep(0.5)
 # response = device.readline().decode('utf-8').strip()
+# response = device.readline().decode('utf-8')
+response = device.readline()
+print(response)
 
 
 
@@ -39,12 +46,3 @@ import time
 # else:
 #     print("No COM ports found.")
 
-
-
-
-
-
-# List all available COM ports using pyserial's list_ports
-print("Available COM ports:")
-for port in serial.tools.list_ports.comports():
-    print(port.device)
