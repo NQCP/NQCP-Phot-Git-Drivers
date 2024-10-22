@@ -20,7 +20,11 @@ class APS100_PS_Driver(Connectable):
         self.connection.close()
 
     def is_connected(self) -> bool:
-        pass
+        try:
+            self.get_id()
+            return True
+        except:
+            return False
 
     def get_id(self) -> None:
         return self.__query("*IDN?;*ESE 12;*ESE?")
