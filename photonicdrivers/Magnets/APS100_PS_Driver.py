@@ -5,45 +5,60 @@ from instruments.Abstract.Connectable import Connectable
 
 
 class APS100_PS_Driver(Connectable):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, com_port:str) -> None:
+        self.port = com_port
+        self.baud_rate = 9600
+        self.timeout = 1
+
+        self.termination_char = '\r'
 
     def connect(self) -> None:
-        return super().connect()
+        self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
     
     def disconnect(self) -> None:
-        return super().disconnect()
+        self.connection.close()
 
-    def is_connected() -> bool:
+    def is_connected(self) -> bool:
         pass
 
-    def get_id() -> None:
-        pass
+    def get_id(self) -> None:
+        return self.__query("*IDN?;*ESE 12;*ESE?")
 
+    def get_channel(self) -> str:
+        return self.__query("CHAN?")
+    
+    def set_channel(self, channel_number:int) -> str:
+        return self.__query(f"CHAN {channel_number}")
+    
     def enable_output(self) -> None:
-        pass
+        return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def disable_output(self) -> None:
-        pass
+        return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def is_enabled(self) -> bool:
-        pass
-
+        return self.__query("*IDN?;*ESE 12;*ESE?")
+    
     def set_current(self, current_A:float) -> None:
-        pass
+        return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def get_current(self) -> float:
-        pass
+        return self.__query("IOUT?")
 
     ################################ PRIVATE METTHODS ################################
 
     def __query(self, command_str:str) -> str:
-        pass
-    
-COM_PORT = 'COM8'
-BAUD_RATE = 9600
+        command = f'b\'{command_str}{self.termination_char}\''
+        print(command)
+        
+        self.connection.write(command)
 
-device = serial.Serial(COM_PORT, BAUD_RATE, timeout=1)
-device.write(b'*IDN?\n')
-time.sleep(0.5)
-response = device.readline().decode('utf-8').strip()
+        reflected_command = self.connection.readline()
+        response_raw = self.connection.readline()
+        response = response_raw.decode('utf-8').strip()
+
+        print(reflected_command)
+        print(response_raw)
+        print(response)
+
+        return response

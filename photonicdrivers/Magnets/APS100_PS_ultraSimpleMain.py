@@ -20,6 +20,8 @@ print(response)
 response = device.readline(1024)
 print(response)
 
+device.close()
+
 
 
 
