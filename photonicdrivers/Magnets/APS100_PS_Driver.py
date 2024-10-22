@@ -48,17 +48,23 @@ class APS100_PS_Driver(Connectable):
     ################################ PRIVATE METTHODS ################################
 
     def __query(self, command_str:str) -> str:
-        command = f'b\'{command_str}{self.termination_char}\''
-        print(command)
+        command = f'{command_str}{self.termination_char}'
+        # print(command)
         
-        self.connection.write(command)
+        self.connection.write(command.encode('utf-8'))
+
+        # print("READING")
+
+        # a small wait is required for the device to send back a response. 0.1 s is too little
+        time.sleep(0.2)
+
 
         reflected_command = self.connection.readline()
         response_raw = self.connection.readline()
         response = response_raw.decode('utf-8').strip()
 
-        print(reflected_command)
-        print(response_raw)
-        print(response)
+        # print(reflected_command)
+        # print(response_raw)
+        # print(response)
 
         return response
