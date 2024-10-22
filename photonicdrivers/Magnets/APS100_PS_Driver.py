@@ -14,6 +14,7 @@ class APS100_PS_Driver(Connectable):
 
     def connect(self) -> None:
         self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+        self.unit = self.get_unit()
     
     def disconnect(self) -> None:
         self.connection.close()
@@ -39,11 +40,56 @@ class APS100_PS_Driver(Connectable):
     def is_enabled(self) -> bool:
         return self.__query("*IDN?;*ESE 12;*ESE?")
     
-    def set_current(self, current_A:float) -> None:
-        return self.__query("*IDN?;*ESE 12;*ESE?")
+    def set_current(self, current_A:float, channel:int=None) -> None:
+        if channel != None:
+            self.set_channel(str(channel))
+        self.__query(f"IMAG {current_A} A")
 
-    def get_current(self) -> float:
-        return self.__query("IOUT?")
+
+    def get_unit(self) -> str:
+        return self.__query("UNITS?")
+    
+    def set_unit(self, unit:str) -> str:
+        if unit == "G" or unit == "T":
+            self.__query(f"UNITS {unit}")
+        else:
+            print(f"Trying to set unit to {unit}, but it must be G or A.")
+    
+    def get_current(self, channel:int=None) -> float:
+        '''
+        Returns the current in A
+        '''
+        if channel != None:
+            self.set_channel(str(channel))        
+        
+        if self.unit != "A":
+            self.set_unit("A")
+        
+        response = self.__query("IMAG?")
+        current = response.rstrip('A')
+        return float(current)
+    
+    def set_field(self, field_T:float, channel:int=None) -> None:
+        if channel != None:
+            self.set_channel(str(channel))
+
+        field_kG = field_T*10
+        self.__query(f"IMAG {field_kG} G")
+
+    def get_field(self, channel:int=None) -> float:
+        '''
+        Returns the field in T
+        '''
+        if channel != None:
+            self.set_channel(str(channel))
+
+        if self.unit != "G":
+            self.set_unit("G")
+        
+        response = self.__query("IMAG?")
+        field_kG = response.rstrip('G')
+        field_T = field_kG/10
+        return float(field_T)
 
     ################################ PRIVATE METTHODS ################################
 

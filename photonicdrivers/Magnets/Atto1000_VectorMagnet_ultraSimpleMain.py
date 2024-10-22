@@ -13,9 +13,15 @@ class Atto1000_VectorMagnet(Connectable):
         
         '''
         
+        # The X and Z magnet share the same power supply (PS). The PS operates in dual mode
+
         self.power_supply_x = APS100_PS_Driver() # COM4
         self.power_supply_y = APS100_PS_Driver() # COM6
         self.power_supply_z = self.power_supply_x
+
+        self.channel_x = 1
+        self.channel_y = None
+        self.channel_z = 2
 
         self.B_max = B_max
         self.Bx_max = Bx_max
@@ -101,7 +107,7 @@ class Atto1000_VectorMagnet(Connectable):
 
         if self.is_B_within_thresholds(new_Bx, By, Bz):
             current = self.x_A_per_T * new_Bx
-            self.power_supply_x.set_current(current)
+            self.power_supply_x.set_current(current, self.channel_x)
 
     def set_By(self, new_By:float) -> None:
         if self.mode != "1D":
@@ -119,12 +125,12 @@ class Atto1000_VectorMagnet(Connectable):
 
         if self.is_B_within_thresholds(Bx, By, new_Bz):
             current = self.z_A_per_T * new_Bz
-            self.power_supply_z.set_current(current)
+            self.power_supply_z.set_current(current, self.channel_z)
 
     def get_B(self) -> float | float | float | float:
-        I_x = self.power_supply_x.get_current()
+        I_x = self.power_supply_x.get_current(self.channel_x)
         I_y = self.power_supply_y.get_current()
-        I_z = self.power_supply_z.get_current()
+        I_z = self.power_supply_z.get_current(self.channel_z)
 
         Bx = I_x / self.x_A_per_T
         By = I_y / self.y_A_per_T
