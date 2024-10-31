@@ -139,6 +139,29 @@ class Keithley2450_Driver(Connectable):
         """
         self.write(f":OUTP:STAT {str(value)}")
 
+    def set_voltage_output_range(self,value):
+        """
+        Set output voltage range in volts
+        """
+        self.write(f":SOUR:VOLT:RANG {str(value)}")
+    
+    def set_current_output_limit(self,value):
+        """
+        Set current limit in amps
+        """
+        self.write(f":SOUR:VOLT:ILIM {str(value)}")
+
+    def set_voltage_measurement_range(self,value):
+        """
+        Set measurement voltage range in volts
+        """
+        self.write(f":SENS:VOLT:RANG {str(value)}")
+
+    def set_current_measurement_range(self,value):
+        """
+        Set measurement current range in amps
+        """
+        self.write(f":SENS:CURR:RANG {str(value)}")
 
 # Example usage:
 if __name__ == "__main__":
