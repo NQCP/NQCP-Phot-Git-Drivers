@@ -1,8 +1,9 @@
 import socket
+from photonicdrivers.Abstract.Connectable import Connectable
 
-class Keithley2450:
+class Keithley2450_Driver(Connectable):
 
-    def __init__(self, ip_address="10.209.67.218", port=5025):
+    def __init__(self, ip_address, port=5025):
         """
         Initialize the Keithley 2450 SourceMeter driver.
 
@@ -138,11 +139,34 @@ class Keithley2450:
         """
         self.write(f":OUTP:STAT {str(value)}")
 
+    def set_voltage_output_range(self,value):
+        """
+        Set output voltage range in volts
+        """
+        self.write(f":SOUR:VOLT:RANG {str(value)}")
+    
+    def set_current_output_limit(self,value):
+        """
+        Set current limit in amps
+        """
+        self.write(f":SOUR:VOLT:ILIM {str(value)}")
+
+    def set_voltage_measurement_range(self,value):
+        """
+        Set measurement voltage range in volts
+        """
+        self.write(f":SENS:VOLT:RANG {str(value)}")
+
+    def set_current_measurement_range(self,value):
+        """
+        Set measurement current range in amps
+        """
+        self.write(f":SENS:CURR:RANG {str(value)}")
 
 # Example usage:
 if __name__ == "__main__":
     # Replace with the actual IP address of your Keithley 2450
-    device = Keithley2450()
+    device = Keithley2450_Driver()
 
     try:
         device.connect()
