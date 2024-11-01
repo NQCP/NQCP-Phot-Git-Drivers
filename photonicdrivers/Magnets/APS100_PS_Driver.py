@@ -36,28 +36,51 @@ class APS100_PS_Driver(Connectable):
         return self.__query(f"CHAN {channel_number}")
     
     def enable_output(self) -> None:
+        print("this does nothign atm")
         return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def disable_output(self) -> None:
+        print("this does nothign atm")
         return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def is_enabled(self) -> bool:
+        print("this does nothign atm")
         return self.__query("*IDN?;*ESE 12;*ESE?")
     
-    def set_current(self, current_A:float, channel:int=None) -> None:
-        if channel != None:
-            self.set_channel(str(channel))
-        self.__query(f"IMAG {current_A} A")
-
+    def get_mode(self) -> str:
+        return self.__query("MODE?")
+    
+    def set_control_remote(self) -> str:
+        return self.__query("REMOTE")
+    
+    def set_control_local(self) -> str:
+        return self.__query("LOCAL")
 
     def get_unit(self) -> str:
         return self.__query("UNITS?")
     
     def set_unit(self, unit:str) -> str:
-        if unit == "G" or unit == "T":
+        if unit == "G" or unit == "A" or unit == "T" or unit == "kG":
             self.__query(f"UNITS {unit}")
         else:
-            print(f"Trying to set unit to {unit}, but it must be G or A.")
+            print(f"Trying to set unit to {unit}, but it must be G, kG, T, or A.")
+    
+    def get_lower_current_limit(self) -> str:
+        return self.__query("LLIM?")
+
+    def set_lower_current_limit(self, current:float):
+        return self.__query(f"LLIM {current}")
+    
+    def get_upper_current_limit(self) -> str:
+        return self.__query("ULIM?")
+
+    def set_upper_current_limit(self, current:float):
+        return self.__query(f"ULIM {current}")
+
+    def set_current(self, current_A:float, channel:int=None) -> None:
+        # if channel != None:
+        #     self.set_channel(str(channel))
+        return self.__query(f"IMAG {current_A}")
     
     def get_current(self, channel:int=None) -> float:
         '''
@@ -78,11 +101,11 @@ class APS100_PS_Driver(Connectable):
             self.set_channel(str(channel))
 
         field_kG = field_T*10
-        self.__query(f"IMAG {field_kG} G")
+        return self.__query(f"IMAG {field_kG} G")
 
     def get_field(self, channel:int=None) -> float:
         '''
-        Returns the field in T
+        Returns the field in T. This number is derived from the current used a factor determined at the factory
         '''
         if channel != None:
             self.set_channel(str(channel))
@@ -94,6 +117,9 @@ class APS100_PS_Driver(Connectable):
         field_kG = response.rstrip('G')
         field_T = field_kG/10
         return float(field_T)
+    
+    def send_custom_command(self, command:str) -> str:
+        return(self.__query(command))
 
     ################################ PRIVATE METTHODS ################################
 
@@ -113,8 +139,10 @@ class APS100_PS_Driver(Connectable):
         response_raw = self.connection.readline()
         response = response_raw.decode('utf-8').strip()
 
-        # print(reflected_command)
-        # print(response_raw)
-        # print(response)
+        # print("")
+        print(reflected_command)
+        print(response_raw)
+        print(response)
+        # print("")
 
         return response
