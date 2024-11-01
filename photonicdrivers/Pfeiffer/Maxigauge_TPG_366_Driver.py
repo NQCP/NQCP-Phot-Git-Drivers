@@ -126,7 +126,6 @@ class Maxigauge_TPG_366_Driver(Connectable):
         return read_response, command_acknowledged
 
     def _write(self, commandString: str) -> None:
-        print("hi")
         command = commandString + self.terminationChar
         self.sock.sendall(command.encode("utf-8"))
 
