@@ -6,6 +6,8 @@ from instruments.Abstract.Connectable import Connectable
 
 class APS100_PS_Driver(Connectable):
     def __init__(self, com_port:str) -> None:
+        print("Initialising APS100 Ps Driver. Make sure to set it to REMOTE mode to control it.")
+        
         self.port = com_port
         self.baud_rate = 9600
         self.timeout = 1
@@ -40,28 +42,36 @@ class APS100_PS_Driver(Connectable):
         Sets which output channel is currently controlled (1 or 2)
         '''
         return self.__query(f"CHAN {channel_number}")
-    
-    def get_mode(self) -> str:
-        return self.__query("MODE?")
-    
+       
     def set_control_remote(self) -> str:
         return self.__query("REMOTE")
     
     def set_control_local(self) -> str:
         return self.__query("LOCAL")
+    
+    def get_control_mode(self) -> str:
+        return "There is no way of asking the PS whether it is in LOCAL or REMOTE mode. Look at the front panel"
 
     def get_unit(self) -> str:
         return self.__query("UNITS?")
     
     def set_unit(self, unit:str) -> str:
         '''
-        Unit options are G, A, T or kG.
+        Unit options are A or kG.
         Both G and kG will set the unit to kG.
         '''
-        if unit == "G" or unit == "A" or unit == "T" or unit == "kG":
-            return self.__query(f"UNITS {unit}")
+        # The PS will also accept T and G as an input, but it will set the unit to kG
+        if unit == "A" or unit == "kG":
+            try:
+                response = self.__query(f"UNITS {unit}")
+                self.unit = self.get_unit()
+                return response
+            except:
+                warning_str = "Set unit failed"
+                print(warning_str)
+                return warning_str
         else:
-            print(f"Trying to set unit to {unit}, but it must be G, kG, T, or A.")
+            print(f"Trying to set unit to {unit}, but it must be kG or A.")
     
     def get_lower_current_limit(self) -> str:
         return self.__query("LLIM?")
@@ -75,14 +85,30 @@ class APS100_PS_Driver(Connectable):
     def set_upper_current_limit(self, current:float):
         return self.__query(f"ULIM {current}")
     
-    def ramp_up(self) -> None:
-        return self.__query("SWEEP UP")
+    def ramp_up(self, wait_while_ramping:bool=True) -> str:
+        return self.__ramp("SWEEP UP", wait_while_ramping)
     
-    def ramp_down(self) -> None:
-        return self.__query("SWEEP DOWN")
+    def ramp_down(self, wait_while_ramping:bool=True) -> None:
+        return self.__ramp("SWEEP DOWN", wait_while_ramping)
     
-    def ramp_to_zero(self) -> None:
-        return self.__query("SWEEP ZERO")
+    def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
+        return self.__ramp("SWEEP ZERO", wait_while_ramping)
+    
+    def get_sweep_mode(self) -> str:
+        '''
+        Returns: "Sweeping up", "Standby", "Pause", "Sweeping to zero", "Sweeping down"
+        '''
+        return self.__query("SWEEP?")
+    
+    def __ramp(self, command:str, wait_while_ramping:bool) -> str:
+        response = self.__query(command)
+        status = "unknown"
+        if wait_while_ramping: print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be remoed later is ramp rates are made less cautious
+        while status != "Standby" and wait_while_ramping == True:
+            time.sleep(1)
+            status = self.get_sweep_mode()
+            print(status)
+        return response
 
     # Attocube says the IMAG command should be avoided, as it ignores ramp speed limits.
     # def set_current(self, current_A:float, channel:int=None) -> None:
@@ -98,7 +124,9 @@ class APS100_PS_Driver(Connectable):
             self.set_channel(str(channel))        
         
         if self.unit != "A":
+            print("Changing unit to A")
             self.set_unit("A")
+            print(self.get_unit())
         
         response = self.__query("IMAG?")
         current = response.rstrip('A')
@@ -116,15 +144,16 @@ class APS100_PS_Driver(Connectable):
         Returns the field in T. This number is derived from the current used a factor determined at the factory
         '''
         if channel != None:
+            print("Changing unit to kG")
             self.set_channel(str(channel))
 
-        if self.unit != "G":
-            self.set_unit("G")
+        if self.unit != "kG":
+            self.set_unit("kG")
         
         response = self.__query("IMAG?")
-        field_kG = response.rstrip('G')
+        field_kG = float(response.rstrip('kG'))
         field_T = field_kG/10
-        return float(field_T)
+        return field_T
     
     def send_custom_command(self, command:str) -> str:
         return(self.__query(command))
@@ -148,9 +177,9 @@ class APS100_PS_Driver(Connectable):
         response = response_raw.decode('utf-8').strip()
 
         # print("")
-        print(reflected_command)
-        print(response_raw)
-        print(response)
+        # print(reflected_command)
+        # print(response_raw)
+        # print(response)
         # print("")
 
         return response
