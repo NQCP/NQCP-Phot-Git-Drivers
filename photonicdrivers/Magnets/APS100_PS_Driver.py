@@ -30,22 +30,16 @@ class APS100_PS_Driver(Connectable):
         return self.__query("*IDN?;*ESE 12;*ESE?")
 
     def get_channel(self) -> str:
+        '''
+        Returns which output channel is currently controlled (1 or 2)
+        '''
         return self.__query("CHAN?")
     
     def set_channel(self, channel_number:int) -> str:
+        '''
+        Sets which output channel is currently controlled (1 or 2)
+        '''
         return self.__query(f"CHAN {channel_number}")
-    
-    def enable_output(self) -> None:
-        print("this does nothign atm")
-        return self.__query("*IDN?;*ESE 12;*ESE?")
-
-    def disable_output(self) -> None:
-        print("this does nothign atm")
-        return self.__query("*IDN?;*ESE 12;*ESE?")
-
-    def is_enabled(self) -> bool:
-        print("this does nothign atm")
-        return self.__query("*IDN?;*ESE 12;*ESE?")
     
     def get_mode(self) -> str:
         return self.__query("MODE?")
@@ -60,8 +54,12 @@ class APS100_PS_Driver(Connectable):
         return self.__query("UNITS?")
     
     def set_unit(self, unit:str) -> str:
+        '''
+        Unit options are G, A, T or kG.
+        Both G and kG will set the unit to kG.
+        '''
         if unit == "G" or unit == "A" or unit == "T" or unit == "kG":
-            self.__query(f"UNITS {unit}")
+            return self.__query(f"UNITS {unit}")
         else:
             print(f"Trying to set unit to {unit}, but it must be G, kG, T, or A.")
     
@@ -76,11 +74,21 @@ class APS100_PS_Driver(Connectable):
 
     def set_upper_current_limit(self, current:float):
         return self.__query(f"ULIM {current}")
+    
+    def ramp_up(self) -> None:
+        return self.__query("SWEEP UP")
+    
+    def ramp_down(self) -> None:
+        return self.__query("SWEEP DOWN")
+    
+    def ramp_to_zero(self) -> None:
+        return self.__query("SWEEP ZERO")
 
-    def set_current(self, current_A:float, channel:int=None) -> None:
-        # if channel != None:
-        #     self.set_channel(str(channel))
-        return self.__query(f"IMAG {current_A}")
+    # Attocube says the IMAG command should be avoided, as it ignores ramp speed limits.
+    # def set_current(self, current_A:float, channel:int=None) -> None:
+    #     # if channel != None:
+    #     #     self.set_channel(str(channel))
+    #     return self.__query(f"IMAG {current_A}")
     
     def get_current(self, channel:int=None) -> float:
         '''
@@ -96,12 +104,12 @@ class APS100_PS_Driver(Connectable):
         current = response.rstrip('A')
         return float(current)
     
-    def set_field(self, field_T:float, channel:int=None) -> None:
-        if channel != None:
-            self.set_channel(str(channel))
-
-        field_kG = field_T*10
-        return self.__query(f"IMAG {field_kG} G")
+    # Attocube says the IMAG command should be avoided, as it ignores ramp speed limits.
+    # def set_field(self, field_T:float, channel:int=None) -> None:
+    #     if channel != None:
+    #         self.set_channel(str(channel))
+    #     field_kG = field_T*10
+    #     return self.__query(f"IMAG {field_kG} G")
 
     def get_field(self, channel:int=None) -> float:
         '''
