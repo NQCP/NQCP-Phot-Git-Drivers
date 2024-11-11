@@ -73,17 +73,37 @@ class APS100_PS_Driver(Connectable):
         else:
             print(f"Trying to set unit to {unit}, but it must be kG or A.")
     
-    def get_lower_current_limit(self) -> str:
+
+    #### REWRITE THE UPPER LIMITS TO TAKE BOTH CURRENT AND FIELD
+
+
+    def get_lower_limit(self) -> str:
         return self.__query("LLIM?")
 
-    def set_lower_current_limit(self, current:float):
-        return self.__query(f"LLIM {current}")
+    def set_lower_limit(self, limit:float, unit:str):
+        '''
+        unit: should be A or kG
+        '''
+        ps_unit = self.get_unit()
+        if  ps_unit != unit:
+            warning_str = f"Trying to set the lower limit to {limit} {unit}, but the power supply unit is {ps_unit}. Ignoring command."
+            print(warning_str)
+            return warning_str
+        return self.__query(f"LLIM {limit}")
     
-    def get_upper_current_limit(self) -> str:
+    def get_upper_limit(self) -> str:
         return self.__query("ULIM?")
 
-    def set_upper_current_limit(self, current:float):
-        return self.__query(f"ULIM {current}")
+    def set_upper_limit(self, limit:float, unit:str):
+        '''
+        unit: should be A or kG
+        '''
+        ps_unit = self.get_unit()
+        if  ps_unit != unit:
+            warning_str = f"Trying to set the upper limit to {limit} {unit}, but the power supply unit is {ps_unit}. Ignoring command."
+            print(warning_str)
+            return warning_str
+        return self.__query(f"ULIM {limit}")
     
     def ramp_up(self, wait_while_ramping:bool=True) -> str:
         return self.__ramp("SWEEP UP", wait_while_ramping)
