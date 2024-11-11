@@ -72,10 +72,6 @@ class APS100_PS_Driver(Connectable):
                 return warning_str
         else:
             print(f"Trying to set unit to {unit}, but it must be kG or A.")
-    
-
-    #### REWRITE THE UPPER LIMITS TO TAKE BOTH CURRENT AND FIELD
-
 
     def get_lower_limit(self) -> str:
         return self.__query("LLIM?")
@@ -161,7 +157,7 @@ class APS100_PS_Driver(Connectable):
 
     def get_field(self, channel:int=None) -> float:
         '''
-        Returns the field in T. This number is derived from the current used a factor determined at the factory
+        Returns the field in kG. This number is derived from the current used a factor determined at the factory
         '''
         if channel != None:
             print("Changing unit to kG")
@@ -172,8 +168,7 @@ class APS100_PS_Driver(Connectable):
         
         response = self.__query("IMAG?")
         field_kG = float(response.rstrip('kG'))
-        field_T = field_kG/10
-        return field_T
+        return field_kG
     
     def send_custom_command(self, command:str) -> str:
         return(self.__query(command))
@@ -181,25 +176,16 @@ class APS100_PS_Driver(Connectable):
     ################################ PRIVATE METTHODS ################################
 
     def __query(self, command_str:str) -> str:
-        command = f'{command_str}{self.termination_char}'
-        # print(command)
-        
+        command = f'{command_str}{self.termination_char}'        
         self.connection.write(command.encode('utf-8'))
-
-        # print("READING")
 
         # a small wait is required for the device to send back a response. 0.1 s is too little
         time.sleep(0.2)
 
-
+        # The power supply first returns the command that was sent to it:
         reflected_command = self.connection.readline()
+        # The power supply then returns its response (if nay)
         response_raw = self.connection.readline()
         response = response_raw.decode('utf-8').strip()
-
-        # print("")
-        # print(reflected_command)
-        # print(response_raw)
-        # print(response)
-        # print("")
 
         return response

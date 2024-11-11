@@ -20,7 +20,7 @@ print(ps.set_control_remote())
 print(ps.set_unit("kG"))
 print(ps.get_unit())
 
-ps.set_upper_limit(1)
+ps.set_upper_limit(1, "kG")
 print(ps.get_upper_limit())
 # print(ps.ramp_up(wait_while_ramping=False))
 
