@@ -121,12 +121,12 @@ class APS100_PS_Driver(Connectable):
         status = "unknown"
         if wait_while_ramping: print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be remoed later is ramp rates are made less cautious
         while status != "Standby" and wait_while_ramping == True:
-            time.sleep(1)
+            time.sleep(0.2)
             status = self.get_sweep_mode()
             print(status)
         return response
 
-    # Attocube says the IMAG command should be avoided, as it ignores ramp speed limits.
+    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
     # def set_current(self, current_A:float, channel:int=None) -> None:
     #     # if channel != None:
     #     #     self.set_channel(str(channel))
@@ -148,7 +148,7 @@ class APS100_PS_Driver(Connectable):
         current = response.rstrip('A')
         return float(current)
     
-    # Attocube says the IMAG command should be avoided, as it ignores ramp speed limits.
+    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
     # def set_field(self, field_T:float, channel:int=None) -> None:
     #     if channel != None:
     #         self.set_channel(str(channel))
