@@ -27,33 +27,35 @@ asc500.data.setDataEnable(1)
 # print("Getting Scanner State: ")
 # print(asc500.scanner.getScannerState())
 
+# print("Getting Scanner absolute coor system: ")
+# print(asc500.scanner.getScannerAbsolutCoordSystem())
 
 
-# print("Getting Scanner State: ")
-# print(asc500.scanner.getScannerState())
+# print("Getting Scanner Position: ")
+# print(asc500.scanner.getPositionsXYZRel())
 
-print("Getting Scanner State: ")
-print(asc500.scanner.getScannerAbsolutCoordSystem())
-
-
-print("getScannerAbsolutCoordSystem: ")
-print(asc500.scanner.getPositionsXYZRel())
-
+time.sleep(3)
 
 print("start scanner: ")
-print(asc500.scanner.startScanner())
+# print(asc500.scanner.startScanner())
+asc500.scanner.startScanner()
 
 print("Setting Scanner Position: ")
-new_position_m = [10.0e-6, 0.0] # array is in pm, which is then convereted to m
+new_position_m = [-10.0e-6, 0.0] # array is in pm, which is then convereted to m
 asc500.scanner.setPositionsXYRel(new_position_m)
 time.sleep(0.5)
 
 print("stop scanner: ")
 print(asc500.scanner.stopScanner())
 
+print("Getting Scanner State: ")
+print(asc500.scanner.getScannerState())
 
 print("Getting Scanner Position: ")
 print(asc500.scanner.getPositionsXYZRel())
+
+print("Disabling outputs") # SHOULD PERHAPS ALSO BE ENABLED??
+print(asc500.base.setOutputs(0))
 
 print("closing scanner: ")
 asc500.scanner.closeScanner()
