@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 61.2", "versioningit ~= 2.0.1"]
+requires = ["setuptools >= 61.2", "versioningit >= 2.2.1"]
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -21,7 +21,7 @@ classifiers = [
 ]
 license = { text = "MIT" }
 requires-python = ">=3.9"
-dependencies = ["numpy", "qcodes", "versioningit~=2.0.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "rpyc", "loguru"]
+dependencies = ["numpy", "qcodes", "versioningit>=2.2.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "rpyc", "loguru"]
 
 dynamic = ["version"]
 
@@ -161,6 +161,7 @@ reportMissingTypeStubs = true
 [tool.pytest.ini_options]
 minversion = "6.0"
 junit_family = "legacy"
+asyncio_default_fixture_loop_scope = "function"
 
 addopts = "-n auto --dist=loadfile"
 
@@ -184,6 +185,9 @@ ignore = ["E501"]
 # deprecated modules left
 # for backwards compatibility
 
+[tool.setuptools.cmdclass]
+sdist = "versioningit.cmdclass.sdist"
+build_py = "versioningit.cmdclass.build_py"
 
 [tool.versioningit]
 default-version = "0.0"
