@@ -21,7 +21,23 @@ classifiers = [
 ]
 license = { text = "MIT" }
 requires-python = ">=3.9"
-dependencies = ["numpy", "qcodes", "versioningit>=2.2.1", "pythonnet", "pyvisa", "toptica-lasersdk", "future", "wraps", "pyserial", "lakeshore", "pygame", "pymodbus", "rpyc", "loguru", "pylablib", "timetagger"]
+dependencies = [
+    "numpy", 
+    "qcodes", 
+    "versioningit>=2.2.1", 
+    "pythonnet", 
+    "pyvisa", 
+    "toptica-lasersdk", 
+    "future", 
+    "wraps", 
+    "pyserial", 
+    "lakeshore", 
+    "pygame", 
+    "pymodbus", 
+    "rpyc", 
+    "loguru", 
+    "pylablib", 
+    "timetagger"]
 
 dynamic = ["version"]
 
