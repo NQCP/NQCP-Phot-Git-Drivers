@@ -15,6 +15,7 @@ def flatten_value_nodes(values_dict: dict[str, dict]):
     for (k, v) in values_dict.items():
         if "content" in v:
             latest_value = v["content"]["latest_value"]
+            # Value not present
             if latest_value is None or latest_value["value"] is None or latest_value["value"] == "":
                 value = None
             else:
@@ -39,10 +40,10 @@ def strip_prefix(s: str):
     return s.split('.')[-1]
 
 
-def filter_type(data: dict, filter_types: list[type]=None):
+def filter_type(data: dict, filter_types: list[type] | None = None):
     return {k: v for k, v in data.items() if filter_types is None or type(v) in filter_types}
 
-class BlueForsControlSoftware_Driver(Connectable):
+class BlueForsFridge_Driver(Connectable):
     """Driver for interacting with the BlueFors Control Software application programmatically"""
     def __init__(self, host="http://localhost", port=LAN_PORT):
         self.port = port

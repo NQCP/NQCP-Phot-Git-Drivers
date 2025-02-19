@@ -1,7 +1,7 @@
-from photonicdrivers.BlueForsControlSoftware.BlueForsControlSoftware_Driver import BlueForsControlSoftware_Driver, OnOffError
+from photonicdrivers.BlueForsFridge.BlueForsFridge_Driver import BlueForsFridge_Driver, OnOffError
 
 # Must be executed on a computer running the control software
-driver = BlueForsControlSoftware_Driver()
+driver = BlueForsFridge_Driver()
 driver.connect()
 
 get_temperatures = driver.get_temperatures()
