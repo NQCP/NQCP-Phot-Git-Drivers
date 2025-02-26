@@ -3,6 +3,7 @@ import sys
 import os
 import pathlib
 
+from photonicdrivers.Abstract.Connectable import Connectable
 
 current_directory = os.path.dirname(__file__)
 file_path = current_directory + "\\dll_files/Santec_FTDI"
@@ -10,7 +11,7 @@ ref = clr.AddReference(file_path)
 
 import Santec_FTDI as ftdi
 
-class Santec_TSL570_driver():  # Developer: Magnus Linnet Madsen
+class Santec_TSL570_driver(Connectable):  # Developer: Magnus Linnet Madsen
 
     def __init__(self, _serial_number='24040112'):
         # The serial_number of the TSL570 is '24040112'
@@ -28,9 +29,15 @@ class Santec_TSL570_driver():  # Developer: Magnus Linnet Madsen
         print("closing laser")
         self.laser.CloseUsbConnection()
     
+    def is_connected(self):
+        connected = False
+        try:
+            connected = self.get_idn() is not None
+        finally:
+            return connected
+
     def get_idn(self):
-        idn_query = self.laser.QueryIdn()
-        print('\n' + idn_query)
+        return self.laser.QueryIdn()
     
     def get_wavelength(self):
         """
