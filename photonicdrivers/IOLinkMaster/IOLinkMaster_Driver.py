@@ -1,8 +1,8 @@
 import requests
-# from FlowMeterPF3W720 import FlowMeterPF3W720
+from photonicdrivers.Abstract.Connectable import Connectable
 from photonicdrivers.IOLinkMaster.FlowMeterPF3W720_Driver import FlowMeterPF3W720_Driver
 
-class IOLinkMaster_Driver:
+class IOLinkMaster_Driver(Connectable):
     def __init__(self, IPAddress):
         self.ip = IPAddress
         print("Initalising an IO master")
@@ -14,9 +14,26 @@ class IOLinkMaster_Driver:
         data_hex = response_raw["data"]['value']
         response = self.flowMeter.convert_pdinData(data_hex)
         return response
+    
+    def connect(self) -> None:
+        pass
+
+    def disconnect(self) -> None:
+        pass
+
+    def is_connected(self):
+        connected = False
+        try:
+            requests.get(self.__base_url(), timeout=2)
+            connected = True
+        finally:
+            return connected
 
     ##################### PRIVATE METHODS ###########################
 
     def __query(self, url_ending):
-        url = f"http://{self.ip}/iolinkmaster{url_ending}"
+        url = self.__base_url() + {url_ending}
         return requests.get(url).json()
+    
+    def __base_url(self) -> str:
+        return f"http://{self.ip}/iolinkmaster"
