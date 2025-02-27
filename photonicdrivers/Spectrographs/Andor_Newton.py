@@ -8,6 +8,7 @@ import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
 from photonicdrivers.utils.Range import Range
+from photonicdrivers.Abstract.Connectable import Connectable
 
 try:
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
@@ -19,7 +20,7 @@ except:
 
 
 
-class Andor_Newton:
+class Andor_Newton(Connectable):
 
     def __init__(self) -> None:
         self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")

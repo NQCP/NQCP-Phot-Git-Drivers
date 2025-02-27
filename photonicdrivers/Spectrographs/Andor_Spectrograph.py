@@ -1,16 +1,5 @@
-
 from photonicdrivers.Spectrographs.Andor_Kymera import Andor_Kymera
 from photonicdrivers.Spectrographs.Andor_Newton import Andor_Newton
-import matplotlib.pyplot as plt
-import numpy as np
-from instruments.Implementations.Lasers.Toptica_CTL950 import Toptica_CTL950
-from photonicdrivers.Lasers.Toptica.Toptica_DLC_Pro_Driver import Toptica_DLC_PRO_Driver
-import time
-import datetime    
-import os
-from configparser import ConfigParser
-from mpl_toolkits.mplot3d import Axes3D
-from itertools import product
 
 class Andor_Spectrograph():
 
@@ -30,8 +19,3 @@ class Andor_Spectrograph():
 
     def calibration(pixel_list, center_wavelength):
         return
-
-
-if __name__ == "__main__":
-
-    

@@ -2,6 +2,7 @@ import sys
 import time
 
 from photonicdrivers.utils.Range import Range
+from photonicdrivers.Abstract.Connectable import Connectable
 import numpy as np
 from typing import Optional
 
@@ -15,7 +16,7 @@ except:
     print("Andor Solis is not installed ")
 
 
-class Andor_Kymera():
+class Andor_Kymera(Connectable):
     def __init__(self) -> None:
         self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
         self.device_index = 0
