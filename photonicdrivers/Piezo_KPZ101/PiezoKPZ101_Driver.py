@@ -2,6 +2,8 @@ import time
 
 import clr  # is in the 'pythonnet' package
 
+from photonicdrivers.Abstract.Connectable import Connectable
+
 # get these files by downloading the kinesis software from
 # https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=Motion_Control
 
@@ -17,7 +19,7 @@ from Thorlabs.MotionControl.KCube.PiezoCLI import *
 from System import Decimal  # necessary for real world units
 
 
-class PiezoKPZ101_Driver:
+class PiezoKPZ101_Driver(Connectable):
     def __init__(self, _serialNo):
         print("Initialising instance of thorlabs piezo class")
         DeviceManagerCLI.BuildDeviceList()
@@ -53,6 +55,17 @@ class PiezoKPZ101_Driver:
         # print("Setting Zero Point")
         # self.device.SetZero()
 
+    def connect(self) -> None:
+        self.enable()
+    
+    def disconnect(self) -> None:
+        self.disable()
+
+    def is_connected(self) -> bool:
+        try:
+            return self.is_enabled()
+        except:
+            return False
 
     def enable(self):
         try:
@@ -95,19 +108,15 @@ class PiezoKPZ101_Driver:
         output_voltage = self.device.GetOutputVoltage()
         return output_voltage
         
-    def getStatus(self):
-        statusBits = hex(self.device.GetStatusBits())
-        print(statusBits)
+    def getStatus(self) -> str:
+        return hex(self.device.GetStatusBits())
+
+    def is_enabled(self) -> bool:
+        status_bits = self.getStatus()
         ENABLED_MASK = hex(0x80000000) # got this from the documentation. search for GetStatusBits
-        print(ENABLED_MASK)
-        is_enabled = (int(statusBits,16) & int(ENABLED_MASK,16)) != 0
-        print(f"logic = {int(statusBits,16) & int(ENABLED_MASK,16)}")
-        if is_enabled:
-            print("Device is enabled")
-        else:
-            print("Device is disabled")
-        return statusBits
-    
+        is_enabled = (int(status_bits,16) & int(ENABLED_MASK,16)) != 0
+        return is_enabled
+
     def getSerialNumber(self):
         deviceInfo = self._getDeviceInfo()
         print(deviceInfo.Serialnumber)
