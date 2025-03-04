@@ -31,12 +31,10 @@ class ArduinoPressureReader_Driver(Connectable):
         pass
 
     def is_connected(self):
-        connected = False
         try:
-            _ = requests.get(self.url, timeout=2)
-            connected = True
-        finally:
-            return connected
+            return requests.get(self.url, timeout=2) is not None
+        except:
+            return False
 
     def getPressures(self):
         rawDataArray = self.__getRawData()

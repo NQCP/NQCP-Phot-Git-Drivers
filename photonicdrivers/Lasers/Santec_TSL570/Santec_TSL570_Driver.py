@@ -30,11 +30,10 @@ class Santec_TSL570_driver(Connectable):  # Developer: Magnus Linnet Madsen
         self.laser.CloseUsbConnection()
     
     def is_connected(self):
-        connected = False
         try:
-            connected = self.get_idn() is not None
-        finally:
-            return connected
+            return self.get_idn() is not None
+        except:
+            return False
 
     def get_idn(self):
         return self.laser.QueryIdn()

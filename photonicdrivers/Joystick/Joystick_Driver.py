@@ -34,11 +34,10 @@ class Joystick(Connectable):
             self.joystick = None
 
     def is_connected(self):
-        connected = False
         try:
-            connected = self.joystick is not None and self.joystick.get_id() is not None
-        finally:
-            return connected
+            return self.joystick is not None and self.joystick.get_id() is not None
+        except:
+            return False
 
 
     def joystick_acquisition(self):

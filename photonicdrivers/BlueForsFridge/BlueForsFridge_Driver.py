@@ -67,12 +67,10 @@ class BlueForsFridge_Driver(Connectable):
         self.session = None
 
     def is_connected(self) -> bool:
-        connected = False
         try:
-            dummy_response = self.session.get(self._request_url("system"))
-            connected = dummy_response.status_code == 200
-        finally:
-            return connected
+            return self.session.get(self._request_url("system")).status_code == 200
+        except:
+            return False
 
     def get_from_root(self, path: str, query=None) -> dict:
         """Extract information directly from the API"""
