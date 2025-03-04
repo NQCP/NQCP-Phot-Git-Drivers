@@ -21,7 +21,6 @@ class IOLinkMaster_Driver(Connectable):
     def disconnect(self) -> None:
         pass
 
-    """CHECK IF THE RESPONSE CODE IS 200!!!"""
     def is_connected(self):
         try:
             return requests.get(self.__base_url(), timeout=2).status_code == 200

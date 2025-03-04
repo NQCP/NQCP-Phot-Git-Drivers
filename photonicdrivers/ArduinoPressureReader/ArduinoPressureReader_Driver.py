@@ -32,7 +32,7 @@ class ArduinoPressureReader_Driver(Connectable):
 
     def is_connected(self):
         try:
-            return requests.get(self.url, timeout=2) is not None
+            return requests.get(self.url, timeout=2).status_code == 200
         except:
             return False
 
