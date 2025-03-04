@@ -1,6 +1,8 @@
 import pygame
 
-class Joystick:
+from photonicdrivers.Abstract.Connectable import Connectable
+
+class Joystick(Connectable):
     def __init__(self):
         # Initialize Pygame
         pygame.init()
@@ -25,6 +27,18 @@ class Joystick:
         else:
             print("No joystick connected.")
             return False
+
+    def disconnect(self):
+        if self.joystick is not None:
+            self.joystick.quit()
+            self.joystick = None
+
+    def is_connected(self):
+        try:
+            return self.joystick is not None and self.joystick.get_id() is not None
+        except:
+            return False
+
 
     def joystick_acquisition(self):
         # Main loop

@@ -16,4 +16,4 @@ info = controller.queryKK4Info()
 #print(info)
 print(info.IBI01_TT001)
 
-controller.closeConnection()
+controller.disconnect()

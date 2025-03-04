@@ -1,10 +1,11 @@
 # class to communicate with the iSMA_MAC36 controller that control the Ventek cooling system
+from photonicdrivers.Abstract.Connectable import Connectable
 
 from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodbus 
 from pymodbus import pymodbus_apply_logging_config # to enable debug mode
 import struct
 
-class ISMA_MAC36_Driver:
+class ISMA_MAC36_Driver(Connectable):
     def __init__(self, _ip_address, _port=502, _slave_id=1, _debug=False) -> None:
         # _ip_address: IP of the Modbus TCP server
         # _port: port of the Modbus TCP server. Default is 502
@@ -26,9 +27,19 @@ class ISMA_MAC36_Driver:
         # Open the connection
         self.client.connect()
 
-    
-    def closeConnection(self):
+    def connect(self):
+        self.client = ModbusTcpClient(self.ip_address, self.port)
+
+        self.client.connect()
+
+    def disconnect(self):
         self.client.close()
+
+    def is_connected(self):
+        try:
+            return self.queryKK4Info() is not None
+        except:
+            return False
 
     def queryKK4Info(self):
         # this function is hardcoded to return the registers relevant for the KK4 lab

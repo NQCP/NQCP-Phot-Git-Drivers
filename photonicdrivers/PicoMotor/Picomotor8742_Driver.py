@@ -5,6 +5,8 @@ import socket
 import usb.core
 from matplotlib import pyplot as plt
 
+from photonicdrivers.Abstract.Connectable import Connectable
+
 # 'usb' is part of the pyusb package (which has dependencies in the libusb package).
 # Neither package is included in the .toml file, because installing the packages with pip does not work.
 # Instead the packages should be INSTALLED WITH CONDA using:
@@ -15,8 +17,7 @@ from matplotlib import pyplot as plt
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
 
-class NewFocus_8742_Driver():
-
+class NewFocus_8742_Driver(Connectable):
     def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None):
         print("Initialising instance of PicoMotor class")
 
@@ -133,6 +134,12 @@ class NewFocus_8742_Driver():
         else:
             print("Insufficient arguments for initialising the PicoMotor class")
 
+    def is_connected(self) -> bool:
+        try:
+            return self.get_product_ID() is not  None
+        except:
+            return False
+
     def load_settings(self) -> dict:
         pass
 
@@ -185,7 +192,7 @@ class NewFocus_8742_Driver():
 
         return MAC_joinedStr
 
-
+# This is clearly an instrument
 class PicoMotor_Driver:
 
     def __init__(self, driver: NewFocus_8742_Driver, axis_number: int):

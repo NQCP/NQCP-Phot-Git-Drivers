@@ -26,13 +26,11 @@ class RS_ZNL20_Driver(Connectable):
             self.connection = None
 
     def is_connected(self) -> bool:
-        success = False
         try:
             response = self.identify()
-            if response is not None and response != "":
-                success = True
-        finally:
-            return success
+            return response is not None and response != ""
+        except:
+            return False
         
     def write(self, command: str) -> None:
         self.connection.write(command)
