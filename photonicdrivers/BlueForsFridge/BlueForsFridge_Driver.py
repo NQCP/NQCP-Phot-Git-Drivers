@@ -61,7 +61,10 @@ class BlueForsFridge_Driver(Connectable):
         # If you happen to know a more elegant and simple way to avoid this issue with the TCP connection, please fix!
         # When trying in a browser, the first request is usually 300 ms compared to single digits afterwards.
         # The 10^-9 value is completely arbitrary.
-        self.session.get(self._request_url("system"), timeout=10 ** -9)
+        try:
+            self.session.get(self._request_url("system"), timeout=10 ** -9)
+        except:
+            pass
 
     def disconnect(self):
         self.session = None
