@@ -29,7 +29,7 @@ class IOLinkMaster_Driver(Connectable):
     ##################### PRIVATE METHODS ###########################
 
     def __query(self, url_ending):
-        url = self.__base_url() + {url_ending}
+        url = self.__base_url() + url_ending
         return requests.get(url).json()
     
     def __base_url(self) -> str:
