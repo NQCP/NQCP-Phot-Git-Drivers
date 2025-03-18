@@ -112,5 +112,5 @@ class Picus_Driver(Connectable):
     def _query(self, command: str) -> str:
         self._write(command)
         response = self._read()
-        print("Command: " + str(command) + ", reponse: " + str(response))
+        #print("Command: " + str(command) + ", reponse: " + str(response))
         return response

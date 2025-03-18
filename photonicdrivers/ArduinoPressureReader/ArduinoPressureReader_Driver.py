@@ -6,9 +6,12 @@
 
 import json
 from urllib.request import urlopen
-import numpy as np 
+import requests
+import numpy as np
 
-class ArduinoPressureReader_Driver:
+from photonicdrivers.Abstract.Connectable import Connectable 
+
+class ArduinoPressureReader_Driver(Connectable):
     def __init__(self, _ip_address_string, _port_string, _pressureRanges_npArray):
         # _pressureRanges_npArray has to be length 4 to match the number of sensors
         print("Initialising arduinoPressureReader class with IP:")
@@ -20,6 +23,18 @@ class ArduinoPressureReader_Driver:
         self.pressureRanges = _pressureRanges_npArray # from 0 to 2.5, 6, 10, or 16 bar
         self.voltageDivider = 2
         self.outputVoltage = 10 # V. The sensor outputs 10 V
+
+    def connect(self):
+        pass
+
+    def disconnect(self):
+        pass
+
+    def is_connected(self):
+        try:
+            return requests.get(self.url, timeout=2).status_code == 200
+        except:
+            return False
 
     def getPressures(self):
         rawDataArray = self.__getRawData()

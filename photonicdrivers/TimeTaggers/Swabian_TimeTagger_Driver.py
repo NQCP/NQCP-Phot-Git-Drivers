@@ -7,6 +7,7 @@ import time
 # For manufacturer drivers associated with TimeTaggerLab version <2.17.4,  the TimeTagger module uses an older version of numpy. 
 # I got it to work with 1.26 (the highest 1.x version)
 
+# TODO: MOA make into a connectable component
 class Swabian_TimeTagger_Driver():
     def __init__(self, serialNumber: str=None, serverIP: str=None, serverPort: str=None) -> None:
         self.serialNumber = serialNumber
