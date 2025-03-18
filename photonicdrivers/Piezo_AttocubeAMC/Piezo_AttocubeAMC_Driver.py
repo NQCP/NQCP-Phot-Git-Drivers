@@ -48,7 +48,7 @@ class Piezo_AttocubeAMC_Driver(Connectable):
                 stages_moving = True
                 while stages_moving:
                     sleep(0.1)
-                    status = self.is_axis_moving
+                    status = self.is_axis_moving()
                     stages_moving = np.any(status)
 
         else:
