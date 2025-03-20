@@ -1,0 +1,8 @@
+version unknown - 01/07/21
+- Refactored existing examples to use standard string formatting
+- Refactored spectrograph.py to use pythonic double quotations for function 
+    docstrings and renamed function names to be more user friendly 
+    by removing class prefix and  renamed boolean methods to use pythonic convention
+- Added new example files ShowImage.py & SaveAsCalibratedSif.py
+- Updated README.rst to match other sdk README's 
+  
