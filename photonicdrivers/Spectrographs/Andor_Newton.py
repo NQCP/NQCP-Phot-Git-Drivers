@@ -101,7 +101,7 @@ class Andor_Newton(Connectable):
             print("Gain out of range: " + gain_range)
 
     def disconnect(self):
-        self.camera.ShutDown()
+        self.abort_acquisition()
     
     def abort_acquisition(self):
         self.camera.AbortAcquisition()
