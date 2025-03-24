@@ -15,7 +15,10 @@ class Swabian_TimeTagger_Client(Connectable):
         TimeTagger.freeTimeTagger(self.ttNetwork)
 
     def is_connected(self) -> bool:
-        return self.ttNetwork.isConnected()
+        try:
+            return self.ttNetwork.isConnected()
+        except: 
+            return False
 
     def get_model(self):
         return self.ttNetwork.getModel()
