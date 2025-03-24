@@ -23,11 +23,11 @@ except:
 class Andor_Newton(Connectable):
 
     def __init__(self) -> None:
-        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
         self.num_pixel_y = 200
         self.num_pixel_x = 1600
 
     def connect(self):
+        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
         self.camera.Initialize("")
         self.camera.SetReadMode(4)
         self.camera.SetImage(1,1,1,self.num_pixel_x,1,self.num_pixel_y)
@@ -101,11 +101,17 @@ class Andor_Newton(Connectable):
             print("Gain out of range: " + gain_range)
 
     def disconnect(self):
-        self.camera.AbortAcquisition()
+        self.camera.ShutDown()
     
+    def abort_acquisition(self):
+        self.camera.AbortAcquisition()
+
     def is_connected(self):
-        return bool(self.get_serial_number())
-        
+        try:
+            return bool(self.get_serial_number())
+        except:
+            return False
+
     def get_settings(self):
         return {
             "id": self.get_serial_number(),

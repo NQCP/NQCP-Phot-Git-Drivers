@@ -18,16 +18,20 @@ except:
 
 class Andor_Kymera(Connectable):
     def __init__(self) -> None:
-        self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
         self.device_index = 0
 
     def connect(self):
+        self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
         message = self.spectrograph.Initialize("")
-        print("Function Initialize returned {}".format(self.spectrograph.GetFunctionReturnDescription(message, 64)[1]))
+        #print("Function Initialize returned {}".format(self.spectrograph.GetFunctionReturnDescription(message, 64)[1]))
 
     def get_serial_number(self):
+        sn, status = self.get_serial_number_with_success()
+        return sn
+    
+    def get_serial_number_with_success(self):
         (message, serial_number) = self.spectrograph.GetSerialNumber(self.device_index, maxSerialStrLen=20)
-        return serial_number
+        return serial_number, message == self.spectrograph.ATSPECTROGRAPH_SUCCESS
     
     def get_id(self):
         return self.get_serial_number()
@@ -51,8 +55,12 @@ class Andor_Kymera(Connectable):
         self.spectrograph.Close()
         
     def is_connected(self):
-        return bool(self.get_center_wavelength())
-    
+        try:
+            _, success = self.get_serial_number_with_success()
+            return success
+        except:
+            return False
+
     def get_settings(self):
         return {
             "grating": self.get_grating(),
