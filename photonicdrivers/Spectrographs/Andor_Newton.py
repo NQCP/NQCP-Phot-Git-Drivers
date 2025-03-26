@@ -23,22 +23,21 @@ except:
 class Andor_Newton(Connectable):
 
     def __init__(self) -> None:
-        self.num_pixel_y = 200
-        self.num_pixel_x = 1600
+        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
+
 
     def connect(self):
-        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
-        self.camera.Initialize("")
-        self.camera.SetReadMode(4)
-        self.camera.SetImage(1,1,1,self.num_pixel_x,1,self.num_pixel_y)
-        self.camera.SetAcquisitionMode(codes.Acquisition_Mode.SINGLE_SCAN)
-        self.set_temperature(-70)
-        self.cooler_on()
-        self.set_exposure_time_s(0.1)
-        self.roi = [49,53]
+        ret= self.camera.Initialize("")
+        # Check whether we have connection, using serial number to verify that we can get non-zero results.
+        if ret == 20002:
+            print('Camera Initialization Successful')
+        elif ret == 20992 and self.camera.GetCameraSerialNumber()[0]==20002:
+            print('Camera Already Initialized')
+        else:
+            print('ERROR WHEN INITIALIZING CAMERA')
 
-    def set_exposure_time_s(self, exposure_time_s):
-        self.camera.SetExposureTime(exposure_time_s)
+        #get the amount of pixels in the camera
+        _,self.num_pixel_x,self.num_pixel_y=self.camera.GetDetector()        
 
     def get_exposure_time_s(self):
         (message, exposure_time) = self.camera.GetMaximumExposure()
@@ -52,10 +51,10 @@ class Andor_Newton(Connectable):
         image = np.flip(np.flip(np.reshape(arr, (self.num_pixel_y, self.num_pixel_x)), axis=1),axis=0)
         return image
 
-    def get_ROI_counts(self):
+    def get_ROI_counts(self,roi):
         '''return an array of counts from the image where we sum all rows within the region of interest (ROI)'''
         image = self.get_image()
-        return np.sum(image[self.roi[0]:self.roi[1]], axis=0)/(self.roi[1] - self.roi[0])
+        return np.sum(image[roi[0]:roi[1]], axis=0)/(roi[1] - roi[0])
 
     def get_trace(self):
         image = self.get_image()
@@ -99,6 +98,18 @@ class Andor_Newton(Connectable):
             self.camera.SetGain
         else:
             print("Gain out of range: " + gain_range)
+        
+    def set_exposure_time_s(self, exposure_time_s):
+        self.camera.SetExposureTime(exposure_time_s)
+
+    def set_read_mode(self, readmode):
+        self.camera.SetReadMode(readmode)
+
+    def set_camera_image(self,hbin, vbin, hstart, hend, vstart, vend):
+        self.camera.SetImage(hbin, vbin, hstart, hend, vstart, vend)
+    
+    def set_camera_acquisition(self,mode):
+        self.camera.SetAcquisitionMode(mode)
 
     def disconnect(self):
         self.abort_acquisition()
