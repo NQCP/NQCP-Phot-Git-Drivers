@@ -188,6 +188,8 @@ wvl_list=CalibDict1330.interpolate_from_fit(num_pixel_x)
 
 plt.figure()
 plt.plot(wvl_list,collapse)
+plt.xlabel("Wavelength (nm)")
+plt.ylabel("Counts")
 plt.show()
 
 spec=np.array([wvl_list,collapse])
