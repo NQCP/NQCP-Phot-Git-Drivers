@@ -17,7 +17,7 @@ for idx, resource in enumerate(available_resources, start=1):
     print(f"{idx}. {resource}")
 
 # Open a VISA instrument connection
-instrument = rm.open_resource("USB0::0x1313::0x807A::M01044633::INSTR")
+instrument = rm.open_resource("USB0::0x1313::0x8078::P0041989::INSTR")
 
 # AutoProber room PM103A: USB0::0x1313::0x807A::M01044633::INSTR 
 
@@ -29,7 +29,7 @@ print("Device Identification:", response.strip())
 
 # Measure instance of power
 power = instrument.query("MEAS:POW?")
-print(power)
+print(f"power now: {power}")
 
 # Close the instrument connection
 instrument.close()

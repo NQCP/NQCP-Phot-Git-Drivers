@@ -83,16 +83,28 @@ while not asc500.base.getOutputStatus():
 # Set the scanner moving speed. Not mandatory.
 asc500.scanner.setPositioningSpeed(1e-6)
 
+#Print the new position:
+print(asc500.scanner.getPositionsXYZRel())
+
 # Set the scanner position (in m).
-asc500.scanner.setPositionsXYRel([10e-6, 15e-6])
+asc500.scanner.setPositionsXYRel([6e-6, 5e-6])
+
+# Wait a short time for communication to take place
+time.sleep(0.5)
 
 # Wait while scanner is moving.
 print('Scanner State: {}'.format(asc500.scanner.getScannerStateMoving()))
-while asc500.scanner.getScannerStateMoving():
+# while asc500.scanner.getScannerStateMoving():
+count =1
+while count < 10:
+    print("Scanner is still moving")
+    print('Scanner State: {}'.format(asc500.scanner.getScannerStateMoving()))
     time.sleep(0.5)
+    count += 1
 
 #Print the new position:
 print(asc500.scanner.getPositionsXYZRel())
+
 
 #%% Close ASC500
 #-----------------------------------------------------------------------
@@ -104,3 +116,9 @@ while asc500.base.getOutputStatus():
 
 # stops the server (not mandatory)
 asc500.base.stopServer()
+
+
+print("done")
+
+
+

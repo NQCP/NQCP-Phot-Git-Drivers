@@ -22,7 +22,7 @@ print("hello")
 
 # Open a VISA instrument connection
 
-powerMeter = Thorlabs_PM100D_Driver(rm, "USB0::0x1313::0x807A::M01044633::INSTR")
+powerMeter = Thorlabs_PM100D_Driver(rm, "USB0::0x1313::0x8078::P0041989::INSTR")
 
 powerMeter.connect()
 print(powerMeter.get_idn())

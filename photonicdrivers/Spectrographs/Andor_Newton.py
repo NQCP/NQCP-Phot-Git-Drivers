@@ -15,6 +15,7 @@ try:
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
     from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
     codes = atmcd_codes
+    errors=atmcd_errors.Error_Codes
 except:
     print("Andor Solis is not installed ")
 
@@ -24,21 +25,20 @@ class Andor_Newton(Connectable):
 
     def __init__(self) -> None:
         self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
-        self.num_pixel_y = 200
-        self.num_pixel_x = 1600
+        self.verbose=True
 
     def connect(self):
-        self.camera.Initialize("")
-        self.camera.SetReadMode(4)
-        self.camera.SetImage(1,1,1,self.num_pixel_x,1,self.num_pixel_y)
-        self.camera.SetAcquisitionMode(codes.Acquisition_Mode.SINGLE_SCAN)
-        self.set_temperature(-70)
-        self.cooler_on()
-        self.set_exposure_time_s(0.1)
-        self.roi = [49,53]
+        ret= self.camera.Initialize("")
+        # Check whether we have connection, using serial number to verify that we can get non-zero results.
+        if ret == 20002:
+            print('Camera Initialization Successful')
+        elif ret == 20992 and self.camera.GetCameraSerialNumber()[0]==20002:
+            print('Camera Already Initialized')
+        else:
+            print('ERROR WHEN INITIALIZING CAMERA')
 
-    def set_exposure_time_s(self, exposure_time_s):
-        self.camera.SetExposureTime(exposure_time_s)
+        #get the amount of pixels in the camera
+        _,self.num_pixel_x,self.num_pixel_y=self.camera.GetDetector()        
 
     def get_exposure_time_s(self):
         (message, exposure_time) = self.camera.GetMaximumExposure()
@@ -52,10 +52,10 @@ class Andor_Newton(Connectable):
         image = np.flip(np.flip(np.reshape(arr, (self.num_pixel_y, self.num_pixel_x)), axis=1),axis=0)
         return image
 
-    def get_ROI_counts(self):
+    def get_ROI_counts(self,roi):
         '''return an array of counts from the image where we sum all rows within the region of interest (ROI)'''
         image = self.get_image()
-        return np.sum(image[self.roi[0]:self.roi[1]], axis=0)/(self.roi[1] - self.roi[0])
+        return np.sum(image[roi[0]:roi[1]], axis=0)/(roi[1] - roi[0])
 
     def get_trace(self):
         image = self.get_image()
@@ -63,9 +63,11 @@ class Andor_Newton(Connectable):
         return trace.tolist()
 
     def cooler_on(self):
-        self.camera.CoolerON()
+        ret=self.camera.CoolerON()
+        if self.verbose:
+            print("cooler_on returned: ",errors(ret).name)
 
-    def coolor_off(self):
+    def cooler_off(self):
         self.camera.CoolerOFF()
 
     def set_temperature(self, temperature_celsius):
@@ -93,19 +95,71 @@ class Andor_Newton(Connectable):
         (message, gain) = self.camera.GetEMCCDGain()
         return gain
 
+    def get_available_cameras(self):
+        ret,cameras=self.camera.GetAvailableCameras()
+        if self.verbose:
+            print("get_available_cameras returned: ",errors(ret).name)
+        return cameras
+
     def set_gain(self, gain):
         gain_range = self.get_gain_range()
         if gain_range.contains(gain):
             self.camera.SetGain
         else:
             print("Gain out of range: " + gain_range)
+        
+    def set_exposure_time_s(self, exposure_time_s):
+        self.camera.SetExposureTime(exposure_time_s)
+
+    def set_active_camera(self,index):
+        ret, handle = self.camera.GetCameraHandle(index)
+        ret = self.camera.SetCurrentCamera(handle)
+        if self.verbose:
+            print("set_active_camera returned: ",errors(ret).name)
+
+
+    def set_verbose(self,boool):
+        self.verbose=boool
+
+    def set_read_mode(self, readmode):
+        ret=self.camera.SetReadMode(readmode)
+        if self.verbose:
+            print("set_read_mode returned: ",errors(ret).name)
+
+
+    def set_image(self,hbin, vbin, hstart, hend, vstart, vend):
+        ret=self.camera.SetImage(hbin, vbin, hstart, hend, vstart, vend)
+        if self.verbose:
+            print("set_image returned: ",errors(ret).name)
+    
+    def set_camera_acquisition(self,mode):
+        self.camera.SetAcquisitionMode(mode)
 
     def disconnect(self):
-        self.camera.AbortAcquisition()
+        self.abort_acquisition()
+        self.cooler_off()
+        temp=self.get_temperature()
+        if temp < -20:
+            print ("Too cold to safely shut down, waiting...")
+        while temp < -20:
+            print("T=",temp)
+            temp=self.get_temperature()
+            time.sleep(10)
+
+        ret = self.camera.ShutDown()
+        if self.verbose:
+            print("ShutDown returned: ",errors(ret).name)
+
     
+    def abort_acquisition(self):
+        self.camera.AbortAcquisition()
+
     def is_connected(self):
-        return bool(self.get_serial_number())
-        
+        try:
+            return bool(self.get_serial_number())
+        except:
+            return False
+
     def get_settings(self):
         return {
             "id": self.get_serial_number(),
