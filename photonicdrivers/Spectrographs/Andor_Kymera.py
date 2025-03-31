@@ -46,6 +46,17 @@ class Andor_Kymera(Connectable):
     def get_center_wavelength(self):
         (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
         return wavelength
+    
+    def get_focus_mirror_max_steps(self):
+        (message, max_steps) = self.spectrograph.GetFocusMirrorMaxSteps(self.device_index)
+        return message, max_steps
+
+    def get_focus_mirror_position(self):
+        (message, position) = self.spectrograph.GetFocusMirror(self.device_index)
+        return position
+
+    def set_focus_mirror_position(self,position):
+        self.spectrograph.SetFocusMirror(self.device_index,position)
 
     def disconnect(self):
         self.spectrograph.Close()
