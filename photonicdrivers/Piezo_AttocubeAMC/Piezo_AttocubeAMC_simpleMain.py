@@ -10,11 +10,11 @@ piezo.connect()
 # x,y,z = piezo.get_position()
 # piezo.set_position(x_nm=x + 10*1000, move_x=True)
 
-piezo.set_position_relative(x_nm=-2*1000, move_x=True)
+#piezo.set_position_relative(x_nm=-2*1000, move_x=True)
 
 # piezo.set_position_relative(y_nm=2*1000, move_y=True)
 
-# piezo.set_position_relative(z_nm=-5*1000, move_z=True)
+#piezo.set_position_relative(z_nm=1*1000, move_z=True)
 
 # print(piezo.is_axis_moving())
 
