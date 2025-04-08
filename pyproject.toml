@@ -33,7 +33,7 @@ dependencies = [
     "pyserial", 
     "lakeshore", 
     "pygame", 
-    "pymodbus", 
+    "pymodbus==3.6.9", 
     "rpyc", 
     "loguru", 
     "pylablib", 
