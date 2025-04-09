@@ -1,15 +1,20 @@
+from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
 
 
-class Santec_TSL570_driver:
+class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
         resource_manager=None,
         ip_address: str = "10.209.67.181",
         port_number: str = "5000",
+        prints_enabled=True
     ):
+        self.prints_enabled = prints_enabled
         if resource_manager is not None:
             self.resource_manager = resource_manager
+        else:
+            self.resource_manager = pyvisa.ResourceManager()
         self.ip_address = ip_address
         self.port_number = port_number
 
@@ -23,17 +28,28 @@ class Santec_TSL570_driver:
                 write_termination="\n",
                 read_termination="\r",
             )
-            print("Connected to laser.")
+            if self.prints_enabled:
+                print("Connected to laser.")
         except Exception as e:
-            print(e)
-            print("Could not connect to laser.")
+            if self.prints_enabled:
+                print(e)
+                print("Could not connect to laser.")
+            else:
+                raise
 
     def disconnect(self):
         """
         Closes the connections to laser
         """
         self.laser.close()
-        print("Connection to laser closed.")
+        if self.prints_enabled:
+            print("Connection to laser closed.")
+
+    def is_connected(self):
+        try:
+            return self.get_idn() is not None
+        except:
+            return False
 
     def get_idn(self):
         """
@@ -45,11 +61,14 @@ class Santec_TSL570_driver:
         model = return_msg_split[1]
         serial_number = return_msg_split[2]
         firmware_version = return_msg_split[3]
-        print("Identification string returned:")
-        print(f"- Manufacturer: {manufacturer}")
-        print(f"- Model: {model}")
-        print(f"- Serial number: {serial_number}")
-        print(f"- Firmware version: {firmware_version}")
+        if self.prints_enabled:
+            print("Identification string returned:")
+            print(f"- Manufacturer: {manufacturer}")
+            print(f"- Model: {model}")
+            print(f"- Serial number: {serial_number}")
+            print(f"- Firmware version: {firmware_version}")
+        else:
+            return manufacturer, model, serial_number, firmware_version
 
     def get_wavelength(self) -> float:
         """
