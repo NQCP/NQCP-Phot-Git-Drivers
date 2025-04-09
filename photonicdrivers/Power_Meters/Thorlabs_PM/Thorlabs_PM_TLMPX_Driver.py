@@ -15,7 +15,7 @@ Driver class for interfacing with Thorlabs powermeters via the TLPMX dll.
 
 class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
-    def __init__(self, resource_name:str) -> None:
+    def __init__(self, resource_name:str, auto_disconnecting=False) -> None:
         """
         Initializes the Thorlabs_PM100D_driver instance.
 
@@ -26,6 +26,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         self.driver = TLPMX()
         self.resource_name = resource_name
         self.enabled = False
+        self.auto_disconnecting = auto_disconnecting
         
     def connect(self) -> None:
         """

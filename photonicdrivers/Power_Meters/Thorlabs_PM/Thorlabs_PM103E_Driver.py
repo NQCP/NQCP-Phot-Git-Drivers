@@ -28,6 +28,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         self.port = port
         self.power_meter = None
         self.enabled = False
+        self.auto_disconnecting = True
 
     def connect(self) -> None:
         """
