@@ -1,7 +1,7 @@
 from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp, c_uint16
-
+import time
 from photonicdrivers.Power_Meters.Thorlabs_PM.TLPMX import TLPMX, TLPM_DEFAULT_CHANNEL
-
+from photonicdrivers.Power_Meters.Thorlabs_PM.autoreconnect_pm import auto_reconnect
 from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 # See Thorlabs' github for example https://github.com/Thorlabs/Light_Analysis_Examples/tree/main 
@@ -25,6 +25,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         self.driver = TLPMX()
         self.resource_name = resource_name
+        self.enabled = False
         
     def connect(self) -> None:
         """
@@ -32,11 +33,14 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
 
         self.driver.open(resourceName=c_char_p(self.resource_name.encode('utf-8')), IDQuery=c_bool(True), resetDevice=c_bool(True))
+        self.enabled = True
 
     def disconnect(self) -> None:
         """
         Closes the connection to the Thorlabs power meter.
         """
+        # If connection is already dead, still desirable to disable
+        self.enabled = False
         self.driver.close()
 
     def is_connected(self) -> bool:
@@ -53,6 +57,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         except Exception:
             return False
 
+    @auto_reconnect
     def get_idn(self) -> str:
         """
         Retrieves the identification string of the Thorlabs PM100D power meter.
@@ -67,6 +72,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         self.driver.identificationQuery(manufacturer_name, device_name, serial_number, firmware_revision)
         return manufacturer_name.value, device_name.value, serial_number.value, firmware_revision.value
 
+    @auto_reconnect
     def get_averaging(self) -> int:
         """
         Retrieves the current number of averaging cycles configured on the power meter.
@@ -79,6 +85,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         self.driver.getAvgCnt(averageCount=byref(average), channel=TLPM_DEFAULT_CHANNEL)
         return average.value
 
+    @auto_reconnect
     def set_averaging(self, average: int) -> None:
         """
         Sets the number of averaging cycles on the power meter.
@@ -96,6 +103,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         pass
 
+    @auto_reconnect
     def set_auto_range(self, auto_range_bool: bool) -> None:
         """
         Sets the auto range mode of the power meter.
@@ -120,6 +128,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
         pass
 
+    @auto_reconnect
     def set_wavelength(self, wavelength):
         """
         Sets the wavelength value in nanometers.
@@ -136,6 +145,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         result_code = self.driver.setWavelength(wavelength, channel=TLPM_DEFAULT_CHANNEL)
         return result_code
     
+    @auto_reconnect
     def get_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the power meter.
@@ -151,6 +161,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
         return wavelength.value
 
+    @auto_reconnect
     def set_power_unit(self, power_unit: str) -> None:
         """
         Sets the units for power measurements.
@@ -165,6 +176,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         
         self.driver.setPowerUnit(powerUnit=unit_num, channel=TLPM_DEFAULT_CHANNEL)
 
+    @auto_reconnect
     def get_power_unit(self) -> str:
         """
         Retrieves the current units for power measurements.
@@ -180,6 +192,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         else:
             return "W"
 
+    @auto_reconnect
     def get_power(self) -> float:
         """
         Retrieves the current power measurement from the detector.
@@ -195,6 +208,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
     def get_power_mW(self) -> float:
         return self.get_power() * 1000
     
+    @auto_reconnect
     def get_min_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the power meter.
@@ -210,6 +224,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
         return wavelength.value
     
+    @auto_reconnect
     def get_max_wavelength(self) -> float:
         """
         Retrieves the current wavelength setting of the power meter.
@@ -225,6 +240,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
         return wavelength.value
 
+    @auto_reconnect
     def set_power_ref(self, power_reference_value):
         """
         Sets the power reference value.
@@ -239,11 +255,13 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         self.driver.setPowerRef(power_reference_value, channel=TLPM_DEFAULT_CHANNEL)
     
     def reset(self) -> None:
+        self.driver.reset()
         """
         Resets the power meter to its default state.
         """
         pass
 
+    @auto_reconnect
     def zero(self) -> None:
         """
         Initiates a zero correction procedure on the detector.

@@ -1,6 +1,7 @@
 from anyvisa import AnyVisa
 from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
-
+from photonicdrivers.Power_Meters.Thorlabs_PM.autoreconnect_pm import auto_reconnect
+import time
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
@@ -9,6 +10,9 @@ Anyvisa: Navigate to the folder with the anyvisa .whl file and write "pip instal
 
 TCPIP0::10.209.67.184::PM103E-4E_M01027537::INSTR
 TCPIP0::10.209.67.196::PM103E-A0_M01080977::INSTR
+OR
+TCPIP0::10.209.67.184::2000::SOCKET
+TCPIP0::10.209.67.196::2000::SOCKET
 """
 
 
@@ -23,6 +27,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         """
         self.port = port
         self.power_meter = None
+        self.enabled = False
 
     def connect(self) -> None:
         """
@@ -30,14 +35,14 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         """
         self.power_meter = AnyVisa.TL_Open(self.port)
         self.power_meter.open()
+        self.enabled = True
 
     def disconnect(self) -> None:
         """
         Closes the connection to the Thorlabs PM103E power meter.
         """
-        #self.power_meter.close()
-
-        print("Power meter cannot close in same session due to an error in PyVisa. To be fixed")
+        # The power meter disconnects itself after 120 seconds without interaction
+        self.enabled = False
 
     def is_connected(self) -> bool:
         """
@@ -197,7 +202,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         self._write("SENS:CORR:COLL:ZERO:INIT")
 
     #################################### PRIVATE METHODS ###########################################
-
+    @auto_reconnect
     def _write(self, command: str) -> None:
         """
         Sends a command to the power meter.
@@ -213,6 +218,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         except Exception as exception:
             raise ConnectionError("An error occurred while writing to the power meter") from exception
 
+    @auto_reconnect
     def _read(self) -> str:
         """
         Reads a response from the power meter.
@@ -228,6 +234,7 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         except Exception as exception:
             raise ConnectionError("An error occurred while reading the power meter") from exception
 
+    @auto_reconnect
     def _query(self, command: str) -> str:
         """
         Sends a command to the power meter and retrieves the response.
