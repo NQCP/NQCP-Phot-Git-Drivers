@@ -52,14 +52,12 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             bool: True if the device is connected, False otherwise.
         """
         try:
-            return self.get_idn() is not None
-        except ConnectionError:
-            return False
+            return all(x is not None for x in self.get_idn()) is not None
         except Exception:
             return False
 
     @auto_reconnect
-    def get_idn(self) -> str:
+    def get_idn(self) -> tuple[str, str, str, str]:
         """
         Retrieves the identification string of the Thorlabs PM100D power meter.
 
@@ -82,7 +80,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             int: The number of averaging cycles.
         """
 
-        average = c_int()
+        average = c_int16()
         self.driver.getAvgCnt(averageCount=byref(average), channel=TLPM_DEFAULT_CHANNEL)
         return average.value
 
@@ -95,14 +93,14 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             average (int): The number of averaging cycles to set.
         """
 
-        average = c_uint16(average)
-        self.driver.setAvgCnt(averageCount=average, channel=TLPM_DEFAULT_CHANNEL)
+        c_average = c_int16(average)
+        self.driver.setAvgCnt(averageCount=c_average, channel=TLPM_DEFAULT_CHANNEL)
 
     def set_config_power(self) -> None:
         """
         Configures the power meter for power measurements.
         """
-        pass
+        raise NotImplementedError
 
     @auto_reconnect
     def set_auto_range(self, auto_range_bool: bool) -> None:
@@ -113,12 +111,11 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             auto_range (str): 'ON' to enable auto range, 'OFF' to disable.
         """
         if auto_range_bool:
-            auto_range = c_uint16(1)
+            auto_range = c_int16(1)
         else:
-            auto_range = c_uint16(0)
+            auto_range = c_int16(0)
         
         result_code = self.driver.setPowerAutoRange(auto_range, channel=TLPM_DEFAULT_CHANNEL)
-        return result_code
 
     def set_beam(self, beam: str = 'MIN') -> None:
         """
@@ -127,7 +124,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         Args:
             beam (str): The beam correction type ('MIN', 'MAX', etc.).
         """
-        pass
+        raise NotImplementedError
 
     @auto_reconnect
     def set_wavelength(self, wavelength):
@@ -171,9 +168,11 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             unit (str): The unit to set ('W', or 'dBm').
         """
         if power_unit == "W":
-            unit_num = c_uint16(0)    
+            unit_num = c_int16(0)    
         elif power_unit == "dBm":
-            unit_num = c_uint16(1)
+            unit_num = c_int16(1)
+        else:
+            raise ValueError(f"Unit must be W or dBm (got {power_unit})")
         
         self.driver.setPowerUnit(powerUnit=unit_num, channel=TLPM_DEFAULT_CHANNEL)
 
@@ -186,7 +185,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             str: The current units ('W', 'mW', or 'dBm').
         """
         
-        power_unit = c_uint16()
+        power_unit = c_int16()
         self.driver.getPowerUnit(powerUnit=byref(power_unit), channel=TLPM_DEFAULT_CHANNEL)
         if power_unit.value:
             return "dBm"
@@ -219,7 +218,7 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
 
         wavelength = c_double()
-        attribute = c_int()
+        attribute = c_int16()
         attribute.value = 1
         self.driver.getWavelength(attribute=attribute, wavelength=byref(wavelength), channel=TLPM_DEFAULT_CHANNEL)
 
@@ -235,14 +234,14 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         """
 
         wavelength = c_double()
-        attribute = c_int()
+        attribute = c_int16()
         attribute.value = 2
         self.driver.getWavelength(attribute=attribute, wavelength=byref(wavelength), channel=TLPM_DEFAULT_CHANNEL)
 
         return wavelength.value
 
     @auto_reconnect
-    def set_power_ref(self, power_reference_value):
+    def set_power_ref(self, power_reference_value: float):
         """
         Sets the power reference value.
 
@@ -253,14 +252,14 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             int: The return value, 0 is for success.
         """
         
-        self.driver.setPowerRef(power_reference_value, channel=TLPM_DEFAULT_CHANNEL)
+        self.driver.setPowerRef(c_double(power_reference_value), channel=TLPM_DEFAULT_CHANNEL)
     
     def reset(self) -> None:
         self.driver.reset()
         """
         Resets the power meter to its default state.
         """
-        pass
+        raise NotImplementedError
 
     @auto_reconnect
     def zero(self) -> None:
