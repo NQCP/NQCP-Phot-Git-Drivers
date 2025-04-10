@@ -37,8 +37,7 @@ class VdHB400_Driver(Connectable):
         self.connection.write(full_command.encode())
         
         # Read response
-        response = self.connection.readline().decode().strip()
-        return response
+        return self.connection.readline().decode().strip()
     
     # Read commands implementation
     
@@ -47,6 +46,9 @@ class VdHB400_Driver(Connectable):
     
     def get_pump1_status(self) -> str:
         return self.query("PUMP1")
+    
+    def get_pump2_status(self) -> str:
+        return self.query("PUMP2")
     
     def get_control_status(self) -> str:
         return self.query("COOL")
@@ -71,8 +73,9 @@ class VdHB400_Driver(Connectable):
         response = self.query("SET1")
         return float(response)
     
-    def get_interface_software_version(self) -> str:
-        return self.query("SWC")
+    # This command does not work
+    # def get_interface_software_version(self) -> str:
+    #    return self.query("SWC")
     
     def get_display_software_version(self) -> str:
         return self.query("SWB400")
