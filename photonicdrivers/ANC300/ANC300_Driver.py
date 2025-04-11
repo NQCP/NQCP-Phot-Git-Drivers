@@ -38,8 +38,7 @@ class ANC300_Driver(Connectable):
             
     def is_connected(self) -> bool:
         try:
-            response = self.get_version()
-            return response is not None and "OK" in response
+            return self.get_version() is not None
         except:
             return False
             
