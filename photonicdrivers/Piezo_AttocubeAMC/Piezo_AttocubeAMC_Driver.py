@@ -3,7 +3,15 @@ from photonicdrivers.Abstract.Connectable import Connectable
 
 from time import sleep
 import numpy as np 
-
+def axis_to_id(axis: str) -> int:
+    axis_lower = axis.lower()
+    if axis_lower == 'x':
+        return 0
+    if axis_lower == 'y':
+        return 1
+    if axis_lower == 'z':
+        return 2
+    raise ValueError(f"axis '{axis}' is not a valid axis. Should be ")
 class Piezo_AttocubeAMC_Driver(Connectable):
 
     def __init__(self,ip_string: str, x_min_nm:int=300000, x_max_nm:int=4700000, y_min_nm:int=300000, y_max_nm:int=4700000, z_min_nm:int=300000, z_max_nm:int=4700000) -> None:
@@ -69,7 +77,13 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         x_moving, y_moving, z_moving = self.amc.control.getStatusMovingAllAxes()
         return bool(x_moving), bool(y_moving), bool(z_moving)
 
+    def set_ground(self, axis: str, ground: bool):
+        self.amc.move.setGroundAxis(axis_to_id(axis), ground)
     
+    def set_ground_all(self, ground: bool):
+        for axis in ['x', 'y', 'z']:
+            self.set_ground(axis, ground)
+
     ##################################### PRIVATE METHODS #####################################
 
     def __check_position_limits(self, x:int, y:int, z:int, move_x:bool, move_y:bool, move_z:bool) -> bool:
