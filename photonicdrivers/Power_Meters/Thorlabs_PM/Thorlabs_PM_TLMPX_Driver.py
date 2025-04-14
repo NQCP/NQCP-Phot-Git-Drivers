@@ -1,5 +1,4 @@
 from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp, c_uint16
-import time
 from photonicdrivers.Power_Meters.Thorlabs_PM.TLPMX import TLPMX, TLPM_DEFAULT_CHANNEL
 from photonicdrivers.Power_Meters.Thorlabs_PM.autoreconnect_pm import auto_reconnect
 from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
@@ -95,6 +94,23 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
 
         c_average = c_int16(average)
         self.driver.setAvgCnt(averageCount=c_average, channel=TLPM_DEFAULT_CHANNEL)
+
+    def get_averaging_time(self) -> float:
+        """Gets the average time for a measurement cycle"""
+        average = c_double()
+        attribute = c_int16(0)
+        self.driver.getAvgTime(attribute=attribute, avgTime=byref(average), channel=TLPM_DEFAULT_CHANNEL)
+        return average.value
+    
+    def set_averaging_time(self, cycle_time: float) -> None:
+        """
+        Sets the average time for a measurement cycle
+         
+        Args:
+            time (float): The average measuremnt cycle time
+        """
+
+        self.driver.setAvgTime(avgTime=c_double(cycle_time), channel=TLPM_DEFAULT_CHANNEL)
 
     def set_config_power(self) -> None:
         """
