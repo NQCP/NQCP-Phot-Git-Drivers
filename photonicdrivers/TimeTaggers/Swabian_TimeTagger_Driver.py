@@ -47,7 +47,6 @@ class Swabian_TimeTagger_Driver(Connectable):
                 
 
         elif connection_type == 'Network':
-            print("Connecting via network to server with IP " + self.serverIP + " and port " + self.serverPort)
             self.connection = TimeTagger.createTimeTaggerNetwork(self.serverIP + ":" + self.serverPort)
 
         else:
