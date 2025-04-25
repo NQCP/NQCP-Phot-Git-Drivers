@@ -11,9 +11,10 @@ from time import sleep
 serverIP = "10.209.67.193"
 serverPort = "41101"
 
-ttNetwork = Swabian_TimeTagger_Driver(serverIP=serverIP, serverPort=serverPort)
+ttNetwork = Swabian_TimeTagger_Driver(serverIP=serverIP, serverPort=serverPort, connection_type="Network")
 
-ttNetwork.connect("Network")
+ttNetwork.connect()
+print(ttNetwork.is_connected())
 
 binWidth = int(2e11)
 nBins = 20
