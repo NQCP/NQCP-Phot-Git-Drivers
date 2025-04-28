@@ -61,7 +61,10 @@ class WLPhotonicsTunableFilter(Connectable):
  
     def is_connected(self):
         """Check if the device is connected."""
-        return self.get_device_info() is not None
+        try:
+            return self.get_device_info() is not None
+        except Exception:
+            return False
 
     def send_command(self, command, wait_time=2.0, poll_interval=0.1):
         """Send a command to the tunable filter and return the response."""
