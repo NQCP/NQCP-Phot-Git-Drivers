@@ -32,7 +32,7 @@ dependencies = [
     "wraps", 
     "pyserial", 
     "lakeshore", 
-    "pygame", 
+    "pygame>=2.0", 
     "pymodbus==3.6.9", 
     "rpyc", 
     "loguru", 
