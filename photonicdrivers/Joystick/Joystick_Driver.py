@@ -24,6 +24,8 @@ class PSControllerState:
     LeftStickY: float
     RightStickX: float
     RightStickY: float
+    LeftTrigger: float
+    RightTrigger: float
 
 class Joystick_Driver(Connectable):
     def __init__(self):
@@ -36,11 +38,11 @@ class Joystick_Driver(Connectable):
         joystick_count = pygame.joystick.get_count()
         if joystick_count < joystick_index + 1:
             raise ValueError(f"Joystick index is out of range (found {joystick_count} joysticks but expected at least {joystick_index + 1})")
-        
+        print("x")
         self.joystick = pygame.joystick.Joystick(joystick_index)
         self.joystick.init()
         self.joystick_name = self.joystick.get_name()
-            
+        print("y")    
 
     def disconnect(self):
         if self.joystick is not None:
@@ -80,7 +82,9 @@ class Joystick_Driver(Connectable):
                 LeftStickX=j.get_axis(0),
                 LeftStickY=-j.get_axis(1),
                 RightStickX=j.get_axis(2),
-                RightStickY=-j.get_axis(3))
+                RightStickY=-j.get_axis(3),
+                LeftTrigger=j.get_axis(4),
+                RightTrigger=j.get_axis(5))
 
         elif self.joystick_name == PS5_CONTROLLER_NAME:
             # I don't actually know if PS5 joystick Y value is inverted too. Check please!
@@ -99,6 +103,8 @@ class Joystick_Driver(Connectable):
                 LeftStickX=j.get_axis(0),
                 LeftStickY=-j.get_axis(1),
                 RightStickX=j.get_axis(3),
-                RightStickY=-j.get_axis(4))
+                RightStickY=-j.get_axis(4),
+                LeftTrigger=j.get_axis(2),
+                RightTrigger=j.get_axis(5))
         else:
             raise NotImplementedError(f"Unsupported controller: {self.joystick_name}")
