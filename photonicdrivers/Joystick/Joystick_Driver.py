@@ -26,6 +26,10 @@ class PSControllerState:
     RightStickY: float
     LeftTrigger: float
     RightTrigger: float
+    DpadUp: bool
+    DpadDown: bool
+    DpadLeft: bool
+    DpadRight: bool
 
 class Joystick_Driver(Connectable):
     def __init__(self):
@@ -84,10 +88,16 @@ class Joystick_Driver(Connectable):
                 RightStickX=j.get_axis(2),
                 RightStickY=-j.get_axis(3),
                 LeftTrigger=j.get_axis(4),
-                RightTrigger=j.get_axis(5))
+                RightTrigger=j.get_axis(5),
+                DpadUp=j.get_button(11),
+                DpadDown=j.get_button(12),
+                DpadLeft=j.get_button(13),
+                DpadRight=j.get_button(14))
 
         elif self.joystick_name == PS5_CONTROLLER_NAME:
             # I don't actually know if PS5 joystick Y value is inverted too. Check please!
+            x_hat, y_hat = j.get_hat(0)
+
             return PSControllerState(
                 Cross=j.get_button(0),
                 Circle=j.get_button(1),
@@ -105,6 +115,10 @@ class Joystick_Driver(Connectable):
                 RightStickX=j.get_axis(3),
                 RightStickY=-j.get_axis(4),
                 LeftTrigger=j.get_axis(2),
-                RightTrigger=j.get_axis(5))
+                RightTrigger=j.get_axis(5),
+                DpadUp=y_hat == 1,
+                DpadDown=y_hat == -1,
+                DpadLeft=x_hat == -1,
+                DpadRight=x_hat == 1)
         else:
             raise NotImplementedError(f"Unsupported controller: {self.joystick_name}")
