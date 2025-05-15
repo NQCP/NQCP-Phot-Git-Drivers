@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from photonicdrivers.Abstract.Connectable import Connectable
 
 PS4_CONTROLLER_NAME = "PS4 Controller"
-PS5_CONTROLLER_NAME = "Sony Interactive Entertainment Wireless Controller"
+PS5_CONTROLLER_NAMES = ["Sony Interactive Entertainment Wireless Controller", "DualSense Wireless Controller"]
 
 @dataclass
 class PSControllerState:
@@ -94,7 +94,7 @@ class Joystick_Driver(Connectable):
                 DpadLeft=j.get_button(13),
                 DpadRight=j.get_button(14))
 
-        elif self.joystick_name == PS5_CONTROLLER_NAME:
+        elif self.joystick_name in PS5_CONTROLLER_NAMES:
             # I don't actually know if PS5 joystick Y value is inverted too. Check please!
             x_hat, y_hat = j.get_hat(0)
 
