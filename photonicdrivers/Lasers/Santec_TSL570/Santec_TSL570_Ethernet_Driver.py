@@ -1,6 +1,6 @@
 from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
-
+import logging
 
 class Santec_TSL570_driver(Connectable):
     def __init__(
@@ -29,11 +29,10 @@ class Santec_TSL570_driver(Connectable):
                 read_termination="\r",
             )
             if self.prints_enabled:
-                print("Connected to laser.")
+                logging.info("Succesfully connected to laser.")
         except Exception as e:
             if self.prints_enabled:
-                print(e)
-                print("Could not connect to laser.")
+                logging.error(f"Couldn't connect to the laser due to the error: {e}")
             else:
                 raise
 
