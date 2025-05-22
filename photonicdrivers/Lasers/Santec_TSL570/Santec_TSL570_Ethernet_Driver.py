@@ -6,8 +6,8 @@ class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
         resource_manager=None,
-        ip_address: str = "10.209.67.181",
-        port_number: str = "5000",
+        ip_address: str = "",
+        port_number: str = "",
         prints_enabled=True
     ):
         self.prints_enabled = prints_enabled
