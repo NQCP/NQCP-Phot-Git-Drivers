@@ -4,6 +4,10 @@ Created on Thu Nov  7 14:38:25 2024
 
 @author: NQCPW
 """
+import os
+import sys
+current_directory = os.path.dirname(__file__)
+sys.path.insert(0, current_directory)
 
 from oceandirect.od_logger import od_logger
 from oceandirect.OceanDirectAPI import OceanDirectAPI, OceanDirectError
