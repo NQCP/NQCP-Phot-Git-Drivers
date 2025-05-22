@@ -1,11 +1,12 @@
 import pygame
-
+import time
 from dataclasses import dataclass
 
 from photonicdrivers.Abstract.Connectable import Connectable
 
 PS4_CONTROLLER_NAME = "PS4 Controller"
-PS5_CONTROLLER_NAMES = ["Sony Interactive Entertainment Wireless Controller", "DualSense Wireless Controller"]
+PS5_CONTROLLER_NAME = "Sony Interactive Entertainment Wireless Controller" 
+PS5_DUALSENSE_NAME = "DualSense Wireless Controller"
 
 @dataclass
 class PSControllerState:
@@ -42,11 +43,11 @@ class Joystick_Driver(Connectable):
         joystick_count = pygame.joystick.get_count()
         if joystick_count < joystick_index + 1:
             raise ValueError(f"Joystick index is out of range (found {joystick_count} joysticks but expected at least {joystick_index + 1})")
-        print("x")
         self.joystick = pygame.joystick.Joystick(joystick_index)
         self.joystick.init()
         self.joystick_name = self.joystick.get_name()
-        print("y")    
+        # The controller needs to have a moment to initialize, otherwise the readouts will be zeros
+        time.sleep(0.2)
 
     def disconnect(self):
         if self.joystick is not None:
@@ -68,9 +69,9 @@ class Joystick_Driver(Connectable):
         pygame.event.pump()
         j = self.joystick
 
+        # Holding joysticks up gives a negative value, for some reason. So we flip the sign of joystick Ys
 
         if self.joystick_name == PS4_CONTROLLER_NAME:
-            # Holding joysticks up gives a negative value, for some reason. So we flip the sign of joystick Ys
             return PSControllerState(
                 Cross=j.get_button(0),
                 Circle=j.get_button(1),
@@ -94,8 +95,7 @@ class Joystick_Driver(Connectable):
                 DpadLeft=j.get_button(13),
                 DpadRight=j.get_button(14))
 
-        elif self.joystick_name in PS5_CONTROLLER_NAMES:
-            # I don't actually know if PS5 joystick Y value is inverted too. Check please!
+        elif self.joystick_name == PS5_CONTROLLER_NAME:
             x_hat, y_hat = j.get_hat(0)
 
             return PSControllerState(
@@ -120,5 +120,33 @@ class Joystick_Driver(Connectable):
                 DpadDown=y_hat == -1,
                 DpadLeft=x_hat == -1,
                 DpadRight=x_hat == 1)
+
+        elif self.joystick_name == PS5_DUALSENSE_NAME:
+
+            left_trigger = round(min((j.get_axis(4) + 1) / 2, 1), 2)
+            right_trigger = round(min((j.get_axis(5) + 1) / 2, 1), 2)
+
+            return PSControllerState(
+                Cross=j.get_button(0),
+                Circle=j.get_button(1),
+                Square=j.get_button(2),
+                Triangle=j.get_button(3),
+                LeftBumper=j.get_button(9),
+                RightBumper=j.get_button(10),
+                Share=j.get_button(4),
+                Options=j.get_button(6),
+                LeftStickPressed=j.get_button(7),
+                RightStickPressed=j.get_button(8),
+                PSButton=j.get_button(5),
+                LeftStickX=j.get_axis(0),
+                LeftStickY=-j.get_axis(1),
+                RightStickX=j.get_axis(2),
+                RightStickY=-j.get_axis(3),
+                LeftTrigger=left_trigger,
+                RightTrigger=right_trigger,
+                DpadUp=j.get_button(11),
+                DpadDown=j.get_button(12),
+                DpadLeft=j.get_button(13),
+                DpadRight=j.get_button(14))
         else:
             raise NotImplementedError(f"Unsupported controller: {self.joystick_name}")
