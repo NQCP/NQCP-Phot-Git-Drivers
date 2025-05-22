@@ -3,13 +3,13 @@ from abc import abstractmethod, ABC
 class Connectable(ABC): 
 
     @abstractmethod
-    def connect():
+    def connect(self) -> None:
         pass
     
     @abstractmethod
-    def disconnect():
+    def disconnect(self) -> None:
         pass
     
     @abstractmethod
-    def is_connected():
+    def is_connected(self) -> bool:
         pass
