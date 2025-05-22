@@ -1,14 +1,15 @@
 from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
+import logging
 
 
 class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
         resource_manager=None,
-        ip_address: str = "10.209.67.181",
-        port_number: str = "5000",
-        prints_enabled=True
+        ip_address: str = "",
+        port_number: str = "",
+        prints_enabled=True,
     ):
         self.prints_enabled = prints_enabled
         if resource_manager is not None:
@@ -29,11 +30,10 @@ class Santec_TSL570_driver(Connectable):
                 read_termination="\r",
             )
             if self.prints_enabled:
-                print("Connected to laser.")
+                logging.info("Succesfully connected to laser.")
         except Exception as e:
             if self.prints_enabled:
-                print(e)
-                print("Could not connect to laser.")
+                logging.error(f"Couldn't connect to the laser due to the error: {e}")
             else:
                 raise
 
@@ -81,7 +81,7 @@ class Santec_TSL570_driver(Connectable):
         """
         msg = ":WAV?"
         return_msg = self.laser.query(msg)
-        wavelength_in_nm = float(return_msg)*1e9       
+        wavelength_in_nm = float(return_msg) * 1e9
         return wavelength_in_nm
 
     def get_power(self) -> float:
@@ -114,7 +114,7 @@ class Santec_TSL570_driver(Connectable):
             return "dBm"
         else:
             return "mW"
-    
+
     def get_emission_status(self) -> int:
         """
         Get laser emission status
@@ -128,7 +128,7 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         emission_status = int(return_msg)
         return emission_status
-    
+
     def get_operation_status(self) -> int:
         """
         Get laser operation status, that is, if a command is in operation
@@ -142,7 +142,7 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         operation_status = int(return_msg)
         return operation_status
-        
+
     def set_wavelength(self, wavelength_nm: float) -> None:
         """
         Set wavelength [nm] of the laser
@@ -163,7 +163,6 @@ class Santec_TSL570_driver(Connectable):
         power_dBm_decimal = "{:.2e}".format(power_dBm)
         msg = ":POW " + str(power_dBm_decimal)
         self.laser.write(msg)
-
 
     def set_emission_status(self, emission: bool):
         """
@@ -199,7 +198,7 @@ class Santec_TSL570_driver(Connectable):
         Query a message to the laser
         """
         return self.laser.query(message)
-    
+
     def read(self):
         """
         Read a message from the laser
@@ -207,30 +206,32 @@ class Santec_TSL570_driver(Connectable):
         return self.laser.read()
 
 
-
 if __name__ == "__main__":
     from time import sleep
+
     rm = pyvisa.ResourceManager()
-    santec = Santec_TSL570_driver(rm)
+    santec = Santec_TSL570_driver(resource_manager=rm, ip_address="10.209.69.95")
     santec.connect()
     santec.get_idn()
 
-    # # check all getter methods
-    # print("Wavelength [nm]: ", santec.get_wavelength())
-    # print("Power unit: ", santec.get_power_unit())
-    # print("Power: ", santec.get_power())
-    # print("Emission status: ", santec.get_emission_status())
+    # check all getter methods
+    print("Wavelength [nm]: ", santec.get_wavelength())
+    print("Power unit: ", santec.get_power_unit())
+    print("Power: ", santec.get_power())
+    print("Emission status: ", santec.get_emission_status())
 
-    # # check all setter methods
-    # santec.set_wavelength(1309.41)
-    # print("Operation status:", santec.get_operation_status())
-    # sleep_time = 0.01
-    # sleep(sleep_time)
-    # print(f"Operation status after {sleep_time}s sleep:", santec.get_operation_status())
-    # santec.set_power(-15)
-    # sleep_time = 0.1
-    # sleep(sleep_time)
-    # print("Power: ", santec.get_power())
+    # check all setter methods
+    santec.set_wavelength(1270.41)
+    print("Operation status:", santec.get_operation_status())
+    sleep_time = 0.01
+    sleep(sleep_time)
+    print(f"Operation status after {sleep_time}s sleep:", santec.get_operation_status())
+    print("Wavelength [nm]: ", santec.get_wavelength())
+
+    santec.set_power(-10)
+    sleep_time = 0.1
+    sleep(sleep_time)
+    print("Power: ", santec.get_power())
     santec.set_emission_status(0)
 
     santec.disconnect()
