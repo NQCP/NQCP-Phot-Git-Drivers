@@ -2,13 +2,14 @@ from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
 import logging
 
+
 class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
         resource_manager=None,
         ip_address: str = "",
         port_number: str = "",
-        prints_enabled=True
+        prints_enabled=True,
     ):
         self.prints_enabled = prints_enabled
         if resource_manager is not None:
@@ -80,7 +81,7 @@ class Santec_TSL570_driver(Connectable):
         """
         msg = ":WAV?"
         return_msg = self.laser.query(msg)
-        wavelength_in_nm = float(return_msg)*1e9       
+        wavelength_in_nm = float(return_msg) * 1e9
         return wavelength_in_nm
 
     def get_power(self) -> float:
@@ -113,7 +114,7 @@ class Santec_TSL570_driver(Connectable):
             return "dBm"
         else:
             return "mW"
-    
+
     def get_emission_status(self) -> int:
         """
         Get laser emission status
@@ -127,7 +128,7 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         emission_status = int(return_msg)
         return emission_status
-    
+
     def get_operation_status(self) -> int:
         """
         Get laser operation status, that is, if a command is in operation
@@ -141,7 +142,7 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         operation_status = int(return_msg)
         return operation_status
-        
+
     def set_wavelength(self, wavelength_nm: float) -> None:
         """
         Set wavelength [nm] of the laser
@@ -162,7 +163,6 @@ class Santec_TSL570_driver(Connectable):
         power_dBm_decimal = "{:.2e}".format(power_dBm)
         msg = ":POW " + str(power_dBm_decimal)
         self.laser.write(msg)
-
 
     def set_emission_status(self, emission: bool):
         """
@@ -198,7 +198,7 @@ class Santec_TSL570_driver(Connectable):
         Query a message to the laser
         """
         return self.laser.query(message)
-    
+
     def read(self):
         """
         Read a message from the laser
@@ -206,9 +206,9 @@ class Santec_TSL570_driver(Connectable):
         return self.laser.read()
 
 
-
 if __name__ == "__main__":
     from time import sleep
+
     rm = pyvisa.ResourceManager()
     santec = Santec_TSL570_driver(resource_manager=rm, ip_address="10.209.69.95")
     santec.connect()
