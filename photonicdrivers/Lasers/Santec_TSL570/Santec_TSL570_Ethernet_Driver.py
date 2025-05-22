@@ -210,26 +210,28 @@ class Santec_TSL570_driver(Connectable):
 if __name__ == "__main__":
     from time import sleep
     rm = pyvisa.ResourceManager()
-    santec = Santec_TSL570_driver(rm)
+    santec = Santec_TSL570_driver(resource_manager=rm, ip_address="10.209.69.95")
     santec.connect()
     santec.get_idn()
 
-    # # check all getter methods
-    # print("Wavelength [nm]: ", santec.get_wavelength())
-    # print("Power unit: ", santec.get_power_unit())
-    # print("Power: ", santec.get_power())
-    # print("Emission status: ", santec.get_emission_status())
+    # check all getter methods
+    print("Wavelength [nm]: ", santec.get_wavelength())
+    print("Power unit: ", santec.get_power_unit())
+    print("Power: ", santec.get_power())
+    print("Emission status: ", santec.get_emission_status())
 
-    # # check all setter methods
-    # santec.set_wavelength(1309.41)
-    # print("Operation status:", santec.get_operation_status())
-    # sleep_time = 0.01
-    # sleep(sleep_time)
-    # print(f"Operation status after {sleep_time}s sleep:", santec.get_operation_status())
-    # santec.set_power(-15)
-    # sleep_time = 0.1
-    # sleep(sleep_time)
-    # print("Power: ", santec.get_power())
+    # check all setter methods
+    santec.set_wavelength(1270.41)
+    print("Operation status:", santec.get_operation_status())
+    sleep_time = 0.01
+    sleep(sleep_time)
+    print(f"Operation status after {sleep_time}s sleep:", santec.get_operation_status())
+    print("Wavelength [nm]: ", santec.get_wavelength())
+
+    santec.set_power(-10)
+    sleep_time = 0.1
+    sleep(sleep_time)
+    print("Power: ", santec.get_power())
     santec.set_emission_status(0)
 
     santec.disconnect()

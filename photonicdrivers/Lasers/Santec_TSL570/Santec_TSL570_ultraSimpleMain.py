@@ -72,7 +72,7 @@ rm = pyvisa.ResourceManager()
 
 try:
     santec = rm.open_resource(
-        "TCPIP0::10.209.67.181::5000::SOCKET",
+        "TCPIP0::10.209.69.95::5000::SOCKET",
         write_termination="\n",
         read_termination="\r",
     )
