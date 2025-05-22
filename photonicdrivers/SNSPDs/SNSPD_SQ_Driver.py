@@ -3,11 +3,11 @@ from photonicdrivers.Abstract.Connectable import Connectable
 
 class SNSPD_SQ_Driver(Connectable):
     def __init__(self,_ip_string: str, _control_port: int=12000, _counts_port: int=12345) -> None:
-        self.ipAddress = _ip_string
-        self.controlPort = _control_port
-        self.countsPort = _counts_port
+        self.ip_address = _ip_string
+        self.control_port = _control_port
+        self.counts_port = _counts_port
 
-        self.websq = WebSQControl(TCP_IP_ADR=self.ipAddress, CONTROL_PORT=self.controlPort, COUNTS_PORT=self.countsPort)
+        self.websq = WebSQControl(TCP_IP_ADR=self.ip_address, CONTROL_PORT=self.control_port, COUNTS_PORT=self.counts_port)
 
     def connect(self):        
         self.websq.connect()
@@ -24,14 +24,23 @@ class SNSPD_SQ_Driver(Connectable):
     def getNumberOfDetectors(self) -> int:
         return self.websq.get_number_of_detectors()
     
+    def get_control_port(self):
+        return self.control_port
+
+    def get_ip_address(self):
+        return self.ip_address
+    
+    def get_counts_port(self):
+        return self.counts_port
+    
     def getTemperatures(self) -> float:
         # This function returns all kind of temperatures. See the WebSQControl.py script from the manufacturer
         # Each return type is an array of the last 200 measurements
         time, T, T_40K, v_av, board_T1, board_T2 = self.websq.get_cryo_temperature()
 
         # We are only interested in the latest
-        latestTemp = T[199]
-        return latestTemp
+        latest_temperature = T[199]
+        return latest_temperature
     
     def getCounts(self, numberOfMeasurements: int):
         data = self.websq.acquire_cnts(numberOfMeasurements)
@@ -43,6 +52,18 @@ class SNSPD_SQ_Driver(Connectable):
 
     def getMeasurementPeriod(self) -> float:
         return self.websq.get_measurement_periode()
+    
+    def get_bias_voltages(self):
+        return self.websq.get_bias_voltage()
+    
+    def get_bias_currents(self):
+        # in A
+        return self.websq.get_bias_current()
+    
+    def get_integration_time(self):
+        # in ms
+        return self.websq.get_measurement_periode()
+
 
 
 

@@ -14,7 +14,7 @@ def axis_to_id(axis: str) -> int:
     raise ValueError(f"axis '{axis}' is not a valid axis. Should be ")
 class Piezo_AttocubeAMC_Driver(Connectable):
 
-    def __init__(self,ip_string: str, x_min_nm:int=300000, x_max_nm:int=4700000, y_min_nm:int=300000, y_max_nm:int=4700000, z_min_nm:int=300000, z_max_nm:int=4700000) -> None:
+    def __init__(self,ip_string: str, x_min_nm:int=100000, x_max_nm:int=4900000, y_min_nm:int=100000, y_max_nm:int=4900000, z_min_nm:int=300000, z_max_nm:int=4700000) -> None:
         self.ip_address = ip_string
 
         self.x_min = x_min_nm
