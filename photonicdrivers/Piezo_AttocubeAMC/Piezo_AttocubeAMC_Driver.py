@@ -27,6 +27,7 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         self.amc = AMC.Device(self.ip_address)
 
     def connect(self) -> None:
+        self.amc = AMC.Device(self.ip_address)
         self.amc.connect()
 
     def disconnect(self) -> None:
@@ -39,10 +40,9 @@ class Piezo_AttocubeAMC_Driver(Connectable):
             return False
     
     def get_device_type(self):
-        return self.amc.description.getDeviceType()
-        
+        return self.amc.description.getDeviceType()    
 
-    def get_position(self) -> float | float | float:
+    def get_position(self) -> tuple[float,  float,  float]:
         x, y, z, v1, v2, v3 = self.amc.control.getPositionsAndVoltages()
         return x, y, z
     
@@ -73,7 +73,7 @@ class Piezo_AttocubeAMC_Driver(Connectable):
 
         self.set_position(int(x), int(y), int(z), move_x, move_y, move_z, wait_while_moving)
 
-    def is_axis_moving(self) -> bool | bool | bool:
+    def is_axis_moving(self) -> tuple[bool,  bool,  bool]:
         x_moving, y_moving, z_moving = self.amc.control.getStatusMovingAllAxes()
         return bool(x_moving), bool(y_moving), bool(z_moving)
 
