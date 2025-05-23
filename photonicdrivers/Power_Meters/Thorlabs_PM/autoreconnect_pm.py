@@ -10,7 +10,7 @@ def auto_reconnect(method):
         if self.enabled is True:
             try:
                 return method(self, *args, **kwargs)
-            except:
+            except NameError:
                 self.connect()
                 time.sleep(0.2)
                 return method(self, *args, **kwargs)
