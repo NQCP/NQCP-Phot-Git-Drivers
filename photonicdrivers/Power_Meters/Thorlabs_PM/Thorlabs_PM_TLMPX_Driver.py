@@ -51,7 +51,10 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
             bool: True if the device is connected, False otherwise.
         """
         try:
-            return all(x is not None for x in self.get_idn()) is not None
+            if self.enabled:
+                return all(x is not None for x in self.get_idn()) is not None
+            else:
+                return False
         except Exception:
             return False
 
