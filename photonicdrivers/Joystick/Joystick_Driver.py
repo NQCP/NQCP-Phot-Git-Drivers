@@ -1,5 +1,6 @@
 import pygame
 import time
+import numpy as np
 from dataclasses import dataclass
 
 from photonicdrivers.Abstract.Connectable import Connectable
@@ -31,6 +32,33 @@ class PSControllerState:
     DpadDown: bool
     DpadLeft: bool
     DpadRight: bool
+
+def no_input_state() -> PSControllerState:
+    return PSControllerState(
+        Cross=False,
+        Circle=False,
+        Square=False,
+        Triangle=False,
+        LeftBumper=False,
+        RightBumper=False,
+        Share=False,
+        Options=False,
+        LeftStickPressed=False,
+        RightStickPressed=False,
+        PSButton=False,
+        LeftStickX=0,
+        LeftStickY=0,
+        RightStickX=0,
+        RightStickY=0,
+        LeftTrigger=0,
+        RightTrigger=0,
+        DpadUp=False,
+        DpadDown=False,
+        DpadLeft=False,
+        DpadRight=False)
+
+def deadzoned(value: float, deadzone: float):
+    return (abs(value) - deadzone) / (1 - deadzone) * np.sign(value)
 
 class Joystick_Driver(Connectable):
     def __init__(self):
