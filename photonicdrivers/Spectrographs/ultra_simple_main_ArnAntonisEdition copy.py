@@ -19,7 +19,6 @@ spc = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpec
 shm = spc.Initialize("")
 print(shm)
 if shm == 20202:
-    
     print('Spectrograph Initialization Successful')
 elif spc.GetNumberGratings(device=0)[1]!=0:
     print('Spectrograph Already Initialized')
@@ -60,7 +59,7 @@ print(cam.handle_return(ret))
 
 
 ## Set CameraTemperature ###
-set_temp=-60
+set_temp=-2
 
 
 ret = cam.CoolerON()
@@ -68,8 +67,8 @@ ret = cam.SetTemperature(set_temp)
 ret, temperature = cam.GetTemperature()
 
 #we wait for the camera to cool down
-while temperature >= set_temp+5:
-    time.sleep(10)
+while temperature >= set_temp + 5:
+    time.sleep(2)
     ret, temperature = cam.GetTemperature()
     print("T=", temperature)
 
@@ -77,7 +76,7 @@ while temperature >= set_temp+5:
 
 
 ## Set Spectrograph correctly
-set_wvl=1330
+set_wvl=1350
 set_grating=1
 
 spc.SetGrating(device=0, grating=set_grating)
@@ -141,19 +140,6 @@ print(spc.GetWavelengthLimits(device=0, Grating=1))
 # ### GET IMAGE ###
 (ret, arr, validfirst, validlast) = cam.GetImages16(1,1, size=num_pixel_x*num_pixel_y)
 
-
-#cam.AbortAcquisition()
-# spc.Close()
-#cam.SetAdvancedTriggerModeState(0)
-
-# cam.CoolerOFF()
-# ret, temperature = cam.GetTemperature()
-# while temperature < -20:
-#     time.sleep(10)
-#     ret, temperature = cam.GetTemperature()
-#     print("T=", temperature)
-# cam.ShutDown()
-
 print('Well done!')
 
 import numpy as np
@@ -194,3 +180,16 @@ plt.show()
 
 spec=np.array([wvl_list,collapse])
 
+cam.AbortAcquisition()
+cam.SetAdvancedTriggerModeState(0)
+
+cam.CoolerOFF()
+ret, temperature = cam.GetTemperature()
+while temperature < -20:
+    time.sleep(10)
+    ret, temperature = cam.GetTemperature()
+    print("T=", temperature)
+
+cam.ShutDown()
+
+spc.Close()
