@@ -1,18 +1,18 @@
 
-### Load libraries
+
 import sys
 import time
-import numpy as np
 
-
-import numpy as np
-import matplotlib.pyplot as plt
 from photonicdrivers.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
+import numpy as np
 
 try:
-    sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
+
+    from photonicdrivers.utils.Range import Range
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
+    sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
+    from pyAndorSpectrograph.spectrograph import ATSpectrograph # type: ignore
     from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
     codes = atmcd_codes
     errors=atmcd_errors.Error_Codes
@@ -20,20 +20,34 @@ except:
     print("Andor Solis is not installed ")
 
 
-
-class Andor_Newton(Connectable):
+class Andor(Connectable):
 
     def __init__(self,verbose=False) -> None:
-        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
+        self.camera = None
+        self.spectrograph = None
         self.verbose=verbose
+        self.device_index = 0
 
     def connect(self):
+        self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
+        message = self.spectrograph.Initialize("")
+        print(self.spectrograph)
+        if message == 20202:
+            print('Spectrograph Initialization Successful')
+        elif self.spectrograph.GetNumberGratings(device=0)[1]!=0:
+            print('Spectrograph Already Initialized')
+        else:
+            print('ERROR WHEN INITIALIZING SPECTROGRAPH')
 
-        ret= self.camera.Initialize("")
+        #Our connection issues stem from these lines of code. When we instantiate a new atmcd-object we lose the connection with the camera
+        # this is what forces us to connect and disconnect. The spectograph seems more stable to re-instantiation, but it has been observed to hang in the same way some times.
+        self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")
+
+        message = self.camera.Initialize("")
         # Check whether we have connection, using serial number to verify that we can get non-zero results.
-        if ret == 20002:
+        if message == 20002:
             print('Camera Initialization Successful')
-        elif ret == 20992 and self.camera.GetCameraSerialNumber()[0]==20002:
+        elif message == 20992 and self.camera.GetCameraSerialNumber()[0]==20002:
             print('Camera Already Initialized')
         else:
             print('ERROR WHEN INITIALIZING CAMERA')
@@ -80,12 +94,19 @@ class Andor_Newton(Connectable):
             print("ShutDown returned: ",errors(ret).name)
         return temperature
 
-    def get_serial_number(self):
-        (message, serial_number) = self.camera.GetCameraSerialNumber()
+    def get_cameria_serial_number(self):
+        serial_number, success = self.get_cameria_serial_number_with_success
         return serial_number
+
+    def get_camera_serial_number_with_success(self):
+        (message, serial_number) = self.camera.GetCameraSerialNumber()
+        print(message)
+        print(atmcd_errors.Error_Codes.DRV_SUCCESS)
+        success = message == atmcd_errors.Error_Codes.DRV_SUCCESS
+        return serial_number, success
     
     def get_id(self):
-        return self.get_serial_number()
+        return self.get_camera_serial_number()
 
     def get_gain_range(self):
         (message, min_gain, max_gain) = self.camera.GetEMGainRange()
@@ -153,13 +174,19 @@ class Andor_Newton(Connectable):
         if self.verbose:
             print("ShutDown returned: ",errors(ret).name)
 
+        self.spectrograph.Close()
+
     
     def abort_acquisition(self):
         self.camera.AbortAcquisition()
 
     def is_connected(self):
         try:
-            return bool(self.get_serial_number())
+            _, spectrograph_success = self.get_spectrograph_serial_number_with_success()
+            _, camera_success = self.get_camera_serial_number_with_success()
+            print(spectrograph_success)
+            print(camera_success)
+            return  camera_success and spectrograph_success
         except:
             return False
 
@@ -168,6 +195,48 @@ class Andor_Newton(Connectable):
             "id": self.get_serial_number(),
             "temperature": self.get_temperature(),
             "gain": self.get_gain(),
-            "exposure_time": self.get_exposure_time_s()
+            "exposure_time": self.get_exposure_time_s(),
+            "grating": self.get_grating(),
+            "center_wavelength": self.get_center_wavelength()
         }
+    
+    def get_spectrograph_serial_number(self):
+        serial_number, success = self.get_serial_number_with_success()
+        return serial_number
+    
+    def get_spectrograph_serial_number_with_success(self):
+        (message, serial_number) = self.spectrograph.GetGrating(self.device_index)
+        print(message)
+        print(self.spectrograph.ATSPECTROGRAPH_SUCCESS)
+        success = message == self.spectrograph.ATSPECTROGRAPH_SUCCESS
+        return serial_number, success
+    
+    def get_id(self):
+        return self.get_serial_number()
+    
+    def get_grating(self):
+        (message, grating) = self.spectrograph.GetGrating(self.device_index)
+        return grating
+    
+    def set_grating(self, grating):
+        #1 broader, 2 narrower
+        self.spectrograph.SetGrating(self.device_index, grating)
+    
+    def set_center_wavelength(self, wavelength):
+        self.spectrograph.SetWavelength(self.device_index, wavelength=wavelength)
+    
+    def get_center_wavelength(self):
+        (message, wavelength) = self.spectrograph.GetWavelength(self.device_index)
+        return wavelength
+    
+    def get_focus_mirror_max_steps(self):
+        (message, max_steps) = self.spectrograph.GetFocusMirrorMaxSteps(self.device_index)
+        return message, max_steps
+
+    def get_focus_mirror_position(self):
+        (message, position) = self.spectrograph.GetFocusMirror(self.device_index)
+        return position
+
+    def set_focus_mirror_position(self,position):
+        self.spectrograph.SetFocusMirror(self.device_index,position)
 
