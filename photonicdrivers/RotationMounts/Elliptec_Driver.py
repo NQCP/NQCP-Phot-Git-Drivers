@@ -1,8 +1,5 @@
-import numpy as np
 from pylablib.devices.Thorlabs.elliptec import ElliptecMotor
-import serial
 from photonicdrivers.Abstract.Connectable import Connectable
-import pylablib.devices.Thorlabs.elliptec as ello
 
 class Elliptec_Driver(Connectable):
     """
@@ -25,17 +22,14 @@ class Elliptec_Driver(Connectable):
         """
         Establishes a connection to the ELL6 rotation stage.
         """
-        try:
-            if self.driver is None:
-                self.driver = ElliptecMotor(conn=self.port, addrs=self.addresses)
-        except Exception:
-            print("Unable to connect")
+        self.driver = ElliptecMotor(conn=self.port, addrs=self.addresses)
 
     def disconnect(self) -> None:
         """
         Closes the connection to the ELL6 rotation stage.
         """
         self.driver.close()
+        self.driver = None
 
     def is_connected(self) -> bool:
         """
