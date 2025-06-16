@@ -22,8 +22,8 @@ class Andor_Kymera(Connectable):
 
     def connect(self):
         self.spectrograph = ATSpectrograph(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph\\pyAndorSpectrograph\\libs\\Windows\\64")
-        #message = self.spectrograph.Initialize("")
-        #print("Function Initialize returned {}".format(self.spectrograph.GetFunctionReturnDescription(message, 64)[1]))
+        message = self.spectrograph.Initialize("")
+        print("Function Initialize returned {}".format(self.spectrograph.GetFunctionReturnDescription(message, 64)[1]))
 
     def get_serial_number(self):
         sn, status = self.get_serial_number_with_success()
