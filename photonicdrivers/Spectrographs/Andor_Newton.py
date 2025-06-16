@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from photonicdrivers.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
+from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
+
 
 try:
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
@@ -38,8 +40,13 @@ class Andor_Newton(Connectable):
         else:
             print('ERROR WHEN INITIALIZING CAMERA')
 
+        self.init_detector_params()      
+
+    def init_detector_params(self):
         #get the amount of pixels in the camera
-        _,self.num_pixel_x,self.num_pixel_y=self.camera.GetDetector()        
+        _,self.num_pixel_x,self.num_pixel_y=self.camera.GetDetector()
+        #get the size of the pixels
+        _,self.size_pixel_x,self.size_pixel_y =self.camera.GetPixelSize() 
 
     def get_exposure_time_s(self):
         (message, exposure_time) = self.camera.GetMaximumExposure()
@@ -61,7 +68,7 @@ class Andor_Newton(Connectable):
     def get_trace(self):
         image = self.get_image()
         trace = np.sum(image, axis=0)
-        return trace.tolist()
+        return trace
 
     def cooler_on(self):
         ret=self.camera.CoolerON()
@@ -126,6 +133,7 @@ class Andor_Newton(Connectable):
 
     def set_read_mode(self, readmode):
         ret=self.camera.SetReadMode(readmode)
+        self.read_mode=readmode
         if self.verbose:
             print("set_read_mode returned: ",errors(ret).name)
 
@@ -136,6 +144,7 @@ class Andor_Newton(Connectable):
             print("set_image returned: ",errors(ret).name)
     
     def set_camera_acquisition(self,mode):
+        self.acquisition_mode=mode
         self.camera.SetAcquisitionMode(mode)
 
     def disconnect(self):
@@ -163,11 +172,24 @@ class Andor_Newton(Connectable):
         except:
             return False
 
-    def get_settings(self):
-        return {
+    def get_settings(self) -> dict:
+        setting_dict={
             "id": self.get_serial_number(),
             "temperature": self.get_temperature(),
             "gain": self.get_gain(),
-            "exposure_time": self.get_exposure_time_s()
-        }
-
+            "exposure_time": self.get_exposure_time_s(),
+            "handle":self.camera.GetCurrentCamera(),
+            "num_pixel_x": self.num_pixel_x,
+            "num_pixel_y":self.num_pixel_y,
+            "size_pixel_x": self.size_pixel_x,
+            "size_pixel_y":self.size_pixel_y,
+        } 
+        try:
+            setting_dict.update({"acquisition_mode": self.acquisition_mode})
+        except:
+            pass
+        try:
+            setting_dict.update({"read_mode":self.read_mode})
+        except:
+            pass
+        return setting_dict
