@@ -33,6 +33,7 @@ class Andor_Newton(Connectable):
 
         ret= self.camera.Initialize("")
         # Check whether we have connection, using serial number to verify that we can get non-zero results.
+        self.init_detector_params()
         if ret == 20002:
             print('Camera Initialization Successful')
         elif ret == 20992 and self.camera.GetCameraSerialNumber()[0]==20002:
@@ -40,7 +41,7 @@ class Andor_Newton(Connectable):
         else:
             print('ERROR WHEN INITIALIZING CAMERA')
 
-        self.init_detector_params()      
+             
 
     def init_detector_params(self):
         #get the amount of pixels in the camera
