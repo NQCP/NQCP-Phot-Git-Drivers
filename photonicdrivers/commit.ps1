@@ -50,3 +50,6 @@ if ($doPush -eq 'y') {
 } else {
     Write-Host "Skipping push."
 }
+
+Write-Host "`n===== git status ====="
+git status
