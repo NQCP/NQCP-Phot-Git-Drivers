@@ -38,7 +38,8 @@ dependencies = [
     "loguru", 
     "pylablib", 
     "timetagger",
-    "zeroconf"]
+    "zeroconf",
+    "pulsestreamer"]
 
 dynamic = ["version"]
 
