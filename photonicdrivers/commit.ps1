@@ -1,3 +1,20 @@
+# Show status and staged changes
+Write-Host "`n===== git status ====="
+git status
+
+# Ask to pull
+$doPull = Read-Host "Do you want to pull? [y/n]"
+if ($doPull -eq 'y') {
+    git pull --ff-only
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Pull failed!"
+    } else {
+        Write-Host "Pull successful."
+    }
+} else {
+    Write-Host "Skipping pull."
+}
+
 # Ask to add changes
 $addAll = Read-Host "Do you want to add all changes? [y/n]"
 if ($addAll -eq 'y') {
@@ -7,15 +24,8 @@ if ($addAll -eq 'y') {
     Write-Host "Skipping git add."
 }
 
-# Show status and staged changes
-Write-Host "`n===== git status ====="
-git status
-
-Write-Host "`n===== git diff --cached ====="
-git diff --cached --name-only
-
 # Ask for user info and commit message
-$userName = Read-Host "Enter author name for this commit"
+$userName = Read-Host "Enter author username for this commit"
 $userEmail = Read-Host "Enter author email for this commit"
 $commitMessage = Read-Host "Enter commit message"
 
@@ -26,19 +36,6 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Commit failed or nothing to commit."
 } else {
     Write-Host "Commit successful."
-}
-
-# Ask to pull
-$doPull = Read-Host "Do you want to pull before pushing? [y/n]"
-if ($doPull -eq 'y') {
-    git pull --ff-only
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Pull failed!"
-    } else {
-        Write-Host "Pull successful."
-    }
-} else {
-    Write-Host "Skipping pull."
 }
 
 # Ask to push
