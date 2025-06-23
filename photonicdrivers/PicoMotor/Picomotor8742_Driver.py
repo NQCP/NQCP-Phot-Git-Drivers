@@ -137,7 +137,7 @@ class NewFocus_8742_Driver(Connectable):
     def is_connected(self) -> bool:
         try:
             return self.get_product_ID() is not  None
-        except:
+        except Exception as e:
             return False
 
     def load_settings(self) -> dict:
