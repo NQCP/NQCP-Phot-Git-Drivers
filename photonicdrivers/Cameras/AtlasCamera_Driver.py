@@ -7,7 +7,6 @@ import numpy as np
 
 def extract_img_from_buf(buf: _Buffer) -> np.ndarray:
     if buf.has_chunkdata:
-
         bytes_per_pixel = int(buf.bits_per_pixel / 8)
 
         image_size_in_bytes = buf.height * buf.width * bytes_per_pixel
@@ -16,12 +15,11 @@ def extract_img_from_buf(buf: _Buffer) -> np.ndarray:
     else:
         pixels = buf.data
     
-    return np.asarray(pixels, dtype=np.uint8).reshape((buf.height, buf.width))
+    return np.asarray(pixels, dtype=np.uint8).reshape((buf.height, buf.width, buf.bits_per_pixel // 8))
 
 class AtlasCamera_Driver(Connectable):
     def __init__(self, ip: str):
         self.ip = ip
-
 
     def is_connected(self):
         return self.camera.is_connected()
@@ -39,12 +37,7 @@ class AtlasCamera_Driver(Connectable):
         self.camera = None
 
     def capture_image(self):
-        buf = self.camera.get_buffer()
-        img_buf = BufferFactory.convert(buf, PixelFormat.RGB8)
+        buf: _Buffer = self.camera.get_buffer()
+        img_buf = BufferFactory.convert(buf, PixelFormat.Mono8)
         self.camera.requeue_buffer(buf)
         return extract_img_from_buf(img_buf)
-
-
-cam = AtlasCamera_Driver("10.209.69.91")
-cam.connect()
-print(cam.is_connected())
