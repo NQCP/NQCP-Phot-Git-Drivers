@@ -1,8 +1,23 @@
 from photonicdrivers.Abstract.Connectable import Connectable
 from arena_api.system import system
 from arena_api._device import Device
-from arena_api.buffer import BufferFactory
+from arena_api.buffer import BufferFactory, _Buffer
 from arena_api.enums import PixelFormat
+import numpy as np
+
+def extract_img_from_buf(buf: _Buffer) -> np.ndarray:
+    if buf.has_chunkdata:
+
+        bytes_per_pixel = int(buf.bits_per_pixel / 8)
+
+        image_size_in_bytes = buf.height * buf.width * bytes_per_pixel
+
+        pixels = buf.data[:image_size_in_bytes]
+    else:
+        pixels = buf.data
+    
+    return np.asarray(pixels, dtype=np.uint8).reshape((buf.height, buf.width))
+
 class AtlasCamera_Driver(Connectable):
     def __init__(self, ip: str):
         self.ip = ip
@@ -25,7 +40,10 @@ class AtlasCamera_Driver(Connectable):
 
     def capture_image(self):
         buf = self.camera.get_buffer()
-        BufferFactory.convert(buf, PixelFormat.RGB8)
+        img_buf = BufferFactory.convert(buf, PixelFormat.RGB8)
+        self.camera.requeue_buffer(buf)
+        return extract_img_from_buf(img_buf)
+
 
 cam = AtlasCamera_Driver("10.209.69.91")
 cam.connect()
