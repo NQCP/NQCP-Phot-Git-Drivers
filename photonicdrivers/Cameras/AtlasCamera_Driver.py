@@ -30,6 +30,10 @@ class AtlasCamera_Driver(Connectable):
             raise Exception(f"Expected 1 result with ip {self.ip} but got {len(relevant_infos)}")
         self.info = relevant_infos[0]
         self.camera: Device = system.select_device(system.create_device(self.info))
+        stream_nodemap = self.camera.tl_stream_nodemap
+        stream_nodemap['StreamAutoNegotiatePacketSize'].value = True
+        stream_nodemap['StreamPacketResendEnable'].value = True
+        stream_nodemap["StreamBufferHandlingMode"].value = "NewestOnly"
         self.camera.start_stream()
 
     def disconnect(self):
@@ -40,4 +44,12 @@ class AtlasCamera_Driver(Connectable):
         buf: _Buffer = self.camera.get_buffer()
         img_buf = BufferFactory.convert(buf, PixelFormat.Mono8)
         self.camera.requeue_buffer(buf)
-        return extract_img_from_buf(img_buf)
+        img = extract_img_from_buf(img_buf)
+        BufferFactory.destroy(img_buf)
+        return img
+
+    def gain(self) -> float:
+        return self.camera.nodemap['Gain'].value
+
+    def set_gain(self, gain: float):
+        self.camera.nodemap['Gain'].value = gain
