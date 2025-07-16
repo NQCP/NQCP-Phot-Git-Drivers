@@ -1,3 +1,5 @@
+# https://www.swabianinstruments.com/static/documentation/PulseStreamer/
+
 from photonicdrivers.Abstract.Connectable import Connectable
 from pulsestreamer import PulseStreamer, Sequence, OutputState, Sequence, ClockSource, TriggerRearm, TriggerStart, findPulseStreamers
 
