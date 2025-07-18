@@ -16,9 +16,17 @@ from photonicdrivers.Abstract.Connectable import Connectable
 # https://docs.circuitpython.org/en/latest/shared-bindings/usb/core/index.html#usb.core.Device
 # https://itecnote.com/tecnote/python-pyusb-reading-from-a-usb-device/
 
+def usb_write(dev, endpoint: int, command: str, timeout: int, termChar: str):
+    commandString = command + termChar
+    dev.write(endpoint, commandString, timeout)
+
+def usb_read(dev, endpoint: int, timeout: int, bitsToRead: int) -> str:
+    response_ASCII = dev.read(endpoint, bitsToRead, timeout)
+    response = ''.join(map(chr, response_ASCII))
+    return response
 
 class NewFocus_8742_Driver(Connectable):
-    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None):
+    def __init__(self, vendor_ID_Hex=None, product_ID_Hex=None, IP_adress=None, port=None, hostname=None):
         print("Initialising instance of PicoMotor class")
 
         self.termChar = '\r'  # the termination character THIS IS NEVER USED, BECAUSE IT SHOULD BE SAVED IN A WAY THAT PRESERVES THE TERMINATION CHARACTER TYPE
@@ -29,6 +37,7 @@ class NewFocus_8742_Driver(Connectable):
         self.product_ID_Hex = product_ID_Hex
         self.IP_adress = IP_adress
         self.port = port
+        self.hostname = hostname
 
         print(vendor_ID_Hex)
         print(product_ID_Hex)
@@ -86,6 +95,17 @@ class NewFocus_8742_Driver(Connectable):
         response = self._read_command()
         return response
 
+    def is_moving(self, axis_number_str):
+        """
+        Checks if the specified axis is currently moving.
+
+        @param axis_number_str: Parameter to identify the axis to be checked: {1,2,3,4}
+        @return: True if the axis is moving, False otherwise
+        """
+        self._write_command(str(axis_number_str) + 'MD?')
+        response = self._read_command()
+        return response == '0'
+
     def write_custom_command(self, commandStr):
         self._write_command(commandStr)
         response = self._read_command()
@@ -111,10 +131,27 @@ class NewFocus_8742_Driver(Connectable):
             self.endpointIn = 0x2
             self.endpointOut = 0x81
             self.timeOut = 1000  # ms
+            devs = list(usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex, find_all=True))
+            if self.hostname is None:
+                self.dev = devs[0]  # if no IP address is given, use the first device found
+            else:
+                for dev in devs:
+                    try:
+                        print(dev)
+                        usb_write(dev, self.endpointIn, 'HOSTNAME?', self.timeOut, termChar=self.termChar)
+                        print("Finished write")
+                        hostname = usb_read(dev, self.endpointOut, self.timeOut, 4096).strip()  # read the IP address of the device
+                        print(hostname)
+                        if hostname == self.hostname:
+                            self.dev = dev
+                            print(f"Found matching device with hostname: {hostname}")
+                            break
+                       
+                    except Exception as e:
+                        print(f"Error occurred while looping through USB picomotors to find matching hostname: {e}")
 
-            self.dev = usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex)
-            print(self.dev)
-
+                if self.dev is None:
+                    raise Exception(f"Could not find a device with hostname {self.hostname} in the list of USB devices: {devs}")
 
         elif self.IP_adress is not None and self.port is not None:
             # open an ethernet connection
@@ -147,8 +184,7 @@ class NewFocus_8742_Driver(Connectable):
 
     def _write_command(self, command):
         if self.connectionType == 'USB':
-            commandString = command + self.termChar
-            self.dev.write(self.endpointIn, commandString, self.timeOut)
+            usb_write(self.dev, self.endpointIn, command, self.timeOut, self.termChar)
 
         elif self.connectionType == 'Ethernet':
             commandString = command + self.termChar
@@ -159,11 +195,7 @@ class NewFocus_8742_Driver(Connectable):
 
     def _read_command(self, bitsToRead=4096):
         if self.connectionType == 'USB':
-            response_ASCII = self.dev.read(self.endpointOut, bitsToRead, self.timeOut)
-
-            # Convert response from ASCII to string 
-            # using method 2 from https://www.geeksforgeeks.org/python-ways-to-convert-list-of-ascii-value-to-string/
-            response = ''.join(map(chr, response_ASCII))
+            response = usb_read(self.dev, self.endpointOut, self.timeOut, bitsToRead)
             return response
 
         elif self.connectionType == 'Ethernet':

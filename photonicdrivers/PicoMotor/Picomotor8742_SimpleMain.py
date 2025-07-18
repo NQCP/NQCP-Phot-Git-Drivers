@@ -4,8 +4,7 @@ from photonicdrivers.PicoMotor.Picomotor8742_Driver import NewFocus_8742_Driver
 
 #Decimal VendorID = 1027 & ProductID = 24596
 #Hexadecimal VendorID = 0x403 & ProductID = 0x6014
-
-# pico = NewFocus_8742_Driver(vendor_ID_Hex=0x104d, product_ID_Hex=0x4000)
+#pico = NewFocus_8742_Driver(vendor_ID_Hex=0x104d, product_ID_Hex=0x4000, hostname="8742-103866")
 pico = NewFocus_8742_Driver(IP_adress='10.209.69.4', port=23)
 pico.connect()
 print(pico.get_product_ID())
@@ -13,5 +12,6 @@ print(pico.get_MAC_address())
 print(pico.get_IP_address())
 print(pico.get_host_name())
 print(pico.get_target_position(4))
-# pico.moveRelativePosition('1','-100')
+#pico.move_relative_position('1','1000')
+print(pico.is_moving(1))
 pico.disconnect()
