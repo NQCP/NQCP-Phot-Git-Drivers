@@ -10,7 +10,7 @@ class Lakeshore335_Driver(Connectable):
         self.baud = baud_rate
 
     def connect(self) -> None:
-        self.connection = Model335(57600 , com_port="COM5")
+        self.connection = Model335(baud_rate=self.baud, com_port=self.port)
         # self.connection.connect_usb
 
     def disconnect(self) -> None:
