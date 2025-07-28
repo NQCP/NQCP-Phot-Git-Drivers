@@ -14,8 +14,7 @@ class Lakeshore335_Driver(Connectable):
         # self.connection.connect_usb
 
     def disconnect(self) -> None:
-        # self.connection.disconnect_usb() # it does not seem necessary to execute this command
-        pass
+        self.connection = None
 
     def is_connected(self) -> bool:
         try:
