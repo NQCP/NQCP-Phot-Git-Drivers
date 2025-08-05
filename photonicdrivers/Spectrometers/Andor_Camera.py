@@ -23,7 +23,7 @@ except:
 
 
 
-class Andor_Newton(Connectable):
+class Andor_Camera(Connectable):
 
     def __init__(self,verbose=False) -> None:
         self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")

@@ -16,7 +16,7 @@ except:
     print("Andor Solis is not installed ")
 
 
-class Andor_Kymera(Connectable):
+class Andor_Spectrograph(Connectable):
     def __init__(self) -> None:
         self.device_index = 0
 

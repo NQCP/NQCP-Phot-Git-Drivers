@@ -2,8 +2,8 @@
 import sys
 import time
 
-from photonicdrivers.Spectrographs.Andor_Kymera import Andor_Kymera
-from photonicdrivers.Spectrographs.Andor_Newton import Andor_Newton
+from photonicdrivers.Spectrometers.Andor_Spectrograph import Andor_Spectrograph
+from photonicdrivers.Spectrometers.Andor_Camera import Andor_Camera
 from controllers.Spectrograph_Calibration.spectrograph_calibration import Spectograph_Calibration
 
 
@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 ### Initialize Camera and Spectrograph ###
 
-spc=Andor_Kymera()
-cam=Andor_Newton()
+spc=Andor_Spectrograph()
+cam=Andor_Camera()
 
 #spectograph
 spc.connect()
