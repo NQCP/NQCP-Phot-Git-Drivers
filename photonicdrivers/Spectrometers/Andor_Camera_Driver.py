@@ -7,7 +7,7 @@ import numpy as np
 
 import numpy as np
 import matplotlib.pyplot as plt
-from photonicdrivers.utils.Range import Range
+from instruments.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
 from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
 
@@ -23,7 +23,7 @@ except:
 
 
 
-class Andor_Camera(Connectable):
+class Andor_Camera_Driver(Connectable):
 
     def __init__(self,verbose=False) -> None:
         self.camera = atmcd(userPath="C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2\\pyAndorSDK2\\libs\\Windows\\64")

@@ -2,8 +2,8 @@
 import sys
 import time
 
-from photonicdrivers.Spectrometers.Andor_Spectrograph import Andor_Spectrograph
-from photonicdrivers.Spectrometers.Andor_Camera import Andor_Camera
+from photonicdrivers.Spectrometers.Andor_Spectrograph_Driver import Andor_Spectrograph_Driver
+from photonicdrivers.Spectrometers.Andor_Camera_Driver import Andor_Camera_Driver
 from controllers.Spectrograph_Calibration.spectrograph_calibration import Spectograph_Calibration
 
 
@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 ### Initialize Camera and Spectrograph ###
 
-spc=Andor_Spectrograph()
-cam=Andor_Camera()
+spc=Andor_Spectrograph_Driver()
+cam=Andor_Camera_Driver()
 
 #spectograph
 spc.connect()

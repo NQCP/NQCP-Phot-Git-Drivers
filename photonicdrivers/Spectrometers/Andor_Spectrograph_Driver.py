@@ -1,14 +1,12 @@
 import sys
 import time
 
-from photonicdrivers.utils.Range import Range
+from instruments.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
 import numpy as np
 from typing import Optional
 
 try:
-    from typing import Optional
-    from photonicdrivers.utils.Range import Range
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSDK2")
     sys.path.append(r"C:\\Program Files\\Andor SDK\\Python\\pyAndorSpectrograph")
     from pyAndorSpectrograph.spectrograph import ATSpectrograph # type: ignore
@@ -16,7 +14,7 @@ except:
     print("Andor Solis is not installed ")
 
 
-class Andor_Spectrograph(Connectable):
+class Andor_Spectrograph_Driver(Connectable):
     def __init__(self) -> None:
         self.device_index = 0
 
