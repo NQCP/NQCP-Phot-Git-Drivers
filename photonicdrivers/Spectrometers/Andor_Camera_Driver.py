@@ -9,7 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from instruments.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
-from pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
 
 
 try:
@@ -19,7 +18,7 @@ try:
     codes = atmcd_codes
     errors=atmcd_errors.Error_Codes
 except:
-    print("Andor Solis is not installed ")
+    print("Andor Solis is not installed")
 
 
 
