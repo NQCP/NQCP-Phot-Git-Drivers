@@ -5,12 +5,20 @@ ip = "192.168.1.1"
 
 # (2046444.326, 2170676.425, 3159894.639)
 
-piezo = Piezo_AttocubeAMC_Driver(ip,x_min_nm=2040000,x_max_nm=2050000)
+piezo = Piezo_AttocubeAMC_Driver(ip,z_max_nm=3_500_000)
 piezo.connect()
-# x,y,z = piezo.get_position()
-# piezo.set_position(x_nm=x + 10*1000, move_x=True)
-print(piezo.get_position())
+x,y,z = piezo.get_position()
+piezo.set_position(x_nm=x + 10*1000, move_x=True)
 
-print(piezo.get_device_type())
+#piezo.set_position_relative(x_nm=-2*1000, move_x=True)
+
+# piezo.set_position_relative(y_nm=2*1000, move_y=True)
+
+#piezo.set_position_relative(z_nm=1*1000, move_z=True)
+
+# print(piezo.is_axis_moving())
+
+print(piezo.get_position())
+# print(piezo.get_device_type())
 piezo.disconnect()
 

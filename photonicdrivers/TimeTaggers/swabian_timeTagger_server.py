@@ -4,6 +4,10 @@ import time
 
 # Connecting to time tagger
 serialNumber = "23010013V4"
+
+# Fk5 serialnumber:
+# serialNumber = "2208000ZBU"
+
 print("Connecting to timetagger with serial number " + serialNumber)
 tagger = TimeTagger.createTimeTagger(serialNumber)
 

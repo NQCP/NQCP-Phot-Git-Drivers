@@ -1,7 +1,7 @@
 # https://pypi.org/project/lakeshore/
 # https://lake-shore-python-driver.readthedocs.io/en/latest/model_335.html 
 
-from lakeshore import Model335, Model335InputSensorSettings
+from lakeshore import Model335
 from photonicdrivers.Abstract.Connectable import Connectable
 
 class Lakeshore335_Driver(Connectable):
@@ -10,24 +10,23 @@ class Lakeshore335_Driver(Connectable):
         self.baud = baud_rate
 
     def connect(self) -> None:
-        self.connection = Model335(57600 , com_port="COM5")
+        self.connection = Model335(baud_rate=self.baud, com_port=self.port)
         # self.connection.connect_usb
 
     def disconnect(self) -> None:
-        # self.connection.disconnect_usb() # it does not seem necessary to execute this command
-        pass
+        self.connection = None
 
     def is_connected(self) -> bool:
         try:
             self.get_id()
             return True
-        except:
+        except Exception:
             return False
 
     def get_id(self) -> str:
         return self.connection.query('*IDN?')
     
-    def get_all_kelvin(self) -> tuple[float]:
+    def get_all_kelvin(self) -> list[float]:
         '''
         Returns temperature reading in kelvin for all sensors in an array of floats
         '''

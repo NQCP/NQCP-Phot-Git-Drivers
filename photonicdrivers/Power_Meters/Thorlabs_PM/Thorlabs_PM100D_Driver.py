@@ -136,8 +136,8 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         Returns:
             float: The measured power.
         """
-        self._write('MEAS:POW?')
-        return float(self._read())
+        msg = self._query('MEAS:POW?')
+        return float(msg)
 
     def get_wavelength(self) -> float:
         """

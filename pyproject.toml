@@ -32,12 +32,14 @@ dependencies = [
     "wraps", 
     "pyserial", 
     "lakeshore", 
-    "pygame", 
-    "pymodbus", 
+    "pygame>=2.0", 
+    "pymodbus==3.6.9", 
     "rpyc", 
     "loguru", 
     "pylablib", 
-    "timetagger"]
+    "timetagger",
+    "zeroconf",
+    "pulsestreamer"]
 
 dynamic = ["version"]
 

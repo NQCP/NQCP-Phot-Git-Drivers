@@ -1,0 +1,20 @@
+1.2.2 - 02/08/21
+----
+- Moved error codes to atmcd_errors.py
+- Moved capabilities list to atmcd_capabilities.py
+- Created CameraCapabilities class to extract information from device and provide a simple interface for users.
+- Created new example file GetCapabilities.py which demonstrates how to interact with new helper class.
+- Removed top level class from atmcd_codes.py so enums can be accessed directly.
+- Changed enum type from standard enum to IntEnum.
+
+1.2.1 - 21/06/21
+----
+- Added Spooling.py, WindowsEvent.py, RunTillAbort.py, ReadoutRates.py and SaveAsSif.py
+- Added atmcd codes to be used with several configuration functions
+- Refactored Readme file to include common functions, atmcd_codes descriptions and example file descriptions.
+- Refactored existing examples to use standard string formatting
+- Refactored atmcd.py to use pythonic double quotations for function docstrings
+
+1.2.0 - 08/12/20
+----
+- Refactored setup.py and library loading. Added acquire and acquire_series to acquire and return data as a numpy.ndarray

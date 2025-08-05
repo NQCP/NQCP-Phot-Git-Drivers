@@ -23,7 +23,7 @@ print('\n\n')
 # Find vendor and product ID (in hex) in: Device Manager -> Properties -> Events -> Information
 # Or perhaps the IDs are given in the manual of the device
 # Hopefully IDs are present in the list printed with the code above
-pico = usb.core.find(idVendor=0x403, idProduct=0x6014)
+pico = usb.core.find(idVendor=0x104d, idProduct=0x4000)
 if pico is None:
     raise ValueError("device not found")
 else:
