@@ -1,7 +1,7 @@
 # photonicdrivers
 
 # Description
-[Examples](https://nqcp.github.io/PhotonicDrivers/example_notebooks/index.html)
+This repository contains drivers for hardware used in photonic quantum computing
 
 # Installation
 
