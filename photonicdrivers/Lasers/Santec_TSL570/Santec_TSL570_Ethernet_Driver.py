@@ -83,7 +83,25 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         wavelength_in_nm = float(return_msg) * 1e9
         return wavelength_in_nm
+    
+    def get_wavelength_unit(self) -> str:
+        
+        """
+        OBS not sure if this code work!!
+        Check!
 
+        Get wavelength unit of the laser wavelength [nm]
+
+        Args:
+            None
+        Returns:
+            str: wavelength unit of the laser
+        """
+        msg = ":WAV:UNIT?"
+        return_msg = self.laser.query(msg)
+        return return_msg
+
+        
     def get_power(self) -> float:
         """
         Get power [dBm] of the laser
@@ -207,6 +225,9 @@ class Santec_TSL570_driver(Connectable):
 
 
 if __name__ == "__main__":
+
+
+    # Check if the driver works
     from time import sleep
 
     rm = pyvisa.ResourceManager()

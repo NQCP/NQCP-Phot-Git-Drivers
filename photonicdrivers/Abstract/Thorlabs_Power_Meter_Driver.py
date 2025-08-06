@@ -5,7 +5,7 @@ from photonicdrivers.Abstract.Connectable import Connectable
 class Thorlabs_Power_Meter_Driver(Connectable):
 
     @abstractmethod
-    def get_power(self):
+    def get_power(self) -> float:
         pass
 
     @abstractmethod
@@ -25,7 +25,7 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def get_averaging(self):
+    def get_averaging(self) -> int:
         pass
 
     @abstractmethod
@@ -33,7 +33,7 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def get_power_unit(self):
+    def get_power_unit(self) -> str:
         pass
 
     @abstractmethod

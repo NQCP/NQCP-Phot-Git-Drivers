@@ -1,5 +1,5 @@
 import pyvisa
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Abstract.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 
 """
