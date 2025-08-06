@@ -20,6 +20,7 @@ class Swabian_TimeTagger_Driver(Connectable):
         self.connection = None
 
         self.counter = None
+        self.histogram = None
 
     ###################### HIGH LEVEL FUNCTIONS ######################
 
@@ -66,6 +67,10 @@ class Swabian_TimeTagger_Driver(Connectable):
         # To do any measurements, the TimeTagger must first have initalised a counter
         self.counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
 
+    def initialiseHistogram(self, channel1: int, channel2: int, binwidth_ps: int, n_bins: int) -> None:
+        # To do any measurements, the TimeTagger must first have initalised a counter
+        self.histogram = TimeTagger.Correlation(tagger=self.connection, channel_1=channel1, channel_2=channel2, binwidth=binwidth_ps, n_bins=n_bins)
+
     def getSerial(self) -> str:
         return self.connection.getSerial()
     
@@ -86,15 +91,18 @@ class Swabian_TimeTagger_Driver(Connectable):
             counts = self.counter.getDataTotalCounts()
             return counts
         
-    def getHistogramSnapshot(self):
+    def getHistogramSnapshot(self, int_time_s: float):
         # return an array with size (number of channel in counter)x(number of bins) with counts per bin
-        if self.counter is None: 
-            print("TimeTagger Counter not inialised") 
+        if self.histogram is None: 
+            print("TimeTagger Histogram not inialised") 
             return None
         else:
-            counts = self.counter.getData()
-            times = self.counter.getIndex()
+            self.histogram.startFor(capture_duration=int_time_s * 1e12)
+            self.histogram.waitUntilFinished()
+            counts = self.histogram.getData()
+            times = self.histogram.getIndex()
             return counts, times
+
         
     
     def reset(self):

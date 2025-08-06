@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Quickstart</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="SwabianInstruments.TimeTagger">
+      <HintPath>..\..\csharp\Dependencies\SwabianInstruments.TimeTagger.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

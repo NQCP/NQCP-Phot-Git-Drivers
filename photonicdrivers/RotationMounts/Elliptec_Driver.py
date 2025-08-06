@@ -1,9 +1,6 @@
-import numpy as np
 from pylablib.devices.Thorlabs.elliptec import ElliptecMotor
-import serial
 from photonicdrivers.Abstract.Connectable import Connectable
-import pylablib.devices.Thorlabs.elliptec as ello
-
+import time
 class Elliptec_Driver(Connectable):
     """
     Class for controlling ELL14 rotation stage.
@@ -20,22 +17,23 @@ class Elliptec_Driver(Connectable):
         self.port = port
         self.addresses = addresses
         self.driver: ElliptecMotor = None
+        self.latest_command_time: float | None = None
+
+    def update_command_time(self) -> None:
+        self.latest_command_time = time.time()
 
     def connect(self) -> None:
         """
         Establishes a connection to the ELL6 rotation stage.
         """
-        try:
-            if self.driver is None:
-                self.driver = ElliptecMotor(conn=self.port, addrs=self.addresses)
-        except Exception:
-            print("Unable to connect")
+        self.driver = ElliptecMotor(conn=self.port, addrs=self.addresses)
 
     def disconnect(self) -> None:
         """
         Closes the connection to the ELL6 rotation stage.
         """
         self.driver.close()
+        self.driver = None
 
     def is_connected(self) -> bool:
         """
@@ -45,6 +43,10 @@ class Elliptec_Driver(Connectable):
             bool: True if connected, False otherwise.
         """
         try:
+            # This is a dumb way of preventing the status command from interfering with a movement command
+            # since it causes problems when a separate command is issued while the mount is moving.
+            if self.latest_command_time is not None and time.time() - self.latest_command_time  < 5:
+                return True
             self.driver.get_full_status()
             return True
         except Exception:
@@ -57,23 +59,22 @@ class Elliptec_Driver(Connectable):
         Returns:
             list: List of connected addresses.
         """
+        self.update_command_time()
         return self.driver.get_connected_addrs()
     
 
     def get_position(self, address) -> float:
+        self.update_command_time()
         return self.driver.get_position(addr=address)
 
     def move_to(self, position: int, address) -> None:
+        self.update_command_time()
         self.driver.move_to(position=position, addr=address)
 
     def move_by(self, angle: float, address) -> None:
+        self.update_command_time()
         self.driver.move_by(distance=angle, addr=address)
 
     def home(self, address=None) -> None:
+        self.update_command_time()
         self.driver.home(addr=address)
-  
-  
-
-
-
-

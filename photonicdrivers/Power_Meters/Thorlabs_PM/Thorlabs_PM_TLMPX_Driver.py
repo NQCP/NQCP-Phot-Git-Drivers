@@ -1,7 +1,7 @@
 from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp, c_uint16
 from photonicdrivers.Power_Meters.Thorlabs_PM.TLPMX import TLPMX, TLPM_DEFAULT_CHANNEL
 from photonicdrivers.Power_Meters.Thorlabs_PM.autoreconnect_pm import auto_reconnect
-from photonicdrivers.Power_Meters.Thorlabs_PM.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
+from photonicdrivers.Abstract.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 
 # See Thorlabs' github for example https://github.com/Thorlabs/Light_Analysis_Examples/tree/main 
 # Get the dll files by downloading the Thorlabs "Optical Power Monitor" software, which will put the files here:

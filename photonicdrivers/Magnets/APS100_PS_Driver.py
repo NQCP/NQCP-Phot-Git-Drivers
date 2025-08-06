@@ -1,7 +1,7 @@
 import serial
 import time
 
-from instruments.Abstract.Connectable import Connectable
+from photonicdrivers.Abstract.Connectable import Connectable
 
 
 class APS100_PS_Driver(Connectable):
@@ -25,7 +25,7 @@ class APS100_PS_Driver(Connectable):
         try:
             self.get_id()
             return True
-        except:
+        except Exception:
             return False
 
     def get_id(self) -> None:

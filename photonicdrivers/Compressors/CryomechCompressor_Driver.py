@@ -1,11 +1,10 @@
 
 import struct
 import socket
-import signal
 import datetime
+from photonicdrivers.Abstract.Connectable import Connectable
 
-
-class CryomechCompressor_Driver:
+class CryomechCompressor_Driver(Connectable):
     def __init__(self, _ip_address, _port=502, _timeout=10):
         self.ip_address = _ip_address
         self.port = _port
@@ -36,6 +35,12 @@ class CryomechCompressor_Driver:
 
     def disconnect(self):
         self.comm.close()
+
+    def is_connected(self) -> bool:
+        try:
+            return self.get_operating_state() is not None
+        except Exception:
+            return False
 
     def get_operating_state(self) -> str:
         return self._get_data('Operating State') 

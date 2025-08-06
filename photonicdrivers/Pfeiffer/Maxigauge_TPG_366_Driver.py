@@ -76,7 +76,7 @@ class Maxigauge_TPG_366_Driver(Connectable):
         
         pass
 
-    def get_all_pressures(self) -> tuple[float] | tuple[int]:
+    def get_all_pressures(self) -> tuple[list[float], list[int]]: # type: ignore
         '''
         Gets the pressure of all channels in the unit of the device
         '''
@@ -85,8 +85,8 @@ class Maxigauge_TPG_366_Driver(Connectable):
         if command_acknowledged:
             response, dummy = response_raw.split(b'\r\n')
             response_array = response.split(b',')
-            data_status_array = []
-            pressure_array = []
+            data_status_array: list[int] = []
+            pressure_array: list[float] = []
 
             for i in range(len(response_array)):
                 if i%2==0:
