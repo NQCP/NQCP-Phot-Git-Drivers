@@ -153,7 +153,7 @@ class Santec_TSL570_driver(Connectable):
             None
         """
 
-        msg = ":WAVelength  " + str(wavelength_nm) + "e-9"
+        msg = ":WAVelength  " + str(wavelength_nm) # + "e-9"
         self.laser.write(msg)
 
     def set_power(self, power_dBm: float):
