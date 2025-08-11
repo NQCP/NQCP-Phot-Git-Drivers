@@ -17,7 +17,7 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def get_wavelength(self):
+    def get_wavelength(self) -> float:
         pass
 
     @abstractmethod
@@ -29,15 +29,11 @@ class Thorlabs_Power_Meter_Driver(Connectable):
         pass
 
     @abstractmethod
-    def set_auto_range(self):
-        pass
-
-    @abstractmethod
     def get_power_unit(self) -> str:
         pass
 
     @abstractmethod
-    def set_power_unit(self, power_unit_str):
+    def set_power_unit(self, power_unit: str):
         pass
 
     @abstractmethod

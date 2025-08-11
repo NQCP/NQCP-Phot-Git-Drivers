@@ -20,7 +20,6 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         """
         self.resource_manager = resource_manager
         self.port = resource_name
-        self.powerMeter = None
         
     def connect(self) -> None:
         """
@@ -83,14 +82,14 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(':SENS:CONF:POW')
 
-    def set_auto_range(self, auto_range: str = 'ON') -> None:
+    def set_auto_range(self, auto_range_bool: bool) -> None:
         """
         Sets the auto range mode of the power meter.
 
         Args:
-            auto_range (str): 'ON' to enable auto range, 'OFF' to disable.
+            auto_range_bool (bool): True to enable auto range, False to disable.
         """
-        self._write(f':SENS:POW:RANG:AUTO {auto_range}')
+        self._write(f':SENS:POW:RANG:AUTO {"ON" if auto_range_bool else "OFF"}')
 
     def set_beam(self, beam: str = 'MIN') -> None:
         """
@@ -110,14 +109,14 @@ class Thorlabs_PM100D_Driver(Thorlabs_Power_Meter_Driver):
         """
         self._write(f':SENS:CORR:WAV {wavelength_nm}')
 
-    def set_power_unit(self, unit: str) -> None:
+    def set_power_unit(self, power_unit: str) -> None:
         """
         Sets the units for power measurements.
 
         Args:
-            unit (str): The unit to set ('W', 'mW', or 'dBm').
+            power_unit (str): The unit to set ('W', 'mW', or 'dBm').
         """
-        self._write(f':SENS:POW:UNIT {unit}')
+        self._write(f':SENS:POW:UNIT {power_unit}')
 
     def get_power_unit(self) -> str:
         """
