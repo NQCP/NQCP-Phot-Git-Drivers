@@ -62,7 +62,7 @@ class Swabian_TimeTagger_Driver(Connectable):
             return bool(self.getSerial())
         except:
             return False
-
+        
     def initialiseCounter(self, channelList: list[int], binwidth_ps: int, n_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
         self.counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
