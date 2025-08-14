@@ -9,7 +9,7 @@ class Santec_TSL570_driver(Connectable):
         resource_manager: pyvisa.ResourceManager,
         ip_address: str,
         port_number: str,
-        prints_enabled=True,
+        prints_enabled=False,
     ):
         self.prints_enabled = prints_enabled
         if resource_manager is not None:
