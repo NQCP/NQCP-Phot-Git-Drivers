@@ -88,7 +88,7 @@ class Swabian_TimeTagger_Driver(Connectable):
         else:
             self.counter.startFor(capture_duration=time_ps)
             self.counter.waitUntilFinished()
-            counts = self.counter.getDataTotalCounts()
+            counts = self.counter.getDataTotalCounts()[0]
             return counts
         
     def getHistogramSnapshot(self, int_time_s: float):
