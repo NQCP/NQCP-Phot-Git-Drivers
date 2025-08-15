@@ -8,9 +8,12 @@ import math
 # Methods taken from: https://github.com/santec-corporation/python-samples/tree/main/samples/mpm_instrument
 # for socket questions, see qdac2 instruments
 
+#ip = "192.168.1.161" # static IP for Santec MPM-220, MAC address 3C 6F 45 10 11 64
+#ip = "10.209.69.171" # KU IT registered IP
+
 class santec_MPM220_driver(Identifiable, Connectable):
 
-    def __init__(self, port: int = 5000, ip_adress: str = "192.168.1.161", timeout: int = 2) -> None:
+    def __init__(self, ip_adress: str = "192.168.1.161",port: int = 5000,  timeout: int = 2) -> None:
 
         # self.serial_number = 25020089
         self.port = port
@@ -61,7 +64,8 @@ class santec_MPM220_driver(Identifiable, Connectable):
         #response = self.socket.recv(1024).decode()
         return response
 
-    #========== Calls ==========
+    #======================== driver commands #========================#
+    #========== Instrument info  ==========
     def get_error_info(self):
         """
         Check Error information.
@@ -75,7 +79,7 @@ class santec_MPM220_driver(Identifiable, Connectable):
         error_code = ErrorCode(int(error_value))
         return error_code, error_message
 
-    def get_get_modules(self):
+    def get_modules(self):
         """
         Check recognition of Module for MPM-210H.
         
@@ -166,7 +170,8 @@ class santec_MPM220_driver(Identifiable, Connectable):
             <address>: IP address in the format www.xxx.yyy.zzz (0 ~ 255)
         """
         self._write(f'IP {address}')
-
+    
+    #========== Instrument info  ==========
     def perform_zeroing(self):
         """
         Before measuring optical power, run Zeroing to delete
@@ -191,6 +196,8 @@ class santec_MPM220_driver(Identifiable, Connectable):
         """
         self._write(f'TRIG {value}')
 
+
+    #========== Modes  ==========
     def get_measurement_mode(self):
         """Get the current measurement mode."""
         return self._query('WMOD?')
@@ -210,6 +217,75 @@ class santec_MPM220_driver(Identifiable, Connectable):
         if mode not in ["CONST1", "SWEEP1", "CONST2", "SWEEP2", "FREE-RUN"]:
             raise ValueError("Invalid mode. Supported modes: CONST1, SWEEP1, CONST2, SWEEP2, FREE-RUN")
         self._write(f'WMOD {mode}')
+
+    def get_power_mode(self):
+        """Get the current power mode (Auto or Manual)."""
+        return self._query('AUTO?')
+
+    def set_power_mode(self, value):
+        """
+        Set the power mode (Auto or Manual).
+
+        Parameters:
+            value: 0 for Manual range, 1 for Auto range
+        """
+        if value not in [0, 1]:
+            raise ValueError("Invalid value. It must be 0 (Manual range) or 1 (Auto range).")
+        self._write(f'AUTO {value}')
+
+    def get_power_mode_for_each_channel(self, module_number):
+        """Get the power mode (Auto or Manual) for a specific module."""
+        return self._query(f'DAUTO? {module_number}')
+
+    def set_power_mode_for_each_channel(self, module_number, range_value):
+        """
+        Set the power mode (Auto or Manual) for each channel.
+
+        Parameters:
+            value: A tuple (module, range_mode)
+            module: Module number (0 to 5)
+            range_mode: 0 for Manual range, 1 for Auto range
+        """
+        if range_value not in [0, 1]:
+            raise ValueError("Invalid value. It must be 0 (Manual range) or 1 (Auto range).")
+        self._write(f'DAUTO {module_number},{range_value}')
+
+
+    #========== Measurements  ========== 
+        
+    def start_measurement(self):
+        """Command to start measuring."""
+        self._write('MEAS')
+
+    def stop_measurement(self):
+        """Command to stop measuring."""
+        self._write('STOP')
+
+    def get_power_of_single_module(self, module):
+        
+        """
+        Get the optical power or electrical current for each channel of the selected module.
+
+        Syntax:
+            READ? <module>
+
+        Parameters:
+            <module>: Module Number (0, 1, 2, 3, 4)
+
+        Response:
+            <module>: Module Number (0, 1, 2, 3, 4)
+            Response: <value1>,<value2>,<value3>,<value4>
+            value1: Optical power of port 1
+            value2: Optical power of port 2
+            value3: Optical power of port 3
+            value4: Optical power of port 4
+
+        Example:
+            READ? 0
+            Response: -20.123,-20.454,-20.764,-20.644
+        """
+        response = self._query(f'READ? {module}').split(',')
+        return response
 
     def get_wavelength(self):
         """Get the current wavelength in Constant Wavelength Measurement Mode (CONST1, CONST2)."""
@@ -377,63 +453,6 @@ class santec_MPM220_driver(Identifiable, Connectable):
             raise ValueError("Invalid value. It must be 0 (for dBm/dBmA) or 1 (for mW/mA).")
         self._write(f'UNIT {value}')
 
-    def get_power_mode(self):
-        """Get the current power mode (Auto or Manual)."""
-        return self._query('AUTO?')
-
-    def set_power_mode(self, value):
-        """
-        Set the power mode (Auto or Manual).
-
-        Parameters:
-            value: 0 for Manual range, 1 for Auto range
-        """
-        if value not in [0, 1]:
-            raise ValueError("Invalid value. It must be 0 (Manual range) or 1 (Auto range).")
-        self._write(f'AUTO {value}')
-
-    def get_power_mode_for_each_channel(self, module_number):
-        """Get the power mode (Auto or Manual) for a specific module."""
-        return self._query(f'DAUTO? {module_number}')
-
-    def set_power_mode_for_each_channel(self, module_number, range_value):
-        """
-        Set the power mode (Auto or Manual) for each channel.
-
-        Parameters:
-            value: A tuple (module, range_mode)
-            module: Module number (0 to 5)
-            range_mode: 0 for Manual range, 1 for Auto range
-        """
-        if range_value not in [0, 1]:
-            raise ValueError("Invalid value. It must be 0 (Manual range) or 1 (Auto range).")
-        self._write(f'DAUTO {module_number},{range_value}')
-
-    def get_power_of_single_module(self, module):
-        """
-        Get the optical power or electrical current for each channel of the selected module.
-
-        Syntax:
-            READ? <module>
-
-        Parameters:
-            <module>: Module Number (0, 1, 2, 3, 4)
-
-        Response:
-            <module>: Module Number (0, 1, 2, 3, 4)
-            Response: <value1>,<value2>,<value3>,<value4>
-            value1: Optical power of port 1
-            value2: Optical power of port 2
-            value3: Optical power of port 3
-            value4: Optical power of port 4
-
-        Example:
-            READ? 0
-            Response: -20.123,-20.454,-20.764,-20.644
-        """
-        response = self._query(f'READ? {module}').split(',')
-        return response
-
     def get_wavelength_to_be_calibrated(self, module, index):
         """
         Get the wavelength that should be calibrated for the given module and index.
@@ -476,14 +495,6 @@ class santec_MPM220_driver(Identifiable, Connectable):
         """
         response = self._query(f'CWAVPO? {module},{channel},{index}')
         return float(response)
-
-    def start_measurement(self):
-        """Command to start measuring."""
-        self._write('MEAS')
-
-    def stop_measurement(self):
-        """Command to stop measuring."""
-        self._write('STOP')
 
     def get_logging_status(self):
         """
@@ -538,10 +549,12 @@ class santec_MPM220_driver(Identifiable, Connectable):
 
             expected_size = count * 4 + (2 + 1 + int(math.log10(count)))
             return self.connection._query_binary_values(f'LOGG? {module_no},{channel_no}',
-                                                       data_points=expected_size)
+                                                    data_points=expected_size)
 
         except Exception as e:
             print(f"Error while fetching logging data (query_binary_values): {e}")
+
+
 
 class ErrorCode(Enum):
     NO_ERROR = 0
@@ -602,5 +615,14 @@ if __name__ == "__main__":
     # Example usage    
     driver = santec_MPM220_driver(port=5000, ip_adress="192.168.1.161")
     driver.connect()
+    print(driver.get_id())
+    print(driver.get_modules())
+    print(driver.get_module_information(0))
+    print(driver.get_wavelength())
+    print(driver.get_measurement_mode())
+    print(driver.get_power_mode())
+
+    # Measure 
+
 
 
