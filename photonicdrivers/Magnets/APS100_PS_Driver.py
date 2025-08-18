@@ -116,16 +116,6 @@ class APS100_PS_Driver(Connectable):
         '''
         return self.__query("SWEEP?")
     
-    def __ramp(self, command:str, wait_while_ramping:bool) -> str:
-        response = self.__query(command)
-        status = "unknown"
-        if wait_while_ramping: print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be remoed later is ramp rates are made less cautious
-        while status != "Standby" and wait_while_ramping == True:
-            time.sleep(0.2)
-            status = self.get_sweep_mode()
-            print(status)
-        return response
-
     # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
     # def set_current(self, current_A:float, channel:int=None) -> None:
     #     # if channel != None:
@@ -173,7 +163,17 @@ class APS100_PS_Driver(Connectable):
     def send_custom_command(self, command:str) -> str:
         return(self.__query(command))
 
-    ################################ PRIVATE METTHODS ################################
+    ################################ PRIVATE METHODS ################################
+
+    def __ramp(self, command:str, wait_while_ramping:bool) -> str:
+        response = self.__query(command)
+        status = "unknown"
+        if wait_while_ramping: print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be removed later is ramp rates are made less cautious
+        while status != "Standby" and wait_while_ramping == True:
+            time.sleep(0.2)
+            status = self.get_sweep_mode()
+            print(status)
+        return response
 
     def __query(self, command_str:str) -> str:
         command = f'{command_str}{self.termination_char}'        
