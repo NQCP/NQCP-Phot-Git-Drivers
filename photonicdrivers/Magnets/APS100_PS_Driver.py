@@ -1,11 +1,12 @@
 import serial
 import time
+import socket
 
 from photonicdrivers.Abstract.Connectable import Connectable
 
 
 class APS100_PS_Driver(Connectable):
-    def __init__(self, com_port:str) -> None:
+    def __init__(self, com_port:str = None, IP_address:str=None, IP_port:float=None,) -> None:
         print("Initialising APS100 Ps Driver. Make sure to set it to REMOTE mode to control it.")
         
         self.port = com_port
@@ -14,8 +15,29 @@ class APS100_PS_Driver(Connectable):
 
         self.termination_char = '\r'
 
+        self.ip_address = IP_address
+        self.port_number = IP_port
+
+        if self.port is not None:
+            print('Connection will be via USB')
+            self.connectionType = 'USB'
+        elif self.ip_address is not None and self.port_number is not None:
+            print('Connection will be via Ethernet')
+            self.connectionType = 'Ethernet'
+        else:
+            print("Either com_port or (IP_address and port) must be provided for APS100_PS_Driver initialization.")
+
     def connect(self) -> None:
-        self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+        if self.connectionType == 'USB':
+            self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+        elif self.connectionType == 'Ethernet':
+            self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.connection.settimeout(5)  # sets the timeout of the receive command.
+            self.server_address = (self.ip_address, self.port_number)  # IP address, port
+            self.connection.connect(self.server_address)
+        else:
+            print("Insufficient arguments for connecting the APS100_PS_Driver class")
+
         self.unit = self.get_unit()
     
     def disconnect(self) -> None:
@@ -44,6 +66,9 @@ class APS100_PS_Driver(Connectable):
         return self.__query(f"CHAN {channel_number}")
        
     def set_control_remote(self) -> str:
+        if self.connectionType == 'Ethernet':
+            print("It is not possible nor necessary to set the PS to REMOTE when operating via ethernet.")
+            return
         return self.__query("REMOTE")
     
     def set_control_local(self) -> str:
@@ -176,16 +201,36 @@ class APS100_PS_Driver(Connectable):
         return response
 
     def __query(self, command_str:str) -> str:
-        command = f'{command_str}{self.termination_char}'        
-        self.connection.write(command.encode('utf-8'))
+        if self.connectionType == 'USB':  
+            command = f'{command_str}{self.termination_char}'        
+            self.connection.write(command.encode('utf-8'))
 
-        # a small wait is required for the device to send back a response. 0.1 s is too little
-        time.sleep(0.2)
+            # a small wait is required for the device to send back a response. 0.1 s is too little
+            time.sleep(0.2)
 
-        # The power supply first returns the command that was sent to it:
-        reflected_command = self.connection.readline()
-        # The power supply then returns its response (if nay)
-        response_raw = self.connection.readline()
-        response = response_raw.decode('utf-8').strip()
+            # The power supply first returns the command that was sent to it:
+            reflected_command = self.connection.readline()
+            # The power supply then returns its response (if nay)
+            response_raw = self.connection.readline()
+            response = response_raw.decode('utf-8').strip()
+
+        elif self.connectionType == 'Ethernet':
+            command = command_str + self.termination_char
+            print(f"Sending command: {command}")
+            self.connection.sendall(command.encode())
+
+            time.sleep(0.2)
+            
+            response = self.connection.recv(1024)
+            print(f"Received response: {response}")
+             # remove the newline characters if present
+            if b"\r\n" in response:
+                response, dummy = response.split(b'\r\n')
+
+            # convert from byte string to string
+            response = response.decode('utf-8')
+
+        else:
+            ('ERROR in APS100_PS_Driver class - connection has not been initialised properly')            
 
         return response
