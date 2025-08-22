@@ -21,20 +21,24 @@ class APS100_PS_Driver(Connectable):
         if self.port is not None:
             print('Connection will be via USB')
             self.connectionType = 'USB'
+
         elif self.ip_address is not None and self.port_number is not None:
             print('Connection will be via Ethernet')
             self.connectionType = 'Ethernet'
+
         else:
             print("Either com_port or (IP_address and port) must be provided for APS100_PS_Driver initialization.")
 
     def connect(self) -> None:
         if self.connectionType == 'USB':
             self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+
         elif self.connectionType == 'Ethernet':
             self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.connection.settimeout(5)  # sets the timeout of the receive command.
             self.server_address = (self.ip_address, self.port_number)  # IP address, port
             self.connection.connect(self.server_address)
+
         else:
             print("Insufficient arguments for connecting the APS100_PS_Driver class")
 
@@ -63,16 +67,16 @@ class APS100_PS_Driver(Connectable):
         '''
         Sets which output channel is currently controlled (1 or 2)
         '''
-        return self.__query(f"CHAN {channel_number}")
+        return self.__write(f"CHAN {channel_number}")
        
     def set_control_remote(self) -> str:
         if self.connectionType == 'Ethernet':
             print("It is not possible nor necessary to set the PS to REMOTE when operating via ethernet.")
             return
-        return self.__query("REMOTE")
+        return self.__write("REMOTE")
     
     def set_control_local(self) -> str:
-        return self.__query("LOCAL")
+        return self.__write("LOCAL")
     
     def get_control_mode(self) -> str:
         return "There is no way of asking the PS whether it is in LOCAL or REMOTE mode. Look at the front panel"
@@ -88,7 +92,7 @@ class APS100_PS_Driver(Connectable):
         # The PS will also accept T and G as an input, but it will set the unit to kG
         if unit == "A" or unit == "kG":
             try:
-                response = self.__query(f"UNITS {unit}")
+                response = self.__write(f"UNITS {unit}")
                 self.unit = self.get_unit()
                 return response
             except:
@@ -110,10 +114,16 @@ class APS100_PS_Driver(Connectable):
             warning_str = f"Trying to set the lower limit to {limit} {unit}, but the power supply unit is {ps_unit}. Ignoring command."
             print(warning_str)
             return warning_str
-        return self.__query(f"LLIM {limit}")
-    
-    def get_upper_limit(self) -> str:
-        return self.__query("ULIM?")
+        return self.__write(f"LLIM {limit}")
+
+    def get_upper_limit(self) -> tuple[float, str]:
+        ps_unit = self.get_unit()
+        raw_response = self.__query("ULIM?")
+        if ps_unit == "A":
+            limit, unit = raw_response.split("A")
+        elif ps_unit == "kG":
+            limit, unit = raw_response.split("kG")
+        return limit, unit
 
     def set_upper_limit(self, limit:float, unit:str):
         '''
@@ -124,13 +134,13 @@ class APS100_PS_Driver(Connectable):
             warning_str = f"Trying to set the upper limit to {limit} {unit}, but the power supply unit is {ps_unit}. Ignoring command."
             print(warning_str)
             return warning_str
-        return self.__query(f"ULIM {limit}")
+        return self.__write(f"ULIM {limit}")
     
-    def ramp_up(self, wait_while_ramping:bool=True) -> str:
-        return self.__ramp("SWEEP UP", wait_while_ramping)
+    def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> str:
+        return self.__ramp("SWEEP UP", wait_while_ramping, target_relative_tolerance)
     
-    def ramp_down(self, wait_while_ramping:bool=True) -> None:
-        return self.__ramp("SWEEP DOWN", wait_while_ramping)
+    def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> None:
+        return self.__ramp("SWEEP DOWN", wait_while_ramping, target_relative_tolerance)
     
     def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
         return self.__ramp("SWEEP ZERO", wait_while_ramping)
@@ -147,6 +157,13 @@ class APS100_PS_Driver(Connectable):
     #     #     self.set_channel(str(channel))
     #     return self.__query(f"IMAG {current_A}")
     
+    def __get_output(self, channel:int=None) -> str:
+        '''
+        Returns the output of the power supply in whatever unit it is in.
+        '''
+        return self.__query("IMAG?")
+        
+    
     def get_current(self, channel:int=None) -> float:
         '''
         Returns the current in A
@@ -159,7 +176,7 @@ class APS100_PS_Driver(Connectable):
             self.set_unit("A")
             print(self.get_unit())
         
-        response = self.__query("IMAG?")
+        response = self.__get_output()
         current = response.rstrip('A')
         return float(current)
     
@@ -181,56 +198,117 @@ class APS100_PS_Driver(Connectable):
         if self.unit != "kG":
             self.set_unit("kG")
         
-        response = self.__query("IMAG?")
+        response = self.__get_output()
         field_kG = float(response.rstrip('kG'))
         return field_kG
     
-    def send_custom_command(self, command:str) -> str:
+    def query_custom_command(self, command:str) -> str:
         return(self.__query(command))
 
     ################################ PRIVATE METHODS ################################
 
-    def __ramp(self, command:str, wait_while_ramping:bool) -> str:
-        response = self.__query(command)
+    def __ramp(self, command:str, wait_while_ramping:bool, target_relative_tolerance:float=0) -> str:
+        self.__write(command)
         status = "unknown"
-        if wait_while_ramping: print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be removed later is ramp rates are made less cautious
-        while status != "Standby" and wait_while_ramping == True:
-            time.sleep(0.2)
-            status = self.get_sweep_mode()
-            print(status)
-        return response
+        if wait_while_ramping: 
+            print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be removed later if ramp rates are made less cautious
+            within_tolerance = False
+            target = self.get_upper_limit()[0]
 
-    def __query(self, command_str:str) -> str:
-        if self.connectionType == 'USB':  
-            command = f'{command_str}{self.termination_char}'        
-            self.connection.write(command.encode('utf-8'))
+            while status != "Standby" and not within_tolerance:
+                time.sleep(0.2)
+                status = self.get_sweep_mode()
 
-            # a small wait is required for the device to send back a response. 0.1 s is too little
-            time.sleep(0.2)
+                raw_output = self.__get_output()
+                ps_unit = self.get_unit()
+                if ps_unit == "A":
+                    output, unit = raw_output.split("A")
+                elif ps_unit == "kG":
+                    output, unit = raw_output.split("kG")
 
-            # The power supply first returns the command that was sent to it:
-            reflected_command = self.connection.readline()
-            # The power supply then returns its response (if nay)
+                relative_deviation = abs((float(output) - float(target)) / float(target))            
+                if relative_deviation < target_relative_tolerance:
+                    within_tolerance = True
+
+                print(f"Status: {status}, Output: {output} {unit}")
+
+    # def __query(self, command_str:str) -> str:
+    #     if self.connectionType == 'USB':  
+    #         command = f'{command_str}{self.termination_char}'        
+    #         self.connection.write(command.encode('utf-8'))
+
+    #         # a small wait is required for the device to send back a response. 0.1 s is too little
+    #         time.sleep(0.2)
+
+    #         # The power supply first returns the command that was sent to it:
+    #         reflected_command = self.connection.readline()
+    #         # The power supply then returns its response (if any)
+    #         response_raw = self.connection.readline()
+    #         response = response_raw.decode('utf-8').strip()
+
+    #     elif self.connectionType == 'Ethernet':
+    #         command = command_str + self.termination_char
+    #         print(f"Sending command: {command}")
+    #         self.connection.sendall(command.encode())
+
+    #         time.sleep(0.2)
+            
+    #         response = self.connection.recv(1024)
+    #         print(f"Received response: {response}")
+    #          # remove the newline characters if present
+    #         if b"\r\n" in response:
+    #             response, dummy = response.split(b'\r\n')
+
+    #         # convert from byte string to string
+    #         response = response.decode('utf-8')
+
+    #     else:
+    #         ('ERROR in APS100_PS_Driver class - connection has not been initialised properly')            
+
+    #     return response
+    
+    def __read(self) -> str:
+        '''
+        Reads a response from the device.
+        '''
+        if self.connectionType == 'USB':
             response_raw = self.connection.readline()
             response = response_raw.decode('utf-8').strip()
 
         elif self.connectionType == 'Ethernet':
-            command = command_str + self.termination_char
-            print(f"Sending command: {command}")
-            self.connection.sendall(command.encode())
-
-            time.sleep(0.2)
-            
             response = self.connection.recv(1024)
-            print(f"Received response: {response}")
-             # remove the newline characters if present
+            # remove the newline characters if present
             if b"\r\n" in response:
                 response, dummy = response.split(b'\r\n')
 
             # convert from byte string to string
             response = response.decode('utf-8')
+        else:
+            raise Exception("ERROR in APS100_PS_Driver class - connection has not been initialised properly")
+        
+        return response
+        
+    def __write(self, command_str:str) -> None:
+        '''
+        Writes a command to the device.
+        '''
+        command = command_str + self.termination_char  
+
+        if self.connectionType == 'USB':                
+            self.connection.write(command.encode('utf-8'))            
+            reflected_command = self.connection.readline() # The power supply first returns the command that was sent to it:
+
+        elif self.connectionType == 'Ethernet':
+            self.connection.sendall(command.encode())
 
         else:
-            ('ERROR in APS100_PS_Driver class - connection has not been initialised properly')            
-
+            raise Exception("ERROR in APS100_PS_Driver class - connection has not been initialised properly")\
+            
+    def __query(self, command:str) -> str:
+        '''
+        Sends a command to the device and returns the response.
+        '''
+        self.__write(command)
+        response = self.__read()
+        
         return response

@@ -83,7 +83,32 @@ sock.settimeout(5) # sets the timeout of the receive command.
 server_address = (IPAddress, Port) #IP address, port
 sock.connect(server_address)
 
-commandString = "*IDN?;*ESE 12;*ESE?\n"
+commandString = "*IDN?;*ESE 12;*ESE?\r\n"
 sock.sendall(commandString.encode())
 response = sock.recv(100)
 print(response)
+
+# commandString = "ULIM 0.1\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
+
+commandString = "ULIM?\n"
+sock.sendall(commandString.encode())
+response = sock.recv(100)
+print(response)
+
+commandString = "UNITS?\n"
+sock.sendall(commandString.encode())
+response = sock.recv(100)
+print(response)
+
+commandString = "UNITS kG\n"
+sock.sendall(commandString.encode())
+
+commandString = "UNITS?\n"
+sock.sendall(commandString.encode())
+response = sock.recv(100)
+print(response)
+
+sock.close()

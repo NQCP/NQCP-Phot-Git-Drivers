@@ -4,7 +4,7 @@ from time import sleep
 # COM6 is PS Y, COM4 is XZ
 
 # com_port = 'COM6'
-ip = '10.209.67.152'
+ip = '10.209.67.153'
 port = 4444
 ps = APS100_PS_Driver(IP_address=ip, IP_port=port)
 ps.connect()
@@ -18,30 +18,15 @@ print(ps.get_id())
 # print("getting channel:")
 # print(ps.get_channel())
 
-# print(ps.get_current())
-# print(ps.set_unit("kG"))
+print(ps.get_current())
+ps.set_unit("kG")
 print(ps.get_unit())
 
-# ps.set_upper_limit(1, "kG")
-# print(ps.get_upper_limit())
-# print(ps.ramp_up(wait_while_ramping=False))
-
-# sleep(5)
-# print(ps.get_sweep_mode())
-# print(ps.get_field())
-# print(ps.get_current())
-# print(ps.get_unit())
-# ps.ramp_to_zero(wait_while_ramping=False)
-
-# print("setting mode:")
-# print(ps.set_control_remote())
-
-
-# ps.send_custom_command("SWEEP ZERO")
-
-# print("getting mode:")
-# print(ps.get_mode())
-# sleep(1)
-# print(ps.get_current())
+ps.set_upper_limit(1, "kG")
+print(ps.get_upper_limit()[0])
+# ps.ramp_up(wait_while_ramping=True, target_relative_tolerance=0.05)
+print(ps.get_current())
+# ps.ramp_to_zero(wait_while_ramping=True)
+print(ps.get_current())
 
 ps.disconnect()
