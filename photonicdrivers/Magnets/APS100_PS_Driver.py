@@ -146,20 +146,7 @@ class APS100_PS_Driver(Connectable):
         '''
         Returns: "Sweeping up", "Standby", "Pause", "Sweeping to zero", "Sweeping down"
         '''
-        return self.__query("SWEEP?")
-    
-    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
-    # def set_current(self, current_A:float, channel:int=None) -> None:
-    #     # if channel != None:
-    #     #     self.set_channel(str(channel))
-    #     return self.__query(f"IMAG {current_A}")
-    
-    def __get_output(self, channel:int=None) -> str:
-        '''
-        Returns the output of the power supply in whatever unit it is in.
-        '''
-        return self.__query("IMAG?")
-        
+        return self.__query("SWEEP?")     
     
     def get_current(self, channel:int=None) -> float:
         '''
@@ -207,6 +194,18 @@ class APS100_PS_Driver(Connectable):
 
     ################################ PRIVATE METHODS ################################
 
+    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
+    # def set_current(self, current_A:float, channel:int=None) -> None:
+    #     # if channel != None:
+    #     #     self.set_channel(str(channel))
+    #     return self.__query(f"IMAG {current_A}")
+    
+    def __get_output(self, channel:int=None) -> str:
+        '''
+        Returns the output of the power supply in whatever unit it is in.
+        '''
+        return self.__query("IMAG?")
+
     def __ramp(self, command:str, wait_while_ramping:bool, target_relative_tolerance:float=0) -> str:
         self.__write(command)
         status = "unknown"
@@ -214,9 +213,11 @@ class APS100_PS_Driver(Connectable):
             print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be removed later if ramp rates are made less cautious
             within_tolerance = False
             target = self.get_upper_limit()[0]
+            if target==0:
+                print("Warning: Target is zero, so the relative tolerance check is invalid as a stop ramp condition")
 
             while status != "Standby" and not within_tolerance:
-                time.sleep(0.2)
+                time.sleep(0.5)
                 status = self.get_sweep_mode()
 
                 raw_output = self.__get_output()
@@ -226,47 +227,13 @@ class APS100_PS_Driver(Connectable):
                 elif ps_unit == "kG":
                     output, unit = raw_output.split("kG")
 
-                relative_deviation = abs((float(output) - float(target)) / float(target))            
-                if relative_deviation < target_relative_tolerance:
-                    within_tolerance = True
+                if target != 0:
+                    relative_deviation = abs((float(output) - float(target)) / float(target))            
+                    if relative_deviation < target_relative_tolerance:
+                        within_tolerance = True
 
-                print(f"Status: {status}, Output: {output} {unit}")
+                print(f"Status: {status}, Output: {output} {unit}, Tolerance: {target_relative_tolerance}, Deviation: {relative_deviation}")
 
-    # def __query(self, command_str:str) -> str:
-    #     if self.connectionType == 'USB':  
-    #         command = f'{command_str}{self.termination_char}'        
-    #         self.connection.write(command.encode('utf-8'))
-
-    #         # a small wait is required for the device to send back a response. 0.1 s is too little
-    #         time.sleep(0.2)
-
-    #         # The power supply first returns the command that was sent to it:
-    #         reflected_command = self.connection.readline()
-    #         # The power supply then returns its response (if any)
-    #         response_raw = self.connection.readline()
-    #         response = response_raw.decode('utf-8').strip()
-
-    #     elif self.connectionType == 'Ethernet':
-    #         command = command_str + self.termination_char
-    #         print(f"Sending command: {command}")
-    #         self.connection.sendall(command.encode())
-
-    #         time.sleep(0.2)
-            
-    #         response = self.connection.recv(1024)
-    #         print(f"Received response: {response}")
-    #          # remove the newline characters if present
-    #         if b"\r\n" in response:
-    #             response, dummy = response.split(b'\r\n')
-
-    #         # convert from byte string to string
-    #         response = response.decode('utf-8')
-
-    #     else:
-    #         ('ERROR in APS100_PS_Driver class - connection has not been initialised properly')            
-
-    #     return response
-    
     def __read(self) -> str:
         '''
         Reads a response from the device.
@@ -285,7 +252,7 @@ class APS100_PS_Driver(Connectable):
             response = response.decode('utf-8')
         else:
             raise Exception("ERROR in APS100_PS_Driver class - connection has not been initialised properly")
-        print(f"Received response: {response}")
+        # print(f"Received response: {response}")
         return response
         
     def __write(self, command_str:str) -> None:
@@ -293,7 +260,7 @@ class APS100_PS_Driver(Connectable):
         Writes a command to the device.
         '''
         command = command_str + self.termination_char  
-        print(f"Sending command: {command}")
+        # print(f"Sending command: {command}")
 
         if self.connectionType == 'USB':                
             self.connection.write(command.encode('utf-8'))            
