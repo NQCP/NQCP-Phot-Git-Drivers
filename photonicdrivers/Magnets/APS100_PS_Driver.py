@@ -41,9 +41,7 @@ class APS100_PS_Driver(Connectable):
 
         else:
             print("Insufficient arguments for connecting the APS100_PS_Driver class")
-
-        self.unit = self.get_unit()
-    
+   
     def disconnect(self) -> None:
         self.connection.close()
 
@@ -91,9 +89,11 @@ class APS100_PS_Driver(Connectable):
         '''
         # The PS will also accept T and G as an input, but it will set the unit to kG
         if unit == "A" or unit == "kG":
+            print(f"Changing unit to {unit}")
             try:
                 response = self.__write(f"UNITS {unit}")
-                self.unit = self.get_unit()
+                time.sleep(0.5)  # wait for the command to be processed
+                print(f"Unit set to {self.get_unit()}")
                 return response
             except:
                 warning_str = "Set unit failed"
@@ -195,10 +195,13 @@ class APS100_PS_Driver(Connectable):
             print("Changing unit to kG")
             self.set_channel(str(channel))
 
-        if self.unit != "kG":
+        if self.get_unit() != "kG":
+            print("Changing unit to kG")
             self.set_unit("kG")
-        
+            print(self.get_unit())        
         response = self.__get_output()
+        print(response)
+        print(self.get_unit())
         field_kG = float(response.rstrip('kG'))
         return field_kG
     
@@ -285,7 +288,7 @@ class APS100_PS_Driver(Connectable):
             response = response.decode('utf-8')
         else:
             raise Exception("ERROR in APS100_PS_Driver class - connection has not been initialised properly")
-        
+        print(f"Received response: {response}")
         return response
         
     def __write(self, command_str:str) -> None:
@@ -293,6 +296,7 @@ class APS100_PS_Driver(Connectable):
         Writes a command to the device.
         '''
         command = command_str + self.termination_char  
+        print(f"Sending command: {command}")
 
         if self.connectionType == 'USB':                
             self.connection.write(command.encode('utf-8'))            

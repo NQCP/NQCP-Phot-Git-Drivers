@@ -38,7 +38,7 @@ class WLPhotonicsTunableFilter(Connectable):
         "55": "Error in reading EEPROM/Flash memory"
     }
    
-    def __init__(self, port: str, baudrate:int=115200, timeout:float=5, wavelength_offset:float=-0.3):
+    def __init__(self, port: str, baudrate:int=115200, timeout:float=5, wavelength_offset:float=-0.1):
         """Initialize the connection to a tunable filter over USB with an optional wavelength offset."""
         self.wavelength_offset = float(wavelength_offset)  # Ensure it's a float
         self.lower_limit = None

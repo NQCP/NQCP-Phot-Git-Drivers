@@ -88,27 +88,30 @@ sock.sendall(commandString.encode())
 response = sock.recv(100)
 print(response)
 
-# commandString = "ULIM 0.1\n"
+# commandString = "ULIM 1\n"
 # sock.sendall(commandString.encode())
-# response = sock.recv(100)
-# print(response)
+
+commandString = "*ESR?\n"
+sock.sendall(commandString.encode())
+response = sock.recv(100)
+print(response)
 
 commandString = "ULIM?\n"
 sock.sendall(commandString.encode())
 response = sock.recv(100)
 print(response)
 
-commandString = "UNITS?\n"
-sock.sendall(commandString.encode())
-response = sock.recv(100)
-print(response)
+# commandString = "UNITS?\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
 
-commandString = "UNITS kG\n"
-sock.sendall(commandString.encode())
+# commandString = "UNITS A\n"
+# sock.sendall(commandString.encode())
 
-commandString = "UNITS?\n"
-sock.sendall(commandString.encode())
-response = sock.recv(100)
-print(response)
+# commandString = "UNITS?\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
 
 sock.close()
