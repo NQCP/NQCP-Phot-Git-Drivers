@@ -7,7 +7,7 @@ from photonicdrivers.Abstract.Connectable import Connectable
 
 class APS100_PS_Driver(Connectable):
     def __init__(self, com_port:str = None, IP_address:str=None, IP_port:float=None,) -> None:
-        print("Initialising APS100 Ps Driver. Make sure to set it to REMOTE mode to control it.")
+        print("Initialising an APS100 PS Driver. Make sure to set it to REMOTE mode to control it.")
         
         self.port = com_port
         self.baud_rate = 9600
@@ -68,9 +68,6 @@ class APS100_PS_Driver(Connectable):
         return self.__write(f"CHAN {channel_number}")
        
     def set_control_remote(self) -> str:
-        if self.connectionType == 'Ethernet':
-            print("It is not possible nor necessary to set the PS to REMOTE when operating via ethernet.")
-            return
         return self.__write("REMOTE")
     
     def set_control_local(self) -> str:

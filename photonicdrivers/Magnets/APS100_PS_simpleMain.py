@@ -13,7 +13,7 @@ ps.connect()
 
 # print("getting ID:")
 # print(ps.get_id())
-# print(ps.set_control_remote())
+print(ps.set_control_remote())
 
 # print("getting channel:")
 # print(ps.get_channel())
