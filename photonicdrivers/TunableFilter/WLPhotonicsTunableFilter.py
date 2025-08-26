@@ -222,7 +222,7 @@ if __name__ == "__main__":
         wavelengths = np.arange(wl_start, wl_end + wl_step, wl_step)  # 1240 to 1245 nm
  
         # Here you can run the device as a script
-        filter_device = WLPhotonicsTunableFilter(wavelength_offset=0.0)
+        filter_device = WLPhotonicsTunableFilter(port='COM8',wavelength_offset=0.0)
         for wl in wavelengths:
             filter_device.set_wavelength(wl)
            

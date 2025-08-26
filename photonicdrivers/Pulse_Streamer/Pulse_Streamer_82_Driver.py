@@ -21,7 +21,6 @@ class Pulse_Streamer_82_Driver(Connectable):
     def __init__(self, ip_address='pulsestreamer'):
         self.ip_address = ip_address
         self.driver: PulseStreamer = None
-        self.sequence: Sequence = None
 
     def connect(self) -> None:
         self.driver = PulseStreamer(self.ip_address)
@@ -46,10 +45,6 @@ class Pulse_Streamer_82_Driver(Connectable):
         """Reset the pulse streamer to default state."""
         self.driver.reset()
     
-    def start_streaming(self):
-        """Start streaming."""
-        self.driver.stream(seq=self.sequence)
-    
     def is_streaming(self):
         """Check if the device is streaming."""
         return self.driver.isStreaming()
@@ -65,26 +60,8 @@ class Pulse_Streamer_82_Driver(Connectable):
         """Set the trigger type."""
         self.driver.setTrigger(trigger_type)
 
-    def set_digital_pattern(self, channel: int, pattern: tuple):
-        """
-        Set digital pulse pattern on a channel.
-
-        pattern: list of tuples (duration_ns, state)
-        """
-        if self.sequence is None:
-            self.create_sequence()   
-        self.sequence.setDigital(channel, pattern)
-
-    def set_analog_pattern(self, channel: int, pattern: tuple):
-        """
-        Set analog pulse pattern on a channel.
-
-        pattern: list of tuples (duration_ns, amplitude)
-        """
-        if self.sequence is None:
-            self.create_sequence()   
-        self.sequence.setAnalog(channel, pattern)
-
+    def get_analog_calibration(self):
+        return self.driver.getAnalogCalibration()
     
     def is_streaming(self):
         return self.driver.isStreaming()
@@ -172,3 +149,16 @@ class Pulse_Streamer_82_Driver(Connectable):
             return True
         except Exception:
             return False
+        
+    def get_debug_register(self):
+        return self.driver.getDebugRegister()
+    
+    def stream(self, sequence: Sequence, number_runs: int = np.inf):
+        if number_runs == np.inf:
+            self.driver.stream(seq=sequence)
+            return
+        else:
+            self.driver.stream(seq=sequence, n_runs=number_runs)
+    
+    def force_final(self):
+        self.driver.forceFinal()

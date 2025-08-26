@@ -6,9 +6,9 @@ import logging
 class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
-        resource_manager: pyvisa.ResourceManager,
         ip_address: str,
         port_number: str,
+        resource_manager: pyvisa.ResourceManager = None,
         prints_enabled=False,
     ):
         self.prints_enabled = prints_enabled
@@ -47,7 +47,7 @@ class Santec_TSL570_driver(Connectable):
 
     def is_connected(self):
         try:
-            return self.get_idn() is not None
+            return bool(self.get_idn() is not None)
         except:
             return False
 
