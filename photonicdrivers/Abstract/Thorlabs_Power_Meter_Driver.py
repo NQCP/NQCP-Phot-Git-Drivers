@@ -1,49 +1,33 @@
+'''
+For explanation of this type checking "Abstract class" look up wikipage:
 
-from abc import abstractmethod, ABC
+    DevOps --> Wiki --> NQCP-teams --> Characterization-team --> Onboarding-to-Characterization --> Photonic Characterization Structures
+
+'''
+from typing import Protocol
 from photonicdrivers.Abstract.Connectable import Connectable
 
-class Thorlabs_Power_Meter_Driver(Connectable):
+class Thorlabs_Power_Meter_Driver(Connectable, Protocol):
 
-    @abstractmethod
-    def get_power(self) -> float:
-        pass
 
-    @abstractmethod
-    def set_wavelength(self, wavelength_nm: float):
-        pass
+    def get_power(self) -> float: ...
 
-    @abstractmethod
-    def set_auto_range(self, auto_range_bool: bool):
-        pass
+    def set_wavelength(self, wavelength_nm: float): ...
 
-    @abstractmethod
-    def get_wavelength(self) -> float:
-        pass
+    def set_auto_range(self, auto_range_bool: bool): ...
 
-    @abstractmethod
-    def set_averaging(self, average: int):
-        pass
+    def get_wavelength(self) -> float: ...
 
-    @abstractmethod
-    def get_averaging(self) -> int:
-        pass
+    def set_averaging(self, average: int): ...
 
-    @abstractmethod
-    def get_power_unit(self) -> str:
-        pass
+    def get_averaging(self) -> int: ...
 
-    @abstractmethod
-    def set_power_unit(self, power_unit: str):
-        pass
+    def get_power_unit(self) -> str: ...
 
-    @abstractmethod
-    def set_beam(self, beam):
-        pass
+    def set_power_unit(self, power_unit: str): ...
 
-    @abstractmethod
-    def reset(self):
-        pass
-  
-    @abstractmethod
-    def zero(self):
-        pass
+    def set_beam(self, beam): ...
+
+    def reset(self): ...
+
+    def zero(self): ...

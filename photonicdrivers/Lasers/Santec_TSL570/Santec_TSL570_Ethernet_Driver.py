@@ -48,7 +48,9 @@ class Santec_TSL570_driver(Connectable):
     def is_connected(self):
         try:
             return bool(self.get_idn() is not None)
-        except:
+        except Exception as e:
+            if self.prints_enabled:
+                logging.error(f"Couldn't get ID due to the error: {e}")
             return False
 
     def get_idn(self):
@@ -101,7 +103,6 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         return return_msg
 
-        
     def get_power(self) -> float:
         """
         Get power [dBm] of the laser
@@ -132,6 +133,25 @@ class Santec_TSL570_driver(Connectable):
             return "dBm"
         else:
             return "mW"
+
+    def set_power_unit(self, unit: str) -> None:
+        """
+        OBS: This code has not been tested!
+
+        Set power unit of the laser power [dBm or mW]
+
+        Args:
+            unit (str): Desired unit, either 'dBm' or 'mW'
+        """
+        unit = unit.strip().lower()
+        if unit == "dbm":
+            cmd = ":POW:UNIT DBM"
+        elif unit == "mw":
+            cmd = ":POW:UNIT MW"
+        else:
+            raise ValueError("Invalid unit. Must be 'dBm' or 'mW'.")
+
+        self.laser.write(cmd)
 
     def get_emission_status(self) -> int:
         """
@@ -174,6 +194,20 @@ class Santec_TSL570_driver(Connectable):
         msg = ":WAVelength  " + str(wavelength_nm) # + "e-9"
         self.laser.write(msg)
 
+    def set_wavelength_unit(self, unit: str):
+        
+        # OBS: This code has not been tested!
+
+        unit = unit.strip().lower()
+        if unit == "nm":
+            cmd = ":WAV:UNIT NM"
+        elif unit == "um":
+            cmd = ":WAV:UNIT UM"
+        else:
+            raise ValueError("Invalid unit. Must be 'nm' or 'um'.")
+
+        self.laser.write(cmd)
+
     def set_power(self, power_dBm: float):
         """
         Set power [dBm] of the laser
@@ -192,10 +226,10 @@ class Santec_TSL570_driver(Connectable):
             None
         """
         if emission:
-            emission = 1
+            emission_int = 1
         else:
-            emission = 0
-        msg = ":POW:STAT " + str(emission)
+            emission_int = 0
+        msg = ":POW:STAT " + str(emission_int)
         self.laser.write(msg)
 
     ####################### BLANKET FUNCTIONS #######################
@@ -231,7 +265,10 @@ if __name__ == "__main__":
     from time import sleep
 
     rm = pyvisa.ResourceManager()
-    santec = Santec_TSL570_driver(resource_manager=rm, ip_address="10.209.69.95")
+    santec = Santec_TSL570_driver(
+        resource_manager = rm,
+        ip_address="10.209.69.95",
+        port_number="5000")
     santec.connect()
     santec.get_idn()
 
@@ -253,7 +290,7 @@ if __name__ == "__main__":
     sleep_time = 0.1
     sleep(sleep_time)
     print("Power: ", santec.get_power())
-    santec.set_emission_status(0)
+    santec.set_emission_status(True)
 
     santec.disconnect()
     print("\nDone.")
