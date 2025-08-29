@@ -1,4 +1,4 @@
-import timetagger as TimeTagger
+import TimeTagger
 import time
 
 from photonicdrivers.Abstract.Connectable import Connectable
@@ -19,7 +19,6 @@ class Swabian_TimeTagger_Driver(Connectable):
         self.connection_type = connection_type
         self.connection = None
 
-        self.counter = None
         self.histogram = None
 
     ###################### HIGH LEVEL FUNCTIONS ######################
@@ -62,10 +61,12 @@ class Swabian_TimeTagger_Driver(Connectable):
             return bool(self.getSerial())
         except:
             return False
+
         
     def initialiseCounter(self, channelList: list[int], binwidth_ps: int, n_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
-        self.counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
+        counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
+        return counter
 
     def initialiseHistogram(self, channel1: int, channel2: int, binwidth_ps: int, n_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
@@ -80,16 +81,6 @@ class Swabian_TimeTagger_Driver(Connectable):
 
     def setTestSignal(self, channelNo: int, status: bool) -> None:
         self.connection.setTestSignal(channelNo,status)
-
-    def countForTime(self, time_ps: int) -> int:
-        if self.counter is None: 
-            print("TimeTagger Counter not inialised") 
-            return None
-        else:
-            self.counter.startFor(capture_duration=time_ps)
-            self.counter.waitUntilFinished()
-            counts = self.counter.getDataTotalCounts()[0]
-            return counts
         
     def getHistogramSnapshot(self, int_time_s: float):
         # return an array with size (number of channel in counter)x(number of bins) with counts per bin
