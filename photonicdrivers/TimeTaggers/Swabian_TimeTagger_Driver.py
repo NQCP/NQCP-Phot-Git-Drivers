@@ -1,4 +1,4 @@
-import TimeTagger
+import timetagger as TimeTagger
 import time
 
 from photonicdrivers.Abstract.Connectable import Connectable
