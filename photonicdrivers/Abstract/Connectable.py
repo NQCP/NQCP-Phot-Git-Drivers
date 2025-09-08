@@ -5,8 +5,9 @@ For explanation of this type checking "Abstract class" look up wikipage:
 
 '''
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
+@runtime_checkable
 class Connectable(Protocol):
     def connect(self) -> None:
         ...
