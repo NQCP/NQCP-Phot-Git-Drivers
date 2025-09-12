@@ -19,11 +19,9 @@ class Swabian_TimeTagger_Driver(Connectable):
         self.connection_type = connection_type
         self.connection = None
 
-        self.histogram = None
-
     ###################### HIGH LEVEL FUNCTIONS ######################
 
-    def printAllTriggerLevels(self):
+    def print_all_trigger_levels(self):
         print("Trigger levels for channels [V]:")
         for channelNo in range(1, 13):
             print(self.getTriggerLevel(channelNo), end=', ')
@@ -62,15 +60,17 @@ class Swabian_TimeTagger_Driver(Connectable):
         except:
             return False
 
-        
-    def initialiseCounter(self, channelList: list[int], binwidth_ps: int, n_bins: int) -> None:
+    def initialise_counter(self, channelList: list[int], bin_width_ps: int, num_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
-        counter = TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=binwidth_ps, n_values=n_bins)
-        return counter
+        return TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=bin_width_ps, n_values=num_bins)
 
-    def initialiseHistogram(self, channel1: int, channel2: int, binwidth_ps: int, n_bins: int) -> None:
+    def initialise_correlation(self, channel_1: int, channel_2: int, binwidth_ps: int, num_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
-        self.histogram = TimeTagger.Correlation(tagger=self.connection, channel_1=channel1, channel_2=channel2, binwidth=binwidth_ps, n_bins=n_bins)
+        return TimeTagger.Correlation(tagger=self.connection, channel_1=channel_1, channel_2=channel_2, binwidth=binwidth_ps, n_bins=num_bins)
+
+    def initialise_correlation(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
+        # To do any measurements, the TimeTagger must first have initalised a counter
+        return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, binwidth = bin_width_ps, n_bins=num_bins)
 
     def getSerial(self) -> str:
         return self.connection.getSerial()
@@ -82,27 +82,14 @@ class Swabian_TimeTagger_Driver(Connectable):
     def setTestSignal(self, channelNo: int, status: bool) -> None:
         self.connection.setTestSignal(channelNo,status)
         
-    def getHistogramSnapshot(self, int_time_s: float):
-        # return an array with size (number of channel in counter)x(number of bins) with counts per bin
-        if self.histogram is None: 
-            print("TimeTagger Histogram not inialised") 
-            return None
-        else:
-            self.histogram.startFor(capture_duration=int_time_s * 1e12)
-            self.histogram.waitUntilFinished()
-            counts = self.histogram.getData()
-            times = self.histogram.getIndex()
-            return counts, times
-
-        
     
     def reset(self):
         # Reset the Time Tagger to the start-up state
         print("The reset function clims to not exist for the time tagger network. Setup and better function")
         # self.connection.reset()
 
-    def setTriggerLevel(self, channelNo: int, voltage: float) -> None:
-        self.connection.setTriggerLevel(channelNo,voltage)
+    def set_trigger_level(self, channel: int, voltage: float) -> None:
+        self.connection.setTriggerLevel(channel,voltage)
 
-    def getTriggerLevel(self, channelNo: int) -> float:
-        return self.connection.getTriggerLevel(channelNo)
+    def get_trigger_level(self, channel: int) -> float:
+        return self.connection.getTriggerLevel(channel)
