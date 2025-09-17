@@ -64,11 +64,11 @@ class Swabian_TimeTagger_Driver(Connectable):
         # To do any measurements, the TimeTagger must first have initalised a counter
         return TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=bin_width_ps, n_values=num_bins)
 
-    def initialise_correlation(self, channel_1: int, channel_2: int, binwidth_ps: int, num_bins: int) -> None:
+    def initialise_correlation(self, channel_1: int, channel_2: int, bin_width_ps: int, num_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
-        return TimeTagger.Correlation(tagger=self.connection, channel_1=channel_1, channel_2=channel_2, binwidth=binwidth_ps, n_bins=num_bins)
+        return TimeTagger.Correlation(tagger=self.connection, channel_1=channel_1, channel_2=channel_2, binwidth=bin_width_ps, n_bins=num_bins)
 
-    def initialise_correlation(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
+    def initialise_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
         # To do any measurements, the TimeTagger must first have initalised a counter
         return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, binwidth = bin_width_ps, n_bins=num_bins)
 
