@@ -13,6 +13,9 @@ class OnOffError(Enum):
 def flatten_value_nodes(values_dict: dict[str, dict]):
     flattened_values = {}
     for (k, v) in values_dict.items():
+        dict_key = strip_prefix(k)
+        if dict_key in flattened_values:
+            raise Exception(f"dict key {dict_key} already found in flattened value nodes")
         if "content" in v:
             latest_value = v["content"]["latest_value"]
             # Value not present
@@ -20,7 +23,7 @@ def flatten_value_nodes(values_dict: dict[str, dict]):
                 value = None
             else:
                 value = convert_to_python_type(latest_value["value"], v["type"])
-            flattened_values[strip_prefix(k)] = value
+            flattened_values[dict_key] = value
     return flattened_values
 
 def convert_to_python_type(value: str, typ: str):
@@ -79,7 +82,7 @@ class BlueForsFridge_Driver(Connectable):
         """Extract information directly from the API"""
         return self._get(path, query)
 
-    def get_values(self, metric_path: str | None, query=None) -> dict:
+    def get_values(self, metric_path: str | None, query=None, flatten:bool=True) -> dict:
         """Return metric(s) of interest from the control software"""
         path = "values/mapper/bf"
         if metric_path is not None:
@@ -87,12 +90,17 @@ class BlueForsFridge_Driver(Connectable):
 
         # Every node in the value tree is a dictionary itself
         data: dict = self.get_from_root(path, query)["data"]
-        return flatten_value_nodes(data)
+
+        return flatten_value_nodes(data) if flatten else data
 
     ### Convenience methods that return normalized data ###
     def get_temperatures(self) -> dict[str, float]:
         node_values = self.get_values("temperatures")
         return filter_type(node_values, [float])
+    
+    def get_heaters(self) -> dict[str, bool]:
+        node_values = self.get_values("heaters")
+        return filter_type(node_values)
     
     def get_pressures(self) -> dict[str, float]:
         node_values = self.get_values("pressures")
