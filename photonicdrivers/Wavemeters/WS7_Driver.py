@@ -33,6 +33,9 @@ class WS7_Driver(Connectable):
     def disconnect(self):
         pass
 
+    def shutdown(self):
+        self._ControlWLMEx(consts.cCtrlWLMExit | consts.cCtrlWLMWait, 0, 0, 10*1000, 0)
+
     def is_connected(self) -> bool:
         try:
             return self.get_version() > 0
