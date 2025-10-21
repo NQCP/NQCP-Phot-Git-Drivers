@@ -14,4 +14,4 @@ time.sleep(1)
 print("Wavelength (nm): ", ws.get_wavelength_nm(channel=ch))
 ws.stop_measurement()
 
-ws.shutdown()
+#ws.shutdown()

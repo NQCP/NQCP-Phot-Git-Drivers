@@ -2,6 +2,16 @@
 
 import serial
 from photonicdrivers.Abstract.Connectable import Connectable
+"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
+
+import ctypes
+
+# Load the DLL
+dll_path = r"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
+
+nktp_dll = ctypes.CDLL(dll_path)
+
+import NKTPDLL as NKT 
 
 class SuperK_Driver(Connectable):
     """
