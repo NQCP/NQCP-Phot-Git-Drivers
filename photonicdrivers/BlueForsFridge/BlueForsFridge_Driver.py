@@ -1,3 +1,4 @@
+from typing import Literal
 from photonicdrivers.Abstract.Connectable import Connectable
 import requests
 from enum import Enum
@@ -98,10 +99,6 @@ class BlueForsFridge_Driver(Connectable):
         node_values = self.get_values("temperatures")
         return filter_type(node_values, [float])
     
-    def get_heaters(self) -> dict[str, bool]:
-        node_values = self.get_values("heaters")
-        return filter_type(node_values)
-    
     def get_pressures(self) -> dict[str, float]:
         node_values = self.get_values("pressures")
         return filter_type(node_values, [float])
@@ -117,6 +114,39 @@ class BlueForsFridge_Driver(Connectable):
     def get_heaters(self) -> dict[str, OnOffError]:
         node_values = self.get_values("heaters")
         return filter_type(node_values, [OnOffError])
+    
+    def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
+        payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
+        response = self._post_values(payload)
+        return response
+    
+    def set_hs_still_heater(self, state: bool):
+        return self.set_heater("hs-still", state)
+
+    def set_hs_mc_heater(self, state: bool):
+        return self.set_heater("hs-mc", state)
+
+    def set_ext_heater(self, state: bool):
+        return self.set_heater("ext", state)
+
+    def set_4k_heater(self, state: bool):
+        return self.set_heater("heater", state)
+
+    def set_all_heaters(self, state: bool):
+        payload = {
+            "data": {
+                "mapper.bf.heaters.hs-still": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.hs-mc": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.ext": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.heater": {"content": {"value": int(state)}},
+            }
+        }
+
+        return self._post_values(payload)
+    
+    def _post_values(self, payload:dict) -> dict:
+        response = self.session.post("http://localhost:49099/values/?prettyprint=1&fields=name;value;status", json=payload)
+        return response.json()
 
     def _get(self, endpoint: str, query=None) -> dict:
         response = self.session.get(self._request_url(endpoint), params=query)
