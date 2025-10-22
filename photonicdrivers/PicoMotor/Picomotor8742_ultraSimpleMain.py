@@ -18,7 +18,6 @@ for cfg in devices:
     print('Hexadecimal VendorID = ' + hex(cfg.idVendor) + ' & ProductID = ' + hex(cfg.idProduct) + '\n')
 print('\n\n')
 
-
 ####### Print info of the PicoMotor #######
 # Find vendor and product ID (in hex) in: Device Manager -> Properties -> Events -> Information
 # Or perhaps the IDs are given in the manual of the device

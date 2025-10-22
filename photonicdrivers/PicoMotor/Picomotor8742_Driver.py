@@ -131,7 +131,7 @@ class NewFocus_8742_Driver(Connectable):
             self.endpointIn = 0x2
             self.endpointOut = 0x81
             self.timeOut = 1000  # ms
-            devs = list(usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex, find_all=True))
+            devs = list(usb.core.find(idVendor=int(self.vendor_ID_Hex, 0), idProduct=int(self.product_ID_Hex, 0), find_all=True))
             if self.hostname is None:
                 self.dev = devs[0]  # if no IP address is given, use the first device found
             else:
