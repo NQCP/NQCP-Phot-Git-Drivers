@@ -1,3 +1,4 @@
+from typing import Literal
 from photonicdrivers.Abstract.Connectable import Connectable
 import requests
 from enum import Enum
@@ -13,6 +14,9 @@ class OnOffError(Enum):
 def flatten_value_nodes(values_dict: dict[str, dict]):
     flattened_values = {}
     for (k, v) in values_dict.items():
+        dict_key = strip_prefix(k)
+        if dict_key in flattened_values:
+            raise Exception(f"dict key {dict_key} already found in flattened value nodes")
         if "content" in v:
             latest_value = v["content"]["latest_value"]
             # Value not present
@@ -20,7 +24,7 @@ def flatten_value_nodes(values_dict: dict[str, dict]):
                 value = None
             else:
                 value = convert_to_python_type(latest_value["value"], v["type"])
-            flattened_values[strip_prefix(k)] = value
+            flattened_values[dict_key] = value
     return flattened_values
 
 def convert_to_python_type(value: str, typ: str):
@@ -79,7 +83,7 @@ class BlueForsFridge_Driver(Connectable):
         """Extract information directly from the API"""
         return self._get(path, query)
 
-    def get_values(self, metric_path: str | None, query=None) -> dict:
+    def get_values(self, metric_path: str | None, query=None, flatten:bool=True) -> dict:
         """Return metric(s) of interest from the control software"""
         path = "values/mapper/bf"
         if metric_path is not None:
@@ -87,7 +91,8 @@ class BlueForsFridge_Driver(Connectable):
 
         # Every node in the value tree is a dictionary itself
         data: dict = self.get_from_root(path, query)["data"]
-        return flatten_value_nodes(data)
+
+        return flatten_value_nodes(data) if flatten else data
 
     ### Convenience methods that return normalized data ###
     def get_temperatures(self) -> dict[str, float]:
@@ -109,6 +114,39 @@ class BlueForsFridge_Driver(Connectable):
     def get_heaters(self) -> dict[str, OnOffError]:
         node_values = self.get_values("heaters")
         return filter_type(node_values, [OnOffError])
+    
+    def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
+        payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
+        response = self._post_values(payload)
+        return response
+    
+    def set_hs_still_heater(self, state: bool):
+        return self.set_heater("hs-still", state)
+
+    def set_hs_mc_heater(self, state: bool):
+        return self.set_heater("hs-mc", state)
+
+    def set_ext_heater(self, state: bool):
+        return self.set_heater("ext", state)
+
+    def set_4k_heater(self, state: bool):
+        return self.set_heater("heater", state)
+
+    def set_all_heaters(self, state: bool):
+        payload = {
+            "data": {
+                "mapper.bf.heaters.hs-still": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.hs-mc": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.ext": {"content": {"value": int(state)}},
+                "mapper.bf.heaters.heater": {"content": {"value": int(state)}},
+            }
+        }
+
+        return self._post_values(payload)
+    
+    def _post_values(self, payload:dict) -> dict:
+        response = self.session.post("http://localhost:49099/values/?prettyprint=1&fields=name;value;status", json=payload)
+        return response.json()
 
     def _get(self, endpoint: str, query=None) -> dict:
         response = self.session.get(self._request_url(endpoint), params=query)

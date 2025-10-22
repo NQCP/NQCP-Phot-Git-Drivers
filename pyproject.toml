@@ -39,7 +39,8 @@ dependencies = [
     "pylablib", 
     "timetagger",
     "zeroconf",
-    "pulsestreamer"]
+    "pulsestreamer",
+    "pefile"]
 
 dynamic = ["version"]
 
