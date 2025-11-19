@@ -31,3 +31,4 @@ class Lakeshore335_Driver(Connectable):
         Returns temperature reading in kelvin for all sensors in an array of floats
         '''
         return self.connection.get_all_kelvin_reading()
+    
