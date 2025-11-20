@@ -35,8 +35,8 @@ class NewFocus_8742_Mock(Connectable):
             actual_dist = self._stretch(distance_str)
         else:
             actual_dist = distance_str
-
-        self.axis_positions[axis_number_str] += actual_dist
+        # -1 due to 1-indexing of ports
+        self.axis_positions[axis_number_str - 1] += actual_dist
         print(f"Moving axis {axis_number_str} {actual_dist}" + f" for {self.name}" if self.name is not None else "")
         self.move_history.append([axis_number_str, distance_str]) # Move history is issued commands, not actual distances moved
 
