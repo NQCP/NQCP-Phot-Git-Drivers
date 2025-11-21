@@ -17,5 +17,17 @@ print(wavelength)
 print(laser.set_wavelength_unit(unit="nm"))
 print(laser.get_wavelength_unit())
 
+# testing setting a sweep scan
+laser.write(':WAV:SWE:CYCL 1')  # Set to 1 cycle
+
+laser.write(':WAV:SWE 1')  # Start wavelength 1260 nm
+
+print(f"number of cycles is {laser.query(':WAV:SWE:CYCL?')}")   # No delay between sweeps
+
+print(f"number of wavelength points is {laser.query(':READout:POINts?')}")  # Read number of points
+
+laser.disconnect()
+
+
 
 

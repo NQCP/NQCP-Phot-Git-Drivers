@@ -5,6 +5,20 @@ from photonicdrivers.PicoMotor.Picomotor8742_Driver import NewFocus_8742_Driver
 #Decimal VendorID = 1027 & ProductID = 24596
 #Hexadecimal VendorID = 0x403 & ProductID = 0x6014
 #pico = NewFocus_8742_Driver(vendor_ID_Hex=0x104d, product_ID_Hex=0x4000, hostname="8742-103866")
+
+from pylablib.devices.Newport.picomotor import Picomotor8742
+import pylablib.devices.Newport as Newport
+
+"""print(Newport.get_usb_devices_number_picomotor())
+dev = Picomotor8742()
+dev2 = Picomotor8742(1)
+print(dev.get_id())
+print(dev2.get_id())
+"""
+p = NewFocus_8742_Driver(vendor_ID_Hex="0x104d", product_ID_Hex="0x4000", hostname="8742-103866")
+p.connect()
+print(p.is_connected())
+"""
 pico = NewFocus_8742_Driver(IP_adress='10.209.69.4', port=23)
 pico.connect()
 print(pico.get_product_ID())
@@ -15,3 +29,4 @@ print(pico.get_target_position(4))
 #pico.move_relative_position('1','1000')
 print(pico.is_moving(1))
 pico.disconnect()
+"""

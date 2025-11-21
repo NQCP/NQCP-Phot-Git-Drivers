@@ -2,12 +2,14 @@ from photonicdrivers.Abstract.Connectable import Connectable
 import math
 import numpy as np
 class NewFocus_8742_Mock(Connectable):
-    def __init__(self, skew_negative: bool=False):
+    def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None):
+
         self.axis_positions: list[float] = [0.0, 0.0, 0.0, 0.0]
         self.move_history = []
 
         self.skew_negative = skew_negative
-
+        self.prnt = prnt
+        self.name = name
     def get_product_ID(self):
         return "product_ID"
 
@@ -33,8 +35,9 @@ class NewFocus_8742_Mock(Connectable):
             actual_dist = self._stretch(distance_str)
         else:
             actual_dist = distance_str
-
-        self.axis_positions[axis_number_str] += actual_dist
+        # -1 due to 1-indexing of ports
+        self.axis_positions[axis_number_str - 1] += actual_dist
+        print(f"Moving axis {axis_number_str} {actual_dist}" + f" for {self.name}" if self.name is not None else "")
         self.move_history.append([axis_number_str, distance_str]) # Move history is issued commands, not actual distances moved
 
     def get_target_position(self, axis_number_str):

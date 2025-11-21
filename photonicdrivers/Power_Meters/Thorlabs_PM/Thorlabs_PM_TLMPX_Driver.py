@@ -136,6 +136,78 @@ class Thorlabs_PM_TLMPX_Driver(Thorlabs_Power_Meter_Driver):
         
         result_code = self.driver.setPowerAutoRange(auto_range, channel=TLPM_DEFAULT_CHANNEL)
 
+    def get_auto_range(self) -> bool:
+        """
+        Gets the current auto range mode of the power meter.
+
+        Returns:
+            bool: True if auto range is enabled, False if disabled.
+        """
+        auto_range = c_int16()
+        result_code = self.driver.getPowerAutorange(byref(auto_range), channel=TLPM_DEFAULT_CHANNEL)
+
+        if result_code != 0:
+            # Optionally handle or raise an error if needed
+            raise RuntimeError(f"TLPM_getPowerAutoRange failed with code {result_code}")
+
+        return bool(auto_range.value)
+
+    @auto_reconnect
+    def set_power_range(self, power_to_measure: float) -> int:
+        """
+        Sets the power range manually (disables auto-ranging first if needed).
+
+        Args:
+            power_to_measure (float): The maximum expected signal level in watts [W].
+
+        Returns:
+            int: The return code from the TLPM DLL (0 means success).
+        """
+        # Ensure auto-range is disabled before setting manual range
+        self.set_auto_range(False)
+
+        power_value = c_double(power_to_measure)
+        result_code = self.driver.setPowerRange(power_value, channel=TLPM_DEFAULT_CHANNEL)
+
+        if result_code != 0:
+            raise RuntimeError(f"TLPM_setPowerRange failed with code {result_code}")
+
+        return result_code
+
+
+    @auto_reconnect
+    def get_power_range(self, attribute: str = "SET") -> float:
+        """
+        Retrieves the current or limit power range value.
+
+        Args:
+            attribute (str, optional): One of:
+                'SET' (current range)
+                'MIN' (minimum range)
+                'MAX' (maximum range)
+                Defaults to 'SET'.
+
+        Returns:
+            float: The power range value in watts [W].
+        """
+
+        # Map human-friendly strings to the TLPM constant integers
+        attr_map = {
+            "SET": 0,  # TLPM_ATTR_SET_VAL
+            "MIN": 1,  # TLPM_ATTR_MIN_VAL
+            "MAX": 2   # TLPM_ATTR_MAX_VAL
+        }
+
+        attr_value = c_int16(attr_map[attribute.upper()])
+        power_value = c_double()
+
+        result_code = self.driver.getPowerRange(attr_value, byref(power_value), channel=TLPM_DEFAULT_CHANNEL)
+
+        if result_code != 0:
+            raise RuntimeError(f"TLPM_getPowerRange failed with code {result_code}")
+
+        return power_value.value
+
     def set_beam(self, beam: str = 'MIN') -> None:
         """
         Sets the beam correction type.
