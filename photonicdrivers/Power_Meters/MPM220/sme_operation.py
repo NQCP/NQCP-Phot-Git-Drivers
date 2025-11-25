@@ -91,21 +91,10 @@ class SME:
 
         # Stop any ongoing measurements
         self.power_meter.write('STOP')
-
         # Set the mpm power unit to dBm
         self.power_meter.write('UNIT 0')
-
-        # Set default manual dynamic range mode
-        # and select SWEEP1 measurements mode
-        self.power_meter.write('AUTO 0')
-        self.power_meter.write('LEV 1')  # Sets the first dynamic range value (-30 ~ +10 dBm)
-        measurement_mode = 'SWEEP1'
-
-        # If MPM-215 module is connected, select auto dynamic range mode
-        # and SWEEP2 measurements mode settings
-        if is_mpm_215:
-            self.power_meter.write('AUTO 1')
-            measurement_mode = 'SWEEP2'
+        self.power_meter.write('AUTO 1')
+        measurement_mode = 'SWEEP2'
 
         # Trigger settings
         # Enable external trigger
@@ -125,9 +114,6 @@ class SME:
             self.power_meter.write(f'WMOD {measurement_mode}')
         print("Set Sweep mode: ", self.power_meter.query('WMOD?'))
 
-        # Average wavelength setting
-        average_wavelength = (start_wavelength + stop_wavelength) / 2
-        self.power_meter.write(f'WAV {average_wavelength}')
 
         # Set the expected read data count
         if not is_mpm_215:
@@ -151,8 +137,10 @@ class SME:
 
         # Start TSL scan
         self.laser.write(':WAV:SWE 1')
-        swe_count = 0
-        while swe_count == 0:
+        self.laser.write(':WAV:SWE:DEL 1')
+        swe_count_in = int(self.laser.query(':WAV:SWE:COUN?'))
+        swe_count = swe_count_in
+        while swe_count-swe_count_in == 0:
             swe_count = int(self.laser.query(':WAV:SWE:COUN?'))
             time.sleep(0.1)
         self.laser.write(':WAV:SWE 0')
@@ -196,10 +184,10 @@ class SME:
         logger.info(print_string)
         print(f"\n{print_string}")
         # Stop logging first if necessary
-        self.power_meter.write("LOGS 0")
+        #self.power_meter.write("LOGS 0")
 
         # Request log data
-        self.power_meter.write("LOGG? 0,0")
+        self.power_meter.write("LOGG? 0, 4")
 
         # Step 1: Read header
         header_start = self.power_meter.read_bytes(1)      # should be b'#'

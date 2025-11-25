@@ -2,16 +2,17 @@
 
 import serial
 from photonicdrivers.Abstract.Connectable import Connectable
-"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
+from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
+#"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
 
 import ctypes
 
-# Load the DLL
-dll_path = r"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
+# # Load the DLL
+# dll_path = r"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
 
-nktp_dll = ctypes.CDLL(dll_path)
+# nktp_dll = ctypes.CDLL(dll_path)
 
-import NKTPDLL as NKT 
+# import NKTPDLL as NKT 
 
 class SuperK_Driver(Connectable):
     """
@@ -19,151 +20,81 @@ class SuperK_Driver(Connectable):
     via a USB (COM port) serial connection.
 
     Attributes:
-        port (str): The COM port used to connect to the laser (e.g., 'COM5').
-        baudrate (int): The baud rate for the serial connection.
-        ser (serial.Serial): The active serial connection object.
+        port (str): The COM port to which the SuperK laser is connected.
+        module_address (int): The module address for communication.
     """
 
-    def __init__(self, port='COM5', baudrate=115200, timeout=1):
+    def __init__(self, port: str ='COM5', module_address: int =1):
         """
         Initializes the SuperK driver with serial communication parameters.
 
         Args:
-            port (str): The COM port for the laser (default 'COM5').
-            baudrate (int): Baud rate for serial communication (default 115200).
-            timeout (float): Timeout for serial read/write (default 1 second).
+            port (str): The COM port to which the SuperK laser is connected. Defaults to 'COM5'.
+            module_address (int): The module address for communication. Defaults to 1.
+        
         """
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
-        self.ser = None
+        self.port=port
+        self.module_address=module_address
 
-    def connect(self):
+    def connect(self) -> bool:
+        pass
+    
+    def disconnect(self) -> bool:
+        pass
+    
+    def enable_emission(self) -> None:
         """
-        Opens the serial connection to the laser.
+        Enables laser emission.
+        0x30 is the register for emission control. Writing 0x01 (1) enables emission. -1 is for registers with multiple entry points.
         """
-        self.ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
+        result = NKTP_DLL.registerWriteU8(self.port, self.module_address, 0x30, 0x01, -1)
+        #print('Setting emission ON - Extreme:', RegisterResultTypes(result))
 
-    def disconnect(self):
+    def disable_emission(self) -> None:
         """
-        Closes the serial connection to the laser.
+        Disables laser emission.
+        0x30 is the register for emission control. Writing 0x00 (0) disables emission. -1 is for registers with multiple entry points.
         """
-        if self.ser and self.ser.is_open:
-            self.ser.close()
+        result = NKTP_DLL.registerWriteU8(self.port, self.module_address, 0x30, 0x00, -1)
+        # print('Setting emission OFF - Extreme:', RegisterResultTypes(result))
 
-    def is_connected(self):
+    def get_emission_status(self) -> bool:
         """
-        Checks whether the serial connection is open.
+        Gets the current laser emission status.
+        0x30 is the register for emission control. -1 is for registers with multiple entry points.
+
+        Returns:
+            bool: True if emission is enabled, False otherwise.
+        """
+        emission_status = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x30, -1)
+        return emission_status == 1
+
+    def set_power_level(self,power_level : int):
+        """
+        Sets the laser power level.
+        0x3E is the register for power level control. The power_level argument should be a float representing the desired power level between 0 and 100. -1 is for registers with multiple entry points.
+        """
+        result = NKTP_DLL.registerWriteU8(self.port, self.module_address, 0x3E, power_level, -1)
+
+    def get_power_level(self) -> int:
+        """
+        Gets the current laser power level.
+        0x3E is the register for power level control. -1 is for registers with multiple entry points.
+
+        Returns:
+            int: The current power level of the laser.
+        """
+        power_level = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x3E, -1)
+        return power_level
+    
+    def is_connected(self) -> bool:
+        """
+        Checks if the laser is connected.
 
         Returns:
             bool: True if connected, False otherwise.
         """
-        return self.ser is not None and self.ser.is_open
+        return True
 
-    def _send_command(self, command: str) -> str:
-        """
-        Sends a command to the laser and reads the response.
+    
 
-        Args:
-            command (str): The command string to send.
-
-        Returns:
-            str: The response from the laser.
-        """
-        if not self.is_connected():
-            raise ConnectionError("Not connected to SuperK laser.")
-
-        # Ensure command ends with newline
-        cmd = command.strip() + "\r\n"
-        self.ser.write(cmd.encode('ascii'))
-
-        response = self.ser.readline().decode('ascii').strip()
-        return response
-
-    ###### BASIC CONTROL ######
-
-    def set_laser_enabled(self, enable_bool: bool):
-        """
-        Enables or disables the laser emission.
-
-        Args:
-            enable_bool (bool): True to enable emission, False to disable it.
-        """
-        cmd = "L=1" if enable_bool else "L=0"
-        self._send_command(cmd)
-
-    def get_laser_enabled(self) -> bool:
-        """
-        Retrieves the laser emission status.
-
-        Returns:
-            bool: True if emission is on, False otherwise.
-        """
-        return self._send_command("L?") == "1"
-
-    def set_shutter(self, open_bool: bool):
-        """
-        Opens or closes the shutter.
-
-        Args:
-            open_bool (bool): True to open shutter, False to close it.
-        """
-        cmd = "S=1" if open_bool else "S=0"
-        self._send_command(cmd)
-
-    def get_shutter(self) -> bool:
-        """
-        Retrieves the shutter status.
-
-        Returns:
-            bool: True if shutter is open, False otherwise.
-        """
-        return self._send_command("S?") == "1"
-
-    def get_power(self) -> float:
-        """
-        Retrieves the current laser power.
-
-        Returns:
-            float: Current power in milliwatts (mW).
-        """
-        response = self._send_command("P?")
-        try:
-            return float(response)
-        except ValueError:
-            return 0.0
-
-    def set_power(self, power_mW: float):
-        """
-        Sets the laser output power.
-
-        Args:
-            power_mW (float): Desired power in milliwatts (mW).
-        """
-        self._send_command(f"P={power_mW:.2f}")
-
-    def get_errors(self) -> str:
-        """
-        Retrieves any error messages from the laser.
-
-        Returns:
-            str: Error message string, or '0' if no error.
-        """
-        return self._send_command("ERR?")
-
-    ###### UTILITY ######
-
-    def get_status(self) -> dict:
-        """
-        Retrieves the overall status of the laser.
-
-        Returns:
-            dict: A dictionary containing emission, shutter, power, and errors.
-        """
-        return {
-            "connected": self.is_connected(),
-            "emission": self.get_laser_enabled(),
-            "shutter": self.get_shutter(),
-            "power_mW": self.get_power(),
-            "errors": self.get_errors()
-        }
