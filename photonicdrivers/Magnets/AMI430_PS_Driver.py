@@ -136,7 +136,7 @@ class AMI430_PS_Driver(Connectable):
             return warning_str
         return self.__query(f"CONFigure:CURRent:LIMit {limit}")
 
-    def ramp(self, wait_while_ramping: bool = True) -> str:
+    def     ramp(self, wait_while_ramping: bool = True) -> str:
         """
         Ramps to the target setpoint
         """
