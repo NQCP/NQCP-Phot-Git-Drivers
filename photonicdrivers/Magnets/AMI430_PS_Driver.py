@@ -28,7 +28,15 @@ class AMI430_PS_Driver(Connectable):
         hello_msg = self.connection.recv(1024).decode("utf-8")
         print(f"Connected: {hello_msg.strip()}")
 
-        self.unit = self.get_unit()
+        self.field_unit = self.get_field_unit()
+        self.__set_field_unit("T")
+        self.field_unit = self.get_field_unit()
+
+        self.time_unit = self.get_time_unit()
+        self.__set_time_unit("sec")
+        self.time_unit = self.get_time_unit()
+
+        
 
     def disconnect(self) -> None:
         self.connection.close()
@@ -49,16 +57,24 @@ class AMI430_PS_Driver(Connectable):
     def set_control_local(self) -> str:
         return self.__query("SYSTem:LOCal")
 
-    def get_unit(self) -> str:
+    def get_field_unit(self) -> str:
         """
         Returns "kG" for kilogauss or "T" for tesla
         """
         response = self.__query("FIELD:UNITS?")
-        return "T" if response == "1" else "kG"
 
-    def set_unit(self, unit: str) -> str:
+        if response == "0":
+            return "kG"
+        elif response == "1":
+            return "T"
+        else:
+            warning_str = f"get_field_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_field_unit(self, unit: str) -> str:
         """
-        Unit options are kG or T.
+        Unit options are "kG" or "T".  CONFigure:RAMP:RATE:UNITS
         """
         if unit == "kG":
             response = self.__query("CONFigure:FIELD:UNITS 0")
@@ -69,7 +85,38 @@ class AMI430_PS_Driver(Connectable):
             print(warning_str)
             return warning_str
 
-        self.unit = self.get_unit()
+        self.field_unit = self.get_field_unit()
+        return response
+    
+    def get_time_unit(self) -> str:
+        """
+        Returns "sec" for seconds or "min" for minutes
+        """
+        response = self.__query("RAMP:RATE:UNITS?")
+
+        if response == "0":
+            return "sec"
+        elif response == "1":
+            return "min"
+        else:
+            warning_str = f"get_time_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_time_unit(self, unit: str) -> str:
+        """
+        Unit options are "sec" for seconds or "min" for minutes.
+        """
+        if unit == "sec":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 0")
+        elif unit == "min":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 1")
+        else:
+            warning_str = f"Unit must be sec or min, not {unit}"
+            print(warning_str)
+            return warning_str
+
+        self.field_unit = self.get_time_unit()
         return response
 
     def get_limit(self) -> str:
@@ -89,7 +136,7 @@ class AMI430_PS_Driver(Connectable):
             return warning_str
         return self.__query(f"CONFigure:CURRent:LIMit {limit}")
 
-    def ramp_up(self, wait_while_ramping: bool = True) -> str:
+    def ramp(self, wait_while_ramping: bool = True) -> str:
         """
         Ramps to the target setpoint
         """
@@ -98,14 +145,6 @@ class AMI430_PS_Driver(Connectable):
             self.__wait_for_state([2, 8])  # HOLDING or AT ZERO
         return response
 
-    def ramp_down(self, wait_while_ramping: bool = True) -> str:
-        """
-        Manually ramps down
-        """
-        response = self.__query("DECR")
-        if wait_while_ramping:
-            print("Manual ramp down - will continue until limit or stopped")
-        return response
 
     def ramp_to_zero(self, wait_while_ramping: bool = True) -> str:
         """
@@ -310,7 +349,7 @@ class AMI430_PS_Driver(Connectable):
     def get_all_settings(self) -> dict:
         settings = {
             "ID": self.get_id(),
-            "Unit": self.get_unit(),
+            "Unit": self.get_field_unit(),
             "Limit": self.get_limit(),
             "Current": self.get_current(),
             "Current_Target": self.get_current_target(),
