@@ -1,7 +1,7 @@
 import pyvisa
 
 
-class RigolDHO924SDriver:
+class RigolDHO924S_Driver:
     """Driver for the Rigol DHO924S Oscilloscope over TCP/IP using PyVISA"""
     def __init__(self, ip_address: str) -> None:
         self.ip_address = ip_address
