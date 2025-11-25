@@ -39,12 +39,10 @@ class SuperK_Driver(Connectable):
         self.module_address=module_address
 
     def connect(self) -> bool:
-        print("Always connected")
-        return True
+        pass
     
     def disconnect(self) -> bool:
-        print("Can't disconnect")
-        return False
+        pass
     
     def enable_emission(self) -> None:
         """

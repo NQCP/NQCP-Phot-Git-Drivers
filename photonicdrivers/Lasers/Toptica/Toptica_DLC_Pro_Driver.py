@@ -413,7 +413,7 @@ class Toptica_DLC_PRO_Driver(Connectable):
         Args:
             power_mW (float): The desired power of the laser in milliwatts (mW).
         """
-        self.laser_controller.laser1.power_stabilization.setpoint.set(power_mW)
+        self.laser_controller.laser1.power_stabilization.setpoint.set(float(power_mW))
 
     def get_emission_status(self) -> bool:
         """
