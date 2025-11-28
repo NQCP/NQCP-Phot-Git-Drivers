@@ -13,6 +13,7 @@ instrument = rm.open_resource('GPIB0::16::INSTR')  # Example for COM5 on Windows
 # Print the instrument identification
 print(instrument.query("*IDN?"))
 print(instrument.query("WAV?"))
+print(instrument.query('READ? 0').split(','))
 
 
 rm.close() 

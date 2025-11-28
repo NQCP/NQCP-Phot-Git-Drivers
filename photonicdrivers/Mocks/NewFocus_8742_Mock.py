@@ -2,7 +2,7 @@ from photonicdrivers.Abstract.Connectable import Connectable
 import math
 import numpy as np
 class NewFocus_8742_Mock(Connectable):
-    def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None):
+    def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None, instant_move=True):
 
         self.axis_positions: list[float] = [0.0, 0.0, 0.0, 0.0]
         self.move_history = []
@@ -10,6 +10,7 @@ class NewFocus_8742_Mock(Connectable):
         self.skew_negative = skew_negative
         self.prnt = prnt
         self.name = name
+        self.instant_move = instant_move
     def get_product_ID(self):
         return "product_ID"
 

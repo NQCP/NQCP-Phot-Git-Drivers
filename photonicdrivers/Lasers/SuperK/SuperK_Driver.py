@@ -2,7 +2,7 @@
 
 import serial
 from photonicdrivers.Abstract.Connectable import Connectable
-from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
+
 #"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
 
 import ctypes
@@ -25,6 +25,8 @@ class SuperK_Driver(Connectable):
     """
 
     def __init__(self, port: str ='COM5', module_address: int =1):
+        from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
+
         """
         Initializes the SuperK driver with serial communication parameters.
 
@@ -37,12 +39,10 @@ class SuperK_Driver(Connectable):
         self.module_address=module_address
 
     def connect(self) -> bool:
-        print("Always connected")
-        return True
+        pass
     
     def disconnect(self) -> bool:
-        print("Can't disconnect")
-        return False
+        pass
     
     def enable_emission(self) -> None:
         """

@@ -19,10 +19,10 @@ def main(tsl, mpm):
 
     # Collect user inputs
     power = float(-15)  # in dBm
-    start_wavelength = float(1260)
-    stop_wavelength = float(1380)
-    speed = float(10)
-    step = float(0.01)
+    start_wavelength = float(1240)
+    stop_wavelength = float(1370)
+    speed = float(20)  # in nm/s
+    step = float(0.1)
 
     # Configure TSL and MPM parameters
     sme.configure_tsl(start_wavelength, stop_wavelength, step, power, speed)
@@ -39,8 +39,8 @@ def main(tsl, mpm):
     # Perform sweep
     # Set display_logging_status True to print the MPM logging status
     g = sme.perform_scan(display_logging_status=True)
-    v_every4 = g[3::4]  # index 3 is the 4th element (0-based indexing)
-    p_watts = 10**((np.array(v_every4) - 30)/10)
+    v_every4 = g#[3::4]  # index 3 is the 4th element (0-based indexing)
+    p_watts = 10**(np.array(v_every4)/10-3)
     print(v_every4)  # Output: [40 80]
 
     # Plot
