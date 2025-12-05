@@ -93,3 +93,24 @@ class Swabian_TimeTagger_Driver(Connectable):
 
     def get_trigger_level(self, channel: int) -> float:
         return self.connection.getTriggerLevel(channel)
+    
+    def set_dead_time(self, channel: int, dead_time_ps: int) -> None:
+        self.connection.setDeadtime(channel, dead_time_ps) 
+
+    def get_dead_time(self, channel: int) -> int:
+        return self.connection.getDeadtime(channel)
+    
+    def set_input_hysteresis(self, channel: int, hysteresis_mV: int) -> None:
+        """
+        Allowed hysteresis values: 1, 20, 70
+        """
+        self.connection.setInputHysteresis(channel, hysteresis_mV)
+
+    def get_input_hysteresis(self, channel: int) -> int:
+        return self.connection.getInputHysteresis(channel)
+    
+    def auto_calibration(self) -> list[float]:
+        return self.connection.autoCalibration()
+    
+    def disable_leds(self) -> None:
+        self.connection.disableLEDs()

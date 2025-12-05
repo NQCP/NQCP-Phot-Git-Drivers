@@ -5,7 +5,8 @@ from photonicdrivers.Abstract.Connectable import Connectable
 
 try:
     from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
-except:
+    
+except Exception:
     print("DLL for SuperK could not be loaded")
 
 
@@ -20,7 +21,6 @@ class SuperK_Driver(Connectable):
     """
 
     def __init__(self, port: str ='COM5', module_address: int =1):
-
         """
         Initializes the SuperK driver with serial communication parameters.
 
