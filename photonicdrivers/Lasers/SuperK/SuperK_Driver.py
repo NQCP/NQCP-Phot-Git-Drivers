@@ -1,18 +1,13 @@
 
 
-import serial
+
 from photonicdrivers.Abstract.Connectable import Connectable
-from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
-#"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
 
-import ctypes
+try:
+    from photonicdrivers.Lasers.SuperK.NKTP_DLL import NKTP_DLL
+except:
+    print("DLL for SuperK could not be loaded")
 
-# # Load the DLL
-# dll_path = r"C:\Users\Public\Documents\NKT Photonics\SDK\Examples\DLL_Example_Python\NKTPDLL.dll"
-
-# nktp_dll = ctypes.CDLL(dll_path)
-
-# import NKTPDLL as NKT 
 
 class SuperK_Driver(Connectable):
     """
@@ -25,6 +20,7 @@ class SuperK_Driver(Connectable):
     """
 
     def __init__(self, port: str ='COM5', module_address: int =1):
+
         """
         Initializes the SuperK driver with serial communication parameters.
 
@@ -35,18 +31,20 @@ class SuperK_Driver(Connectable):
         """
         self.port=port
         self.module_address=module_address
+        self.connected = False
 
     def connect(self) -> bool:
-        pass
+        self.connected = True
     
     def disconnect(self) -> bool:
-        pass
+        self.connected = False
     
     def enable_emission(self) -> None:
         """
         Enables laser emission.
         0x30 is the register for emission control. Writing 0x01 (1) enables emission. -1 is for registers with multiple entry points.
         """
+
         result = NKTP_DLL.registerWriteU8(self.port, self.module_address, 0x30, 0x01, -1)
         #print('Setting emission ON - Extreme:', RegisterResultTypes(result))
 
@@ -55,6 +53,7 @@ class SuperK_Driver(Connectable):
         Disables laser emission.
         0x30 is the register for emission control. Writing 0x00 (0) disables emission. -1 is for registers with multiple entry points.
         """
+
         result = NKTP_DLL.registerWriteU8(self.port, self.module_address, 0x30, 0x00, -1)
         # print('Setting emission OFF - Extreme:', RegisterResultTypes(result))
 
@@ -66,8 +65,12 @@ class SuperK_Driver(Connectable):
         Returns:
             bool: True if emission is enabled, False otherwise.
         """
-        emission_status = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x30, -1)
-        return emission_status == 1
+        try:
+            emission_status = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x30, -1)
+            print(emission_status)
+            return bool(emission_status[self.module_address])
+        except Exception:
+            return None 
 
     def set_power_level(self,power_level : int):
         """
@@ -84,8 +87,11 @@ class SuperK_Driver(Connectable):
         Returns:
             int: The current power level of the laser.
         """
-        power_level = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x3E, -1)
-        return power_level
+        try:
+            power_level = NKTP_DLL.registerReadU8(self.port, self.module_address, 0x3E, -1)
+            return power_level[self.module_address]
+        except Exception:
+            return None
     
     def is_connected(self) -> bool:
         """
@@ -94,7 +100,15 @@ class SuperK_Driver(Connectable):
         Returns:
             bool: True if connected, False otherwise.
         """
-        return True
+        try:
+            self.connected = self.connected and NKTP_DLL.registerReadU8(self.port, self.module_address, 0x3E, -1)[0] == 0
+            return self.connected
+        except ConnectionError:
+            self.connected = False
+            return self.connected
+        except Exception:
+            self.connected = False
+            return self.connected
 
     
 

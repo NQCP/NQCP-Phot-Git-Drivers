@@ -8,11 +8,22 @@
 from photonicdrivers.Lasers.SuperK.SuperK_Driver import SuperK_Driver
 
 laser_driver=SuperK_Driver()
+laser_driver.connect()
+print(laser_driver.is_connected())
+laser_driver.set_power_level(75)
 
-laser_driver.set_power_level(0)
+import time
+laser_driver.enable_emission()
+time.sleep(2)
+print(laser_driver.get_emission_status())
+time.sleep(2)
+print(laser_driver.disable_emission())
+print(laser_driver.get_emission_status())
+print(laser_driver.get_power_level())
+laser_driver.disconnect()
 
-#laser_driver.enable_emission()
+print(laser_driver.is_connected())
 
-#print(laser_driver.disable_emission())
+
 
 
