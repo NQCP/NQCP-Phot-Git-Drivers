@@ -6,7 +6,7 @@ class Lakeshore335_Driver(Connectable):
         self.ip_address = ip_address
 
     def connect(self) -> None:
-        self.connection = Model335(ip_address=self.ip_address)
+        self.connection = Model350(ip_address=self.ip_address)
 
     def disconnect(self) -> None:
         self.connection.disconnect_tcp()
