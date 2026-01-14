@@ -10,6 +10,7 @@ class Lakeshore335_Driver(Connectable):
 
     def disconnect(self) -> None:
         self.connection.disconnect_tcp()
+        self.connection = None
 
     def is_connected(self) -> bool:
         try:
