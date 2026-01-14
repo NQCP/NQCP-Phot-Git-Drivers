@@ -1,7 +1,7 @@
 from lakeshore import Model350
 from photonicdrivers.Abstract.Connectable import Connectable
 
-class Lakeshore335_Driver(Connectable):
+class Lakeshore350_Driver(Connectable):
     def __init__(self, ip_address:str) -> None:
         self.ip_address = ip_address
 
