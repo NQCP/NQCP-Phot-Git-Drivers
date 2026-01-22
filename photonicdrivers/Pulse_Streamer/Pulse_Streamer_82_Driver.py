@@ -153,12 +153,8 @@ class Pulse_Streamer_82_Driver(Connectable):
     def get_debug_register(self):
         return self.driver.getDebugRegister()
     
-    def stream(self, sequence: Sequence, number_runs: int = np.inf):
-        if number_runs == np.inf:
-            self.driver.stream(seq=sequence)
-            return
-        else:
-            self.driver.stream(seq=sequence, n_runs=number_runs)
+    def stream(self, sequence: Sequence, number_runs: int = -1):
+        self.driver.stream(seq=sequence, n_runs=number_runs)
     
     def force_final(self):
         self.driver.forceFinal()
