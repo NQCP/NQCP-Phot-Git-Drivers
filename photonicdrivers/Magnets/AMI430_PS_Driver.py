@@ -140,6 +140,7 @@ class AMI430_PS_Driver(Connectable):
         """
         Ramps to the target setpoint
         """
+        print("hi, i'm ramping")
         response = self.__query("RAMP")
         if wait_while_ramping:
             self.__wait_for_state([2, 8])  # HOLDING or AT ZERO
@@ -150,6 +151,7 @@ class AMI430_PS_Driver(Connectable):
         """
         Ramps to zero current
         """
+        print("hi, i'm ramping to zero")
         response = self.__query("ZERO")
         if wait_while_ramping:
             self.__wait_for_state([8])  # AT ZERO
@@ -184,7 +186,7 @@ class AMI430_PS_Driver(Connectable):
         }
         return state_map.get(state_code, f"Unknown state: {state_code}"), state_code
 
-    def __wait_for_state(self, target_states: list, timeout: float = 600):
+    def __wait_for_state(self, target_states: list, timeout: float = 1800):
         """
         Wait for the magnet to reach one of the target states
         """
@@ -195,12 +197,15 @@ class AMI430_PS_Driver(Connectable):
                 break
 
             state = self.__query("STATE?")
-            print(f"Current state: {self.get_sweep_mode()}\r", end="")
+            print(f"\rCurrent state: {self.get_sweep_mode()} | Current field: {self.get_field()} T", end="", flush=True)
 
-            if int(state) in target_states:
-                break
+            try:
+                if int(state) in target_states:
+                    break
+            except ValueError:
+                print(f"Invalid state received: {state}")
 
-            time.sleep(0.5)
+            time.sleep(1)
 
     def get_current(self) -> float:
         """
