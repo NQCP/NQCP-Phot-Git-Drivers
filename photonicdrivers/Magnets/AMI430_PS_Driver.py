@@ -1,6 +1,5 @@
 import socket
 import time
-
 from photonicdrivers.Abstract.Connectable import Connectable
 
 
@@ -140,7 +139,6 @@ class AMI430_PS_Driver(Connectable):
         """
         Ramps to the target setpoint
         """
-        print("hi, i'm ramping")
         response = self.__query("RAMP")
         if wait_while_ramping:
             self.__wait_for_state([2, 8])  # HOLDING or AT ZERO
@@ -151,7 +149,6 @@ class AMI430_PS_Driver(Connectable):
         """
         Ramps to zero current
         """
-        print("hi, i'm ramping to zero")
         response = self.__query("ZERO")
         if wait_while_ramping:
             self.__wait_for_state([8])  # AT ZERO
