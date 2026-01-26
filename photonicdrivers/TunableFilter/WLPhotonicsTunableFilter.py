@@ -153,7 +153,6 @@ class WLPhotonicsTunableFilter(Connectable):
             # Print the raw response for debugging purposes
             # Split response by newlines
             dev_info = response.splitlines()
-            print(f"{dev_info[0]}") # Prints serial number and factory calibration date
            
             if len(dev_info) >= 2:
                 serial_match = re.search(r"SN\((\d+)\)", dev_info[0])
@@ -170,14 +169,7 @@ class WLPhotonicsTunableFilter(Connectable):
                
                 if range_match:
                     self.lower_limit = float(range_match.group(1))
-                    self.upper_limit = float(range_match.group(2))
-                    print(f"Wavelength Range: {self.lower_limit} nm to {self.upper_limit} nm.\n")
-                else:
-                    print("Error parsing wavelength range from device response.")
-            else:
-                print(f"Error: Unexpected response format from device. Received {len(dev_info)} lines instead of 2 or more.")
-                print("Response:", dev_info)
-       
+                    self.upper_limit = float(range_match.group(2))       
         return response
  
     def get_wavelength(self):
