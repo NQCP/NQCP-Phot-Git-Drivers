@@ -17,15 +17,21 @@ class AMI430_PS_Driver(Connectable):
         self.port = port
         self.timeout = 10
         self.termination_char = "\n"
+        self._buffer = ""  # Buffer to store incomplete responses
 
     def connect(self) -> None:
+        self._buffer = ""  # Reset buffer on connect
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.settimeout(self.timeout)
         self.connection.connect((self.ip_address, self.port))
 
-        # Read and discard the "Hello" message
-        hello_msg = self.connection.recv(1024).decode("utf-8")
+        # Read and discard the "Hello" message using proper line reading
+        # The AMI430 sends a welcome message upon connection
+        hello_msg = self.__read_line()
         print(f"Connected: {hello_msg.strip()}")
+        
+        # Clear any additional data that might be in the buffer
+        self.__clear_buffer()
 
         self.field_unit = self.get_field_unit()
         self.__set_field_unit("T")
@@ -38,6 +44,7 @@ class AMI430_PS_Driver(Connectable):
         
 
     def disconnect(self) -> None:
+        self._buffer = ""  # Clear buffer on disconnect
         self.connection.close()
 
     def is_connected(self) -> bool:
@@ -370,17 +377,85 @@ class AMI430_PS_Driver(Connectable):
 
     ################################ PRIVATE METHODS ################################
 
+    def __read_line(self) -> str:
+        """
+        Read a single line from the socket, properly handling the termination character.
+        This prevents reading multiple responses at once and ensures proper parsing.
+        
+        Returns:
+            str: A single line response with termination characters stripped.
+        """
+        while True:
+            # Check if we already have a complete line in the buffer
+            if "\r\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\r\n", 1)
+                return line.strip()
+            elif "\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\n", 1)
+                return line.strip()
+            
+            # Need to read more data from socket
+            try:
+                chunk = self.connection.recv(1024).decode("utf-8")
+                if not chunk:
+                    # Connection closed
+                    if self._buffer:
+                        line = self._buffer.strip()
+                        self._buffer = ""
+                        return line
+                    return ""
+                self._buffer += chunk
+            except socket.timeout:
+                # Timeout - return whatever we have
+                if self._buffer:
+                    line = self._buffer.strip()
+                    self._buffer = ""
+                    return line
+                raise
+
+    def __clear_buffer(self) -> None:
+        """
+        Clear any pending data in the receive buffer.
+        Useful after connect or when recovering from errors.
+        """
+        self.connection.setblocking(False)
+        try:
+            while True:
+                data = self.connection.recv(1024)
+                if not data:
+                    break
+        except BlockingIOError:
+            pass  # No more data available
+        finally:
+            self.connection.setblocking(True)
+            self.connection.settimeout(self.timeout)
+        self._buffer = ""
+
     def __query(self, command_str: str) -> str:
+        """
+        Send a command and optionally read the response.
+        
+        For commands ending with '?', reads and returns the response.
+        For other commands, returns 0 after sending.
+        
+        Args:
+            command_str: The command to send (with or without '?')
+            
+        Returns:
+            str: The response for queries, or 0 for commands.
+        """
+        # Clear any stale data before sending a new command
+        self.__clear_buffer()
+        
         command = f"{command_str}{self.termination_char}"
         self.connection.sendall(command.encode("utf-8"))
 
         if not command_str.endswith("?"):
+            # Small delay to allow command processing
+            time.sleep(0.05)
             return 0
 
-        # Wait for response
-        time.sleep(0.1)
-
-        response_raw = self.connection.recv(4096)
-        response = response_raw.decode("utf-8").strip()
-
+        # Read exactly one response line
+        response = self.__read_line()
+        
         return response
