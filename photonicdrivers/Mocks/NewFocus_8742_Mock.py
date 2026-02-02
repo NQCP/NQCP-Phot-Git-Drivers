@@ -3,6 +3,7 @@ import math
 import numpy as np
 class NewFocus_8742_Mock(Connectable):
     def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None, instant_move=True):
+        self.connected = False
 
         self.axis_positions: list[float] = [0.0, 0.0, 0.0, 0.0]
         self.move_history = []
@@ -53,10 +54,10 @@ class NewFocus_8742_Mock(Connectable):
         pass
 
     def disconnect(self):
-        pass
+        self.connected = False
 
     def connect(self) -> None:
-        pass
+        self.connected = True
 
     def is_connected(self) -> bool:
-        return True
+        return self.connected
