@@ -181,17 +181,17 @@ class Santec_TSL570_driver(Connectable):
         operation_status = int(return_msg)
         return operation_status
 
-    def set_wavelength(self, wavelength_nm: float) -> None:
+    def set_wavelength(self, wavelength_m: float) -> None:
         """
-        Set wavelength [nm] of the laser
+        Set wavelength [m] of the laser
 
         Args:
-            wavelength_nm (float): wavelength in nm
+            wavelength_nm (float): wavelength in m
         Returns:
             None
         """
 
-        msg = ":WAVelength  " + str(wavelength_nm) # + "e-9"
+        msg = ":WAVelength  " + str(wavelength_m) # + "e-9"
         self.laser.write(msg)
 
     def set_wavelength_unit(self, unit: str):
