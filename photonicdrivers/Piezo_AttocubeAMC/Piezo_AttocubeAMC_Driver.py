@@ -50,6 +50,10 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         '''
         Moves the piezo to the position specified by x_nm, y_nm,z_nm
         '''
+        for ax, mov in zip([0, 1, 2], [move_x, move_y, move_z]):
+            if mov:
+                self.amc.control.setControlMove(ax, True)
+                print("set axis " + str(ax) + " to move")
         if self.__check_position_limits(x_nm,y_nm,z_nm,move_x,move_y,move_z):
             self.amc.control.MultiAxisPositioning(int(move_x), int(move_y), int(move_z), x_nm, y_nm, z_nm)
             if wait_while_moving:
@@ -58,6 +62,10 @@ class Piezo_AttocubeAMC_Driver(Connectable):
                     sleep(0.1)
                     status = self.is_axis_moving()
                     stages_moving = np.any(status)
+
+                for ax, mov in zip([0, 1, 2], [move_x, move_y, move_z]):
+                    if mov:
+                        self.amc.control.setControlMove(ax, False)
 
         else:
             print("Requested piezo position was outside the limits. Did not execute the move command.")
