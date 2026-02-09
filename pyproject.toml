@@ -224,5 +224,5 @@ match = ["v*"]
 source-file = "photonicdrivers/_version.py"
 build-file = "photonicdrivers/_version.py"
 
-[tools.setuptools]
+[tool.setuptools]
 py-modules=[]
