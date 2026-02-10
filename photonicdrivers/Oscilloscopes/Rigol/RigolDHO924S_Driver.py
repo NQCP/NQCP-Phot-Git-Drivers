@@ -90,3 +90,4 @@ class RigolDHO924S_Driver:
         Sets the oscilloscope to single acquisition mode.
         """
         self.write(":SINGle")
+        
