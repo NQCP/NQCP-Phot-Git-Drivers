@@ -41,6 +41,7 @@ class NewFocus_8742_Driver(Connectable):
 
         print(vendor_ID_Hex)
         print(product_ID_Hex)
+        self.axis_positions = [0, 0, 0, 0]
 
     def get_product_ID(self):
         self._write_command('*IDN?')
@@ -72,7 +73,8 @@ class NewFocus_8742_Driver(Connectable):
 
         @param axis_number_str: {0,1,2,3}
         """
-        self._write_command(str(axis_number_str) + 'PA')
+        raise NotImplementedError("Use move_relative_position instead")
+        # self._write_command(str(axis_number_str) + 'PA')
 
     def move_relative_position(self, axis_number_str, distance_str):
         """
@@ -83,6 +85,8 @@ class NewFocus_8742_Driver(Connectable):
         @return: None
         """
         self._write_command(str(axis_number_str) + 'PR' + str(distance_str))
+
+        self.axis_positions[int(axis_number_str) - 1] += int(distance_str)
 
     def get_target_position(self, axis_number_str):
         """
