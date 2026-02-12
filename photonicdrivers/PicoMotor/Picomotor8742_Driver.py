@@ -207,7 +207,7 @@ class NewFocus_8742_Driver(Connectable):
 
             # remove the newline characters if present
             if b"\r\n" in response:
-                response, dummy = response.split(b'\r\n')
+                response = response.split(b'\r\n')[0]
 
             # convert from byte string to string
             response = response.decode('utf-8')
