@@ -41,7 +41,6 @@ class NewFocus_8742_Driver(Connectable):
 
         print(vendor_ID_Hex)
         print(product_ID_Hex)
-        self.axis_positions = [0, 0, 0, 0]
 
     def get_product_ID(self):
         self._write_command('*IDN?')
@@ -85,8 +84,6 @@ class NewFocus_8742_Driver(Connectable):
         @return: None
         """
         self._write_command(str(axis_number_str) + 'PR' + str(distance_str))
-
-        self.axis_positions[int(axis_number_str) - 1] += int(distance_str)
 
     def get_target_position(self, axis_number_str):
         """
@@ -274,5 +271,4 @@ if __name__ == "__main__":
         pico_motor_x.move_relative_position(1)
         plt.pause(0.01)
         pico_motor_y.move_relative_position(1)
-
 
