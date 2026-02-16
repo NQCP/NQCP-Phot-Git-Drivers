@@ -122,8 +122,8 @@ class Swabian_TimeTagger_Driver(Connectable):
     def get_input_channel_delay(self, channel: int) -> int:
         return self.connection.getInputDelay(channel)
     
-    def get_time_tag_data(self, channel: int, acquisition_time_ps: int = 1e12, n_max_events: int = 10_000_000) -> TimeTagStreamBuffer :
+    def get_time_tag_data(self, channels: list[int], acquisition_time_ps: int = 1e12, n_max_events: int = 10_000_000) -> TimeTagStreamBuffer :
         # return self.connection.
-        stream = TimeTagger.TimeTagStream(tagger=self.connection, n_max_events=n_max_events, channel=channel)
+        stream = TimeTagger.TimeTagStream(tagger=self.connection, n_max_events=n_max_events, channels=channels)
         stream.startFor(acquisition_time_ps)
         return stream.getData()
