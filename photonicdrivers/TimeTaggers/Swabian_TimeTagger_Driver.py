@@ -114,3 +114,9 @@ class Swabian_TimeTagger_Driver(Connectable):
     
     def disable_leds(self) -> None:
         self.connection.disableLEDs()
+
+    def set_input_channel_delay(self, channel: int, delay_ps: int) -> None:
+        self.connection.setInputDelay(channel, delay_ps)
+
+    def get_input_channel_delay(self, channel: int) -> int:
+        return self.connection.getInputDelay(channel)
