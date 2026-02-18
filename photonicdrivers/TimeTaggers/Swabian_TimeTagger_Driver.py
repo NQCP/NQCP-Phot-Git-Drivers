@@ -73,6 +73,12 @@ class Swabian_TimeTagger_Driver(Connectable):
         # To do any measurements, the TimeTagger must first have initalised a counter
         return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, binwidth = bin_width_ps, n_bins=num_bins)
 
+    def initialise_frequency_stability(self, channel: int, steps: list[int], average: int = 1000, trace_len: int = 1000):
+        return TimeTagger.FrequencyStability(tagger=self.connection, channel=channel, steps=steps, average=average, trace_len=trace_len)
+
+    def initialise_frequency_counter(self, channels: list[int], sampling_interval_ps: int, fitting_window_ps: int, n_values: int = 0):
+        return TimeTagger.FrequencyCounter(tagger=self.connection, channels=channels, sampling_interval=sampling_interval_ps, fitting_window=fitting_window_ps, n_values=n_values)
+
     def getSerial(self) -> str:
         return self.connection.getSerial()
     
