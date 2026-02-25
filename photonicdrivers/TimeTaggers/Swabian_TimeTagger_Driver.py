@@ -1,7 +1,7 @@
 import TimeTagger
 from TimeTagger import TimeTagStreamBuffer
 import time
-from TimeTagger import DelayedChannel, GatedChannel,
+from TimeTagger import DelayedChannel, GatedChannel
 from photonicdrivers.Abstract.Connectable import Connectable
 
 # https://www.swabianinstruments.com/static/documentation/TimeTagger/tutorials/TimeTaggerRPC.html
