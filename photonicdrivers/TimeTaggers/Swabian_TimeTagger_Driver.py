@@ -153,3 +153,15 @@ class Swabian_TimeTagger_Driver(Connectable):
         stream.startFor(acquisition_time_ps)
         stream.waitUntilFinished()
         return stream.getData()
+
+    def set_conditional_channel(self, trigger_channel: int, filtered_channels_list: list[int]) -> None:
+        "Set a conditional filter on the Time Tagger. Only events on the trigger channel that coincide with events on the filtered channels will be recorded."
+        self.connection.setConditionalFilter(trigger=trigger_channel, filtered=filtered_channels_list)
+
+    def get_conditional_filter_filtered(self) -> list[int]:
+        "Get the current filtered channels for a given trigger channel. Returns an empty list if no conditional filter is set for that trigger channel."
+        return self.connection.getConditionalFilterFiltered()
+    
+    def get_conditional_filter_trigger(self) -> list[int]:
+        "Get the current trigger channels that have conditional filters set. Returns an empty list if no conditional filters are set."
+        return self.connection.getConditionalFilterTrigger()
