@@ -1,7 +1,7 @@
 import TimeTagger
 from TimeTagger import TimeTagStreamBuffer
 import time
-
+from TimeTagger import DelayedChannel, GatedChannel,
 from photonicdrivers.Abstract.Connectable import Connectable
 
 # https://www.swabianinstruments.com/static/documentation/TimeTagger/tutorials/TimeTaggerRPC.html
@@ -165,3 +165,9 @@ class Swabian_TimeTagger_Driver(Connectable):
     def get_conditional_filter_trigger(self) -> list[int]:
         "Get the current trigger channels that have conditional filters set. Returns an empty list if no conditional filters are set."
         return self.connection.getConditionalFilterTrigger()
+    
+    def get_delayed_channel(self, channel: int, delay_ps: int) -> None:
+        return DelayedChannel(tagger=self.connection, channel=channel, delay=delay_ps)
+
+    def set_gated_channel(self, channel: int, gate_start_channel: int, gate_stop_channel: int) -> None:
+        return GatedChannel(tagger=self.connection, input_channel=channel, gate_start_channel=gate_start_channel, gate_stop_channel=gate_stop_channel)
