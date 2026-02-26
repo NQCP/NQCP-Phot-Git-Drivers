@@ -6,6 +6,7 @@ class NewFocus_8742_Mock(Connectable):
         self.connected = False
 
         self.move_history = []
+        self.axis_positions = [0.0, 0.0, 0.0, 0.0]
         self.move_command_counts: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
         self.total_move_commands = 0
 
@@ -39,6 +40,9 @@ class NewFocus_8742_Mock(Connectable):
             actual_dist = self._stretch(distance_str)
         else:
             actual_dist = distance_str
+        if axis_number < 1 or axis_number > len(self.axis_positions):
+            raise ValueError(f"Invalid axis number {axis_number}. Expected 1-{len(self.axis_positions)}.")
+        self.axis_positions[axis_number - 1] += float(actual_dist)
         if self.name is not None:
             print(f"Moving axis {axis_number} {actual_dist}" + f" for {self.name}")
 
@@ -47,6 +51,12 @@ class NewFocus_8742_Mock(Connectable):
             self.move_command_counts[axis_number] = 0
         self.move_command_counts[axis_number] += 1
         self.total_move_commands += 1
+
+    def get_simulated_axis_position(self, axis_number: int) -> float:
+        axis = int(axis_number)
+        if axis < 1 or axis > len(self.axis_positions):
+            raise ValueError(f"Invalid axis number {axis}. Expected 1-{len(self.axis_positions)}.")
+        return float(self.axis_positions[axis - 1])
 
     def get_axis_move_command_count(self, axis_number: int) -> int:
         return int(self.move_command_counts.get(int(axis_number), 0))
