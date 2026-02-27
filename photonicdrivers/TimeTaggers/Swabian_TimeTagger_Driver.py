@@ -75,6 +75,13 @@ class Swabian_TimeTagger_Driver(Connectable):
     def initialise_frequency_counter(self, channels: list[int], sampling_interval_ps: int, fitting_window_ps: int, n_values: int = 0):
         return TimeTagger.FrequencyCounter(tagger=self.connection, channels=channels, sampling_interval=sampling_interval_ps, fitting_window=fitting_window_ps, n_values=n_values)
 
+    def initialize_2d_histogram(self, stop_channel_1: int, stop_channel_2: int, start_channel: int, bin_width_1_ps: int, bin_width_2_ps: int, num_bins_1: int, num_bins_2: int) -> None:
+        return TimeTagger.Histogram2D(tagger=self.connection, start_channel=start_channel, stop_channel_1=stop_channel_1, stop_channel_2=stop_channel_2, binwidth_1=bin_width_1_ps, binwidth_2=bin_width_2_ps, n_bins_1=num_bins_1, n_bins_2=num_bins_2)
+
+    def initialise_delayed_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
+        delayed_start_channel = self.get_delayed_channel_number(channel=start_channel, delay_ps=1_000_000)
+        return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=delayed_start_channel, binwidth = bin_width_ps, n_bins=num_bins)
+
     def getSerial(self) -> str:
         return self.connection.getSerial()
     
@@ -179,9 +186,5 @@ class Swabian_TimeTagger_Driver(Connectable):
     
     def get_channel_number_scheme(self):
         return self.connection.getChannelNumberScheme()
-
-    def initialise_delayed_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
-        delayed_start_channel = self.get_delayed_channel_number(channel=start_channel, delay_ps=1_000_000)
-        return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=delayed_start_channel, binwidth = bin_width_ps, n_bins=num_bins)
-
+    
 

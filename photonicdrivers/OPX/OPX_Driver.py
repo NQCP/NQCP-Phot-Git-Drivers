@@ -29,12 +29,12 @@ class OPX_Driver(Connectable):
     def disconnect(self) -> None:
         self.driver = None
     
-    # def is_connected(self) -> bool:
-    #     try:
-    #         self.get_serial_number()
-    #         return True
-    #     except Exception:
-    #         return False
+    def is_connected(self) -> bool:
+        try:
+            self.driver.list_open_qms()
+            return True
+        except Exception:
+            return False
     
     def open_quantum_machine(self, config):
         return self.driver.open_qm(config=config)
