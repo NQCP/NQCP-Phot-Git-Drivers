@@ -40,7 +40,11 @@ dependencies = [
     "timetagger",
     "zeroconf",
     "pulsestreamer",
-    "pefile"]
+    "pefile",
+    "qm-octave",
+    "qm-qua",
+    "qualang-tools"
+    ]
 
 dynamic = ["version"]
 

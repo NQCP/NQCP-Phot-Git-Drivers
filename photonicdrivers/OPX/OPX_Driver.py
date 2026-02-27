@@ -7,12 +7,6 @@ from qm import SimulationConfig, LoopbackInterface
 from qm.qua import *
 from qm import QuantumMachinesManager
 
-#import the device detection
-# from pulsestreamer import findPulseStreamers
-
-# import enum types
-# from pulsestreamer import TriggerStart
-
 import time 
 import numpy as np
     
@@ -26,6 +20,7 @@ class OPX_Driver(Connectable):
         self.ip_address = ip_address
         self.cluster_name = cluster_name
         self.qop_port = qop_port
+        self.sequence_stack = []
 
     def connect(self) -> None:
         ### Create a QuantumMachinesManager instance for the OPX and set it as the driver
@@ -66,6 +61,37 @@ class OPX_Driver(Connectable):
         else:
             raise Exception("Quantum machine is not currently open.")
     
+    def add_sequence_step(self, pulse=None, element=None, duration=None):
+        program_step = {}
+        if pulse is not None:
+            program_step["pulse"] = pulse
+        if element is not None:
+            program_step["element"] = element
+        if duration is not None:
+            program_step["duration"] = duration
+        self.sequence_stack.append(program_step)
+
+    def execute_program(self):
+        with program() as sequence_program:
+            for step in self.sequence_stack:
+                if "pulse" in step and "element" in step and "duration" in step:
+                    play(pulse=step["pulse"], element=step["element"], duration=step["duration"])
+                elif "pulse" in step and "element" in step:
+                    play(pulse=step["pulse"], element=step["element"])
+                elif "pulse" in step and "duration" in step:
+                    play(pulse=step["pulse"], duration=step["duration"])
+                elif "element" in step and "duration" in step:
+                    play(element=step["element"], duration=step["duration"])
+                elif "pulse" in step:
+                    play(pulse=step["pulse"])
+                elif "element" in step:
+                    play(element=step["element"])
+                elif "duration" in step:
+                    play(duration=step["duration"])
+
+        job = self.get_quantum_machine().execute(sequence_program)
+        print(job.get_status())
+
     def close_all_quantum_machines(self):
         self.driver.close_all_qms()
 

@@ -65,7 +65,7 @@ class RS_ZNL20_Driver(Connectable):
     def get_frequency_start(self) -> float:
         return float(self.query(f"SENS:FREQ:STAR?"))
 
-    def get_frequency_end(self) -> None:
+    def get_frequency_end(self) -> float:
         return float(self.query(f"SENS:FREQ:STOP?"))
     
     def get_num_sweep_points(self) -> int:
@@ -75,7 +75,7 @@ class RS_ZNL20_Driver(Connectable):
         return bool(self.query(f"INIT:CONT?")) 
     
     def get_bandwidth(self) -> float:
-        return None
+        return float(self.query(f"SENS:BAND:RES?"))
 
     def set_power(self, power_dBm: float) -> None:
         self.write(f"SOUR:POW {power_dBm}dBm")
@@ -97,6 +97,9 @@ class RS_ZNL20_Driver(Connectable):
 
     def set_sweep_count(self, sweeps: int) -> None:
         self.write(f"SENS:SWE:COUN {sweeps}")
+
+    def set_bandwidth(self, bandwidth_Hz: float) -> None:
+        self.write(f"SENS:BAND:RES {bandwidth_Hz}")
 
     def start_sweep(self) -> None:
         self.write("INIT:IMM")
