@@ -2,8 +2,8 @@ from photonicdrivers.Abstract.Connectable import Connectable
 import numpy as np
 
 class NewFocus_8742_Mock(Connectable):
-    def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None, instant_move=True):
-        self.connected = False
+    def __init__(self, skew_negative: bool=False, prnt=False, name: str | None=None, instant_move=True, skew_positive: bool=False):
+        self.connected = True
 
         self.move_history = []
         self.axis_positions = [0.0, 0.0, 0.0, 0.0]
@@ -11,6 +11,7 @@ class NewFocus_8742_Mock(Connectable):
         self.total_move_commands = 0
 
         self.skew_negative = skew_negative
+        self.skew_positive = skew_positive
         self.prnt = prnt
         self.name = name
         self.instant_move = instant_move
@@ -34,10 +35,23 @@ class NewFocus_8742_Mock(Connectable):
         decay_rate = 0.002
         return (x / (1 + k * np.exp(-np.abs(x) * decay_rate)))
 
+    def _stretch_positive(self, x):
+        abs_x = np.abs(float(x))
+        # Percent skew stays within roughly +/-10% from 5..500, with most of the change before ~100
+        # and a slower positive tail afterwards.
+        pct = (
+            -0.10
+            + 0.13 * (1 - np.exp(-abs_x / 35.0))
+            + 0.06 * (1 - np.exp(-abs_x / 500.0))
+        )
+        return float(x) * (1.0 + pct)
+
     def move_relative_position(self, axis_number_str, distance_str):
         axis_number = int(axis_number_str)
         if self.skew_negative and distance_str < 0:
             actual_dist = self._stretch(distance_str)
+        elif self.skew_positive and distance_str > 0:
+            actual_dist = self._stretch_positive(distance_str)
         else:
             actual_dist = distance_str
         if axis_number < 1 or axis_number > len(self.axis_positions):
