@@ -63,6 +63,12 @@ class Swabian_TimeTagger_Driver(Connectable):
     def initialise_counter(self, channelList: list[int], bin_width_ps: int, num_bins: int) -> None:
         return TimeTagger.Counter(tagger=self.connection, channels=channelList, binwidth=bin_width_ps, n_values=num_bins)
 
+    def initialise_delayed_counter(self, channel, bin_width_ps: int, num_bins: int, delay_ps: int) -> None:
+        self.delayed_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=channel, delay=delay_ps)
+        self.delayed_channel_number = self.delayed_channel.getChannel()
+        return TimeTagger.Counter(tagger=self.connection, channels=self.delayed_channel_number, binwidth=bin_width_ps, n_values=num_bins)
+
+
     def initialise_correlation(self, channel_1: int, channel_2: int, bin_width_ps: int, num_bins: int) -> None:
         return TimeTagger.Correlation(tagger=self.connection, channel_1=channel_1, channel_2=channel_2, binwidth=bin_width_ps, n_bins=num_bins)
 
@@ -78,9 +84,37 @@ class Swabian_TimeTagger_Driver(Connectable):
     def initialize_2d_histogram(self, stop_channel_1: int, stop_channel_2: int, start_channel: int, bin_width_1_ps: int, bin_width_2_ps: int, num_bins_1: int, num_bins_2: int) -> None:
         return TimeTagger.Histogram2D(tagger=self.connection, start_channel=start_channel, stop_channel_1=stop_channel_1, stop_channel_2=stop_channel_2, binwidth_1=bin_width_1_ps, binwidth_2=bin_width_2_ps, n_bins_1=num_bins_1, n_bins_2=num_bins_2)
 
-    def initialise_delayed_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
-        delayed_start_channel = self.get_delayed_channel_number(channel=start_channel, delay_ps=1_000_000)
-        return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=delayed_start_channel, binwidth = bin_width_ps, n_bins=num_bins)
+    def initialise_delayed_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int, delay_ps: int) -> None:
+        self.delayed_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=start_channel, delay=delay_ps)
+        self.delayed_channel_number = self.delayed_channel.getChannel()
+        self.delayed_histogram = TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=self.delayed_channel_number, binwidth = bin_width_ps, n_bins=num_bins)
+        return self.delayed_histogram
+
+    def initialise_gated_lifetime_histogram(self, trigger_channel_number, click_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins):
+        self.gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_start_delay_ps)
+        self.gate_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_stop_delay_ps)
+        self.gate_start_channel_number = self.gate_start_channel.getChannel()
+        self.gate_stop_channel_number = self.gate_stop_channel.getChannel()
+        self.gated_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=self.gate_start_channel_number, gate_stop_channel=self.gate_stop_channel_number)
+        self.gated_channel_number = self.gated_channel.getChannel()
+        print("Gated channel number: ", self.gated_channel_number, " gate start channel number: ", self.gate_start_channel_number, " gate stop channel number: ", self.gate_stop_channel_number)
+        self.gated_life_time_histogram = TimeTagger.Histogram(tagger=self.connection, start_channel=trigger_channel_number, click_channel=self.gated_channel_number, binwidth=bin_width_ps, n_bins=num_bins)
+        return self.gated_life_time_histogram
+
+    def initialise_gated_g2_correlation(self, trigger_channel_number, click_1_channel_number, click_2_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins, histogram_num_bins):
+        gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_start_delay_ps)
+        gate_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_stop_delay_ps)
+        gate_start_channel_number = gate_start_channel.getChannel()
+        gate_stop_channel_number = gate_stop_channel.getChannel()
+        gated_channel_1=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_1_channel_number, gate_start_channel=gate_start_channel_number, gate_stop_channel=gate_stop_channel_number)
+        gated_channel_2=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_2_channel_number, gate_start_channel=gate_start_channel_number, gate_stop_channel=gate_stop_channel_number)
+        gated_channel_1_number = gated_channel_1.getChannel()
+        gated_channel_2_number = gated_channel_2.getChannel()
+        gated_g2_correlation = TimeTagger.Correlation(tagger=self.connection, channel_1=gated_channel_1_number, channel_2=gated_channel_2_number, binwidth=bin_width_ps, n_bins=num_bins)
+        histogram_1 = TimeTagger.Histogram(tagger=self.connection, click_channel=click_1_channel_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        histogram_2 = TimeTagger.Histogram(tagger=self.connection, click_channel=click_2_channel_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        return gated_g2_correlation, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2, histogram_1, histogram_2
+    
 
     def getSerial(self) -> str:
         return self.connection.getSerial()
@@ -169,17 +203,13 @@ class Swabian_TimeTagger_Driver(Connectable):
         "Get the current trigger channels that have conditional filters set. Returns an empty list if no conditional filters are set."
         return self.connection.getConditionalFilterTrigger()
     
-    def get_delayed_channel(self, channel: int, delay_ps: int):
-        return TimeTagger.DelayedChannel(tagger=self.connection, input_channel=channel, delay=delay_ps)
-
-    def get_gated_channel(self, channel: int, gate_start_channel: int, gate_stop_channel: int):
-        return TimeTagger.GatedChannel(tagger=self.connection, input_channel=channel, gate_start_channel=gate_start_channel, gate_stop_channel=gate_stop_channel)
-   
     def get_delayed_channel_number(self, channel: int, delay_ps: int) -> int:
-        return self.get_delayed_channel(channel=channel, delay_ps=delay_ps).getChannel()
+        self.delayed_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=channel, delay=delay_ps)
+        return self.delayed_channel.getChannel()
 
     def get_gated_channel_number(self, channel: int, gate_start_channel: int, gate_stop_channel: int) -> int:
-        return self.get_gated_channel(channel=channel, gate_start_channel=gate_start_channel, gate_stop_channel=gate_stop_channel).getChannel()
+        self.gated_channel = TimeTagger.GatedChannel(tagger=self.connection, input_channel=channel, gate_start_channel=gate_start_channel, gate_stop_channel=gate_stop_channel)
+        return self.gated_channel.getChannel()
     
     def get_channel_list(self):
         return self.connection.getChannelList()
