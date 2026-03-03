@@ -6,10 +6,10 @@ import logging
 class Santec_TSL570_driver(Connectable):
     def __init__(
         self,
-        resource_manager=None,
-        ip_address: str = "",
-        port_number: str = "",
-        prints_enabled=True,
+        ip_address: str,
+        port_number: str,
+        resource_manager: pyvisa.ResourceManager = None,
+        prints_enabled=False,
     ):
         self.prints_enabled = prints_enabled
         if resource_manager is not None:
@@ -47,8 +47,10 @@ class Santec_TSL570_driver(Connectable):
 
     def is_connected(self):
         try:
-            return self.get_idn() is not None
-        except:
+            return bool(self.get_idn() is not None)
+        except Exception as e:
+            if self.prints_enabled:
+                logging.error(f"Couldn't get ID due to the error: {e}")
             return False
 
     def get_idn(self):
@@ -83,6 +85,23 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         wavelength_in_nm = float(return_msg) * 1e9
         return wavelength_in_nm
+    
+    def get_wavelength_unit(self) -> str:
+        
+        """
+        OBS not sure if this code work!!
+        Check!
+
+        Get wavelength unit of the laser wavelength [nm]
+
+        Args:
+            None
+        Returns:
+            str: wavelength unit of the laser
+        """
+        msg = ":WAV:UNIT?"
+        return_msg = self.laser.query(msg)
+        return return_msg
 
     def get_power(self) -> float:
         """
@@ -115,6 +134,25 @@ class Santec_TSL570_driver(Connectable):
         else:
             return "mW"
 
+    def set_power_unit(self, unit: str) -> None:
+        """
+        OBS: This code has not been tested!
+
+        Set power unit of the laser power [dBm or mW]
+
+        Args:
+            unit (str): Desired unit, either 'dBm' or 'mW'
+        """
+        unit = unit.strip().lower()
+        if unit == "dbm":
+            cmd = ":POW:UNIT DBM"
+        elif unit == "mw":
+            cmd = ":POW:UNIT MW"
+        else:
+            raise ValueError("Invalid unit. Must be 'dBm' or 'mW'.")
+
+        self.laser.write(cmd)
+
     def get_emission_status(self) -> int:
         """
         Get laser emission status
@@ -143,18 +181,32 @@ class Santec_TSL570_driver(Connectable):
         operation_status = int(return_msg)
         return operation_status
 
-    def set_wavelength(self, wavelength_nm: float) -> None:
+    def set_wavelength(self, wavelength_m: float) -> None:
         """
-        Set wavelength [nm] of the laser
+        Set wavelength [m] of the laser
 
         Args:
-            wavelength_nm (float): wavelength in nm
+            wavelength_nm (float): wavelength in m
         Returns:
             None
         """
 
-        msg = ":WAVelength  " + str(wavelength_nm) + "e-9"
+        msg = ":WAVelength  " + str(wavelength_m) # + "e-9"
         self.laser.write(msg)
+
+    def set_wavelength_unit(self, unit: str):
+        
+        # OBS: This code has not been tested!
+
+        unit = unit.strip().lower()
+        if unit == "nm":
+            cmd = ":WAV:UNIT NM"
+        elif unit == "um":
+            cmd = ":WAV:UNIT UM"
+        else:
+            raise ValueError("Invalid unit. Must be 'nm' or 'um'.")
+
+        self.laser.write(cmd)
 
     def set_power(self, power_dBm: float):
         """
@@ -174,10 +226,10 @@ class Santec_TSL570_driver(Connectable):
             None
         """
         if emission:
-            emission = 1
+            emission_int = 1
         else:
-            emission = 0
-        msg = ":POW:STAT " + str(emission)
+            emission_int = 0
+        msg = ":POW:STAT " + str(emission_int)
         self.laser.write(msg)
 
     ####################### BLANKET FUNCTIONS #######################
@@ -207,10 +259,16 @@ class Santec_TSL570_driver(Connectable):
 
 
 if __name__ == "__main__":
+
+
+    # Check if the driver works
     from time import sleep
 
     rm = pyvisa.ResourceManager()
-    santec = Santec_TSL570_driver(resource_manager=rm, ip_address="10.209.69.95")
+    santec = Santec_TSL570_driver(
+        resource_manager = rm,
+        ip_address="10.209.69.95",
+        port_number="5000")
     santec.connect()
     santec.get_idn()
 
@@ -232,7 +290,7 @@ if __name__ == "__main__":
     sleep_time = 0.1
     sleep(sleep_time)
     print("Power: ", santec.get_power())
-    santec.set_emission_status(0)
+    santec.set_emission_status(True)
 
     santec.disconnect()
     print("\nDone.")

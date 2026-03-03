@@ -1,15 +1,20 @@
+'''
+For explanation of this type checking "Abstract class" look up wikipage:
 
-from abc import abstractmethod, ABC
-class Connectable(ABC): 
+    DevOps --> Wiki --> NQCP-teams --> Characterization-team --> Onboarding-to-Characterization --> Photonic Characterization Structures
 
-    @abstractmethod
+'''
+
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class Connectable(Protocol):
     def connect(self) -> None:
-        pass
-    
-    @abstractmethod
+        ...
+
     def disconnect(self) -> None:
-        pass
-    
-    @abstractmethod
+        ...
+
     def is_connected(self) -> bool:
-        pass
+        ...
+

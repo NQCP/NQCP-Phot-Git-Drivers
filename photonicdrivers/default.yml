@@ -1,0 +1,73 @@
+redpitaya:
+  autostart: true
+  defaultport: 80
+  delay: 0.05
+  frequency_correction: 1.0
+  gui: true
+  hostname: 10.209.69.191
+  leds_off: true
+  monitor_server_name: monitor_server
+  password: Nmt3ciKK4!
+  port: 80
+  reloadfpga: true
+  reloadserver: false
+  serverbinfilename: fpga.bit.bin
+  serverdirname: //opt//pyrpl//
+  serverdtbofilename: fpga.dtbo
+  silence_env: false
+  sshport: 22
+  timeout: 1
+  user: root
+pyrpl:
+  background_color: ''
+  loglevel: info
+  modules:
+  - NetworkAnalyzer
+  - SpectrumAnalyzer
+  - CurveViewer
+  - PyrplConfig
+  - Lockbox
+  name: default
+  dock_positions: "\0\0\0\xFF\0\0\0\0\xFD\0\0\0\x01\0\0\0\x02\0\0\n\0\0\0\x050\xFC\
+    \x01\0\0\0\x02\xFC\0\0\0\0\0\0\x03\xBF\0\0\0]\0\xFF\xFF\xFF\xFA\0\0\0\0\x01\0\0\
+    \0\f\xFB\0\0\0\x1C\0a\0s\0g\0s\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\x01\0\0\0\0\xFF\xFF\
+    \xFF\xFF\0\0\0]\0\xFF\xFF\xFF\xFB\0\0\0\x1A\0i\0q\0s\0 \0(\0d\0e\0f\0a\0u\0l\0\
+    t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0]\0\xFF\xFF\xFF\xFB\0\0\0\x1C\0p\0i\0d\0s\0\
+    \ \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\
+    \xFB\0\0\0\x1C\0i\0i\0r\0s\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\
+    \xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0\x1E\0t\0r\0i\0g\0s\0 \0(\0d\0e\0f\0a\0\
+    u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0\x1C\0p\0\
+    w\0m\0s\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\
+    \xFF\xFF\xFB\0\0\0\x1A\0h\0k\0s\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\
+    \xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\02\0n\0e\0t\0w\0o\0r\0k\0a\0n\0a\0l\0\
+    y\0z\0e\0r\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\
+    \xFF\xFF\xFF\xFB\0\0\04\0s\0p\0e\0c\0t\0r\0u\0m\0a\0n\0a\0l\0y\0z\0e\0r\0 \0(\0\
+    d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\
+    \0\0*\0c\0u\0r\0v\0e\0v\0i\0e\0w\0e\0r\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\
+    \xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0*\0p\0y\0r\0p\0l\0c\0o\0n\0\
+    f\0i\0g\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\
+    \xFF\xFF\xFB\0\0\0\"\0l\0o\0c\0k\0b\0o\0x\0 \0(\0d\0e\0f\0a\0u\0l\0t\0)\0\0\0\0\
+    \0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0 \0s\0c\0o\0p\0e\0s\0 \0(\0\
+    d\0e\0f\0a\0u\0l\0t\0)\x01\0\0\x03\xC3\0\0\x06=\0\0\0]\0\xFF\xFF\xFF\0\0\n\0\0\
+    \0\0\0\0\0\0\x04\0\0\0\x04\0\0\0\b\0\0\0\b\xFC\0\0\0\0"
+  window_position:
+  - -1
+  - -8
+  - 2560
+  - 1369
+scope:
+  curve_name: scope curve
+  ch2_active: false
+  run_continuous: true
+  duration: 8.589934592
+  average: true
+  trigger_delay: 0.0
+networkanalyzer:
+  curve_name: networkanalyzer curve
+spectrumanalyzer:
+  curve_name: spectrumanalyzer curve
+lockbox:
+  sequence:
+  - outputs: {}
+asg0:
+  waveform: square

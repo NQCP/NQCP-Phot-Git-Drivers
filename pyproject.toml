@@ -39,7 +39,12 @@ dependencies = [
     "pylablib", 
     "timetagger",
     "zeroconf",
-    "pulsestreamer"]
+    "pulsestreamer",
+    "pefile",
+    "qm-octave",
+    "qm-qua",
+    "qualang-tools"
+    ]
 
 dynamic = ["version"]
 
@@ -223,5 +228,5 @@ match = ["v*"]
 source-file = "photonicdrivers/_version.py"
 build-file = "photonicdrivers/_version.py"
 
-[tools.setuptools]
-py-modules=[]
+[tool.setuptools]
+packages = ["photonicdrivers"]

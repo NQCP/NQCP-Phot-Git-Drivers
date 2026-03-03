@@ -72,7 +72,8 @@ class NewFocus_8742_Driver(Connectable):
 
         @param axis_number_str: {0,1,2,3}
         """
-        self._write_command(str(axis_number_str) + 'PA')
+        raise NotImplementedError("Use move_relative_position instead")
+        # self._write_command(str(axis_number_str) + 'PA')
 
     def move_relative_position(self, axis_number_str, distance_str):
         """
@@ -131,7 +132,7 @@ class NewFocus_8742_Driver(Connectable):
             self.endpointIn = 0x2
             self.endpointOut = 0x81
             self.timeOut = 1000  # ms
-            devs = list(usb.core.find(idVendor=self.vendor_ID_Hex, idProduct=self.product_ID_Hex, find_all=True))
+            devs = list(usb.core.find(idVendor=int(self.vendor_ID_Hex, 0), idProduct=int(self.product_ID_Hex, 0), find_all=True))
             if self.hostname is None:
                 self.dev = devs[0]  # if no IP address is given, use the first device found
             else:
@@ -203,7 +204,7 @@ class NewFocus_8742_Driver(Connectable):
 
             # remove the newline characters if present
             if b"\r\n" in response:
-                response, dummy = response.split(b'\r\n')
+                response = response.split(b'\r\n')[0]
 
             # convert from byte string to string
             response = response.decode('utf-8')
@@ -270,5 +271,4 @@ if __name__ == "__main__":
         pico_motor_x.move_relative_position(1)
         plt.pause(0.01)
         pico_motor_y.move_relative_position(1)
-
 
