@@ -116,6 +116,9 @@ class RS_ZNL20_Driver(Connectable):
     def read_formatted_data(self) -> str:
         return self.query("CALC:DATA? FDAT")
     
+    def read_formatted_data_complex(self) -> str:
+        return self.query("CALC:DATA? SDAT")
+    
     def create_channel(self, channel_type: str, channel_name: str) -> None:
         """Channel name must be unique"""
         self.write(f"INST:CRE {channel_type}, '{channel_name}'")
