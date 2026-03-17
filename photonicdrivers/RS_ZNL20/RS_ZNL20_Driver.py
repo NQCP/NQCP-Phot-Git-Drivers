@@ -112,11 +112,17 @@ class RS_ZNL20_Driver(Connectable):
 
     def select_s_parameter(self, s_param: str) -> None:
         self.write(f"CALC:PAR:MEAS 'Trc1', '{s_param}'")
+
+    def select_s_parameter_list(self, s_param_list: list[str]) -> None:
+        for i, s_param in enumerate(s_param_list):
+            self.write(f"CALC:PAR:SDEF 'Trc{i+1}', '{s_param}'")
+        # print('VNA traces: ' + self.query("CALC:PAR:CAT?"))
     
     def read_formatted_data(self) -> str:
         return self.query("CALC:DATA? FDAT")
     
-    def read_formatted_data_complex(self) -> str:
+    def read_formatted_data_complex(self, trace_index: int = 1) -> str:
+        self.write(f"CALC:PAR:SEL 'Trc{trace_index}'")
         return self.query("CALC:DATA? SDAT")
     
     def create_channel(self, channel_type: str, channel_name: str) -> None:
