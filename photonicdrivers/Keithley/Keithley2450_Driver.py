@@ -164,6 +164,18 @@ class Keithley2450_Driver(Connectable):
         """
         self.write(f":SENS:CURR:RANG {str(value)}")
 
+    def get_voltage_source_level(self):
+        """
+        Get voltage source level in volts
+        """
+        return self.query(":SOUR:VOLT:LEV:IMM:AMPL?")
+    
+    def get_current_output_limit(self):
+        """
+        Get current limit in amps
+        """
+        return self.query(":SOUR:VOLT:ILIM?")
+
 # Example usage:
 if __name__ == "__main__":
     # Replace with the actual IP address of your Keithley 2450
