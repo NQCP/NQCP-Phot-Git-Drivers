@@ -263,7 +263,7 @@ class BlueForsFridge_Driver(Connectable):
     def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
         data = {
             f"{self._FSE_HEATER_VALUES_PATH}.{key}": {
-                "content": {"value": int(value) if isinstance(value, bool) else value}
+                "content": {"value": str(int(value)) if isinstance(value, bool) else str(value)}
             }
             for key, value in updates.items()
         }
@@ -274,6 +274,7 @@ class BlueForsFridge_Driver(Connectable):
             raise RuntimeError(f"API Error on push: {response}")
 
         # Tell the mapping software to push ("read" from local, write to hardware) these values.
+        print("BlueFors POST response:", response)
         # This is required because bftc parameters are 'Delayed device values' that only queue updates.
         push_command = {
             "data": {
