@@ -261,21 +261,42 @@ class BlueForsFridge_Driver(Connectable):
         return self._post_fse_heater_values(payload)
 
     def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
-        import time
+        """Write PID/heater values to the bftc2 driver tree and push them to hardware.
+
+        These are 'delayed device values': writing sets status to CHANGED,
+        then the .read method pushes them to the physical device.
+
+        NOTE: Does NOT automatically pull values back from hardware afterwards,
+        because doing so can race with the push and overwrite CHANGED values.
+        Call refresh_fse_heater_values() after ~3-5 seconds to confirm the
+        hardware accepted the new settings.
+        """
         data = {
             f"{self._FSE_HEATER_VALUES_PATH}.{key}": {
-                "content": {"value": int(value) if isinstance(value, bool) else value}
+                "content": {"value": str(int(value)) if isinstance(value, bool) else str(value)}
             }
             for key, value in updates.items()
         }
-        response = self._post_values({"data": data})
+
+        # Step 1: POST values with must_exist=1 so missing paths cause errors
+        response = self._post_values({"data": data}, must_exist=True)
 
         if "error" in response or "Error" in response.get("data", {}):
-            raise RuntimeError(f"API Error on push: {response}")
+            raise RuntimeError(f"API Error setting values: {response}")
 
-        print("BlueFors POST response:", response)
+        # Step 2: Verify values were accepted as CHANGED
+        statuses = self._extract_response_statuses(response, set(data.keys()))
+        non_changed = {k: s for k, s in statuses.items() if s != "CHANGED"}
+        if non_changed:
+            import warnings
+            warnings.warn(
+                f"Not all values accepted as CHANGED (may already match device or were rejected): {non_changed}"
+            )
+        print(f"BlueFors POST statuses: {statuses}")
 
-        # Tell the mapping software to push ("read" from local, write to hardware) these values.
+        # Step 3: Push CHANGED values to hardware via the .read method
+        # (.read = "Write configurations to the device" from the TC's perspective)
+        time.sleep(0.3)
         push_command = {
             "data": {
                 f"{self._FSE_HEATER_VALUES_PATH}.read": {
@@ -283,18 +304,19 @@ class BlueForsFridge_Driver(Connectable):
                 }
             }
         }
-        
-        # Adding a small sleep might help if the API needs time to commit the queued values before triggering 'read'
-        time.sleep(0.5)
-        
-        response2 = self._post_values(push_command)
-        if "error" in response2 or "Error" in response2.get("data", {}):
-            raise RuntimeError(f"API Error on call: {response2}")
-            
-        print("BlueFors READ trigger response:", response2)
+        push_response = self._post_values(push_command)
+        if "error" in push_response:
+            raise RuntimeError(f"API Error on push call: {push_response}")
+        print("BlueFors push (.read) response:", push_response)
 
-        time.sleep(0.5)
-        # Also trigger the 'write' method (which means "read from hardware to local") so our tree updates
+        return response
+
+    def refresh_fse_heater_values(self) -> dict[str, Any]:
+        """Pull current heater values from hardware back into the value tree.
+
+        Call this after allowing sufficient time (~3-5 s) for the push
+        triggered by _post_fse_heater_values to propagate to the device.
+        """
         pull_command = {
             "data": {
                 f"{self._FSE_HEATER_VALUES_PATH}.write": {
@@ -302,16 +324,59 @@ class BlueForsFridge_Driver(Connectable):
                 }
             }
         }
-        self._post_values(pull_command)
-        time.sleep(0.2)
+        return self._post_values(pull_command)
 
-        return response
+    def verify_fse_heater_values(
+        self,
+        expected: dict[str, Any],
+        timeout_s: float = 5.0,
+        poll_interval_s: float = 1.0,
+    ) -> tuple[bool, dict[str, Any]]:
+        """Poll PID settings until they match *expected* or timeout.
+
+        Returns (success, actual_settings).
+        *expected* keys should match those returned by get_pid_settings().
+        """
+        deadline = time.time() + timeout_s
+        actual: dict[str, Any] = {}
+        while time.time() < deadline:
+            self.refresh_fse_heater_values()
+            time.sleep(poll_interval_s)
+            actual = self.get_pid_settings()
+            if all(actual.get(k) == v for k, v in expected.items()):
+                return True, actual
+        mismatches = {k: (v, actual.get(k)) for k, v in expected.items() if actual.get(k) != v}
+        print(f"BlueFors verify failed. Mismatches (expected, actual): {mismatches}")
+        return False, actual
     
-    def _post_values(self, payload:dict) -> dict:
+    def _extract_response_statuses(self, response: dict, expected_keys: set[str]) -> dict[str, str]:
+        """Extract the latest_value status for each key from a POST response."""
+        data = response.get("data", {})
+        statuses: dict[str, str] = {}
+        for key in expected_keys:
+            node = data.get(key, {})
+            if not isinstance(node, dict):
+                statuses[key] = "MISSING"
+                continue
+            content = node.get("content", {})
+            if not isinstance(content, dict):
+                statuses[key] = "MISSING"
+                continue
+            latest = content.get("latest_value", {})
+            if isinstance(latest, dict):
+                statuses[key] = latest.get("status", "MISSING")
+            else:
+                statuses[key] = "MISSING"
+        return statuses
+
+    def _post_values(self, payload: dict, must_exist: bool = False) -> dict:
         self._validate_values_write_payload(payload)
         if self.session is None:
             raise RuntimeError("Driver is not connected. Call connect() before API calls.")
-        response = self.session.post("http://localhost:49099/values/?prettyprint=1&fields=name;value;status", json=payload)
+        url = f"{self.url}/values/?prettyprint=1&fields=name;value;status"
+        if must_exist:
+            url += "&must_exist=1"
+        response = self.session.post(url, json=payload)
         response.raise_for_status()
         out = response.json()
         if "error" in out:
