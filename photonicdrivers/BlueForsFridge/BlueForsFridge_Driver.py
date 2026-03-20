@@ -2,6 +2,7 @@ from typing import Any, Literal
 from photonicdrivers.Abstract.Connectable import Connectable
 import requests
 from enum import Enum
+import time
 # Lan port is only open to the computer running the control software. 
 # If enabled in the control software, access remotely via port 49098 
 LAN_PORT = 49099
@@ -268,6 +269,10 @@ class BlueForsFridge_Driver(Connectable):
         }
         response = self._post_values({"data": data})
 
+        # We also check if the driver responds with an error
+        if "error" in response or "Error" in response.get("data", {}):
+            raise RuntimeError(f"API Error on push: {response}")
+
         # Tell the mapping software to push ("read" from local, write to hardware) these values.
         # This is required because bftc parameters are 'Delayed device values' that only queue updates.
         push_command = {
@@ -277,7 +282,13 @@ class BlueForsFridge_Driver(Connectable):
                 }
             }
         }
-        self._post_values(push_command)
+        
+        # Adding a small sleep might help if the API needs time to commit the queued values before triggering 'read'
+        time.sleep(0.5)
+        
+        response2 = self._post_values(push_command)
+        if "error" in response2 or "Error" in response2.get("data", {}):
+            raise RuntimeError(f"API Error on call: {response2}")
 
         return response
     
@@ -286,7 +297,11 @@ class BlueForsFridge_Driver(Connectable):
         if self.session is None:
             raise RuntimeError("Driver is not connected. Call connect() before API calls.")
         response = self.session.post("http://localhost:49099/values/?prettyprint=1&fields=name;value;status", json=payload)
-        return response.json()
+        response.raise_for_status()
+        out = response.json()
+        if "error" in out:
+            raise RuntimeError(f"API returned an error: {out['error']}")
+        return out
 
     def _validate_values_write_payload(self, payload: dict[str, Any]) -> None:
         data = payload.get("data")
