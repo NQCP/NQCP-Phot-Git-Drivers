@@ -34,7 +34,7 @@ def convert_to_python_type(value: str, typ: str):
     if "Value.Number.Float" in typ:
         return float(value)
     if typ == "Value.Number.Integer.Enumeration.yesNo" or typ == "Value.Number.Integer.Enumeration.Boolean":
-        return bool(value)
+        return bool(int(value))
     if typ == "Value.Number.Integer.Enumeration.onOffError":
         return OnOffError(int(value))
     
@@ -52,6 +52,7 @@ class BlueForsFridge_Driver(Connectable):
     _FORBIDDEN_VALVES = {"v15", "v17", "v18"}
     _NO_PROMPT_VALVES = {"v13"}
     _FSE_HEATER_NR = 4
+    _FSE_HEATER_VALUES_PATH = "driver.bftc2.data.heaters.heater_4"
 
     def __init__(self, host="http://localhost", port=LAN_PORT):
         self.port = port
@@ -125,35 +126,51 @@ class BlueForsFridge_Driver(Connectable):
         node_values = self.get_values("heaters")
         return filter_type(node_values, [OnOffError])
 
-    def get_pid_settings(self) -> dict[int, dict[str, Any]]:
-        """Return PID-related settings for all heaters keyed by heater number."""
-        response = self.get_from_root("heaters")
-        heater_entries = response.get("data", response)
+    def get_pid_settings(self) -> dict[str, Any]:
+        """Return PID-related settings for the FSE heater only."""
+        response = self.get_from_root(f"values/{self._FSE_HEATER_VALUES_PATH}")
+        data = response.get("data", response)
 
-        if not isinstance(heater_entries, list):
+        if not isinstance(data, dict):
             return {}
 
-        pid_settings: dict[int, dict[str, Any]] = {}
-        for heater in heater_entries:
-            if not isinstance(heater, dict):
-                continue
-            heater_nr = heater.get("heater_nr")
-            if heater_nr is None:
-                continue
+        def extract_value(value_suffix: str) -> Any:
+            expected_suffix = f".{value_suffix}"
+            for key, node in data.items():
+                if not isinstance(key, str) or not key.endswith(expected_suffix):
+                    continue
+                if not isinstance(node, dict):
+                    continue
+                content = node.get("content")
+                if not isinstance(content, dict):
+                    continue
+                latest_value = content.get("latest_value")
+                if not isinstance(latest_value, dict):
+                    continue
+                value = latest_value.get("value")
+                if value in (None, ""):
+                    return None
+                typ = node.get("type")
+                if not isinstance(typ, str):
+                    return value
+                return convert_to_python_type(value, typ)
+            return None
 
-            pid_settings[int(heater_nr)] = {
-                "active": heater.get("active"),
-                "pid_mode": heater.get("pid_mode"),
-                "setpoint": heater.get("setpoint"),
-                "control_algorithm": heater.get("control_algorithm"),
-                "control_algorithm_settings": heater.get("control_algorithm_settings"),
-                "max_power": heater.get("max_power"),
-                "power": heater.get("power"),
-                "resistance": heater.get("resistance"),
-                "target_temperature": heater.get("target_temperature"),
-            }
-
-        return pid_settings
+        return {
+            "active": extract_value("active"),
+            "pid_mode": extract_value("pid_mode"),
+            "setpoint": extract_value("setpoint"),
+            "control_algorithm": extract_value("control_algorithm"),
+            "control_algorithm_settings": {
+                "proportional": extract_value("control_algorithm_settings.proportional"),
+                "integral": extract_value("control_algorithm_settings.integral"),
+                "derivative": extract_value("control_algorithm_settings.derivative"),
+            },
+            "max_power": extract_value("max_power"),
+            "power": extract_value("power"),
+            "resistance": extract_value("resistance"),
+            "target_temperature": extract_value("target_temperature"),
+        }
     
     def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
         payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
@@ -205,61 +222,47 @@ class BlueForsFridge_Driver(Connectable):
         *,
         max_power: float | None = None,
         resistance: float | None = None,
-        active: bool = True,
+        active: bool = False,
     ) -> dict[str, Any]:
         """Configure PID control parameters for the FSE heater only."""
-        heater_nr = self._FSE_HEATER_NR
-
         payload: dict[str, Any] = {
-            "heater_nr": heater_nr,
-            "active": active,
             "pid_mode": 1,
             "control_algorithm": 1,
             "setpoint": setpoint,
-            "control_algorithm_settings": {
-                "proportional": proportional,
-                "integral": integral,
-                "derivative": derivative,
-            },
+            "control_algorithm_settings.proportional": proportional,
+            "control_algorithm_settings.integral": integral,
+            "control_algorithm_settings.derivative": derivative,
+            "active": active,
         }
         if max_power is not None:
             payload["max_power"] = max_power
         if resistance is not None:
             payload["resistance"] = resistance
 
-        return self._post("heater/update", payload)
+        return self._post_fse_heater_values(payload)
 
-    def enable_fse_temperature_pid_loop(
-        self,
-        setpoint: float,
-        proportional: float,
-        integral: float,
-        derivative: float,
-        *,
-        max_power: float | None = None,
-        resistance: float | None = None,
-        ) -> dict[str, Any]:
-        """Enable and configure PID control for the currently coupled FSE heater only."""
-        return self.configure_fse_temperature_pid_loop(
-            setpoint=setpoint,
-            proportional=proportional,
-            integral=integral,
-            derivative=derivative,
-            max_power=max_power,
-            resistance=resistance,
-            active=True,
-        )
+    def enable_fse_temperature_pid_loop(self) -> dict[str, Any]:
+        """Enable PID mode on the FSE heater using the existing PID configuration."""
+        payload = {
+            "pid_mode": 1,
+            "active": True,
+        }
+        return self._post_fse_heater_values(payload)
 
     def disable_fse_temperature_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
         """Disable PID mode for the FSE heater only."""
-        heater_nr = self._FSE_HEATER_NR
-
         payload = {
-            "heater_nr": heater_nr,
             "pid_mode": 0,
             "active": keep_heater_active,
         }
-        return self._post("heater/update", payload)
+        return self._post_fse_heater_values(payload)
+
+    def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
+        data = {
+            f"{self._FSE_HEATER_VALUES_PATH}.{key}": {"content": {"value": value}}
+            for key, value in updates.items()
+        }
+        return self._post_values({"data": data})
     
     def _post_values(self, payload:dict) -> dict:
         self._validate_values_write_payload(payload)

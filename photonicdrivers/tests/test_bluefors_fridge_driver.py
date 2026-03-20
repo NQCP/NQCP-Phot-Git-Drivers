@@ -91,11 +91,14 @@ def test_configure_fse_pid_uses_hardcoded_fse_heater_and_never_recouples() -> No
     assert response["ok"] is True
     assert len(session.post_calls) == 1
     post_url, post_json = session.post_calls[0]
-    assert post_url == "http://localhost:49099/heater/update"
+    assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
     assert post_json is not None
-    assert post_json["heater_nr"] == 4
-    assert post_json["pid_mode"] == 1
-    assert post_json["control_algorithm"] == 1
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_mode"]["content"]["value"] == 1
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm"]["content"]["value"] == 1
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.setpoint"]["content"]["value"] == 0.9
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.proportional"]["content"]["value"] == 0.01
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.integral"]["content"]["value"] == 50.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.derivative"]["content"]["value"] == 0.0
     assert all("channel/heater/update" not in call_url for call_url, _ in session.post_calls)
 
 
@@ -108,9 +111,28 @@ def test_disable_fse_pid_uses_hardcoded_fse_heater() -> None:
     assert response["ok"] is True
     assert len(session.post_calls) == 1
     post_url, post_json = session.post_calls[0]
-    assert post_url == "http://localhost:49099/heater/update"
+    assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
     assert post_json == {
-        "heater_nr": 4,
-        "pid_mode": 0,
-        "active": False,
+        "data": {
+            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 0}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": False}},
+        },
+    }
+
+
+def test_enable_fse_pid_reuses_existing_configuration() -> None:
+    session = _DummySession()
+    driver = _make_driver(session)
+
+    response = driver.enable_fse_temperature_pid_loop()
+
+    assert response["ok"] is True
+    assert len(session.post_calls) == 1
+    post_url, post_json = session.post_calls[0]
+    assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
+    assert post_json == {
+        "data": {
+            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 1}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": True}},
+        },
     }
