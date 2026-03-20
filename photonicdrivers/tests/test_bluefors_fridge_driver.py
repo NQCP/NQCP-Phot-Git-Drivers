@@ -96,13 +96,13 @@ def test_configure_fse_pid_uses_hardcoded_fse_heater_and_never_recouples() -> No
     post_url, post_json = session.post_calls[0]
     assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
     assert post_json is not None
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_mode"]["content"]["value"] == "1"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm"]["content"]["value"] == "1"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.setpoint"]["content"]["value"] == "0.9"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_p"]["content"]["value"] == "0.01"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_i"]["content"]["value"] == "50.0"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_d"]["content"]["value"] == "0.0"
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.active"]["content"]["value"] == "1"
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_mode"]["content"]["value"] == 1
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm"]["content"]["value"] == 1
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.setpoint"]["content"]["value"] == 0.9
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_p"]["content"]["value"] == 0.01
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_i"]["content"]["value"] == 50.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_d"]["content"]["value"] == 0.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.active"]["content"]["value"] == 1
 
     sync_url, sync_json = session.post_calls[1]
     assert sync_json["data"]["driver.bftc2.data.heaters.heater_4.read"]["content"]["call"] == 1
@@ -121,8 +121,8 @@ def test_disable_fse_pid_uses_hardcoded_fse_heater() -> None:
     assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
     assert post_json == {
         "data": {
-            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": "0"}},
-            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": "0"}},
+            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 0}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": 0}},
         },
     }
     
@@ -142,8 +142,8 @@ def test_enable_fse_pid_reuses_existing_configuration() -> None:
     assert post_url == "http://localhost:49099/values/?prettyprint=1&fields=name;value;status"
     assert post_json == {
         "data": {
-            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": "1"}},
-            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": "1"}},
+            "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 1}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": 1}},
         },
     }
 

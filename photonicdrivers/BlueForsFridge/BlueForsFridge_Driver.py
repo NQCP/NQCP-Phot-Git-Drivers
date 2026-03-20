@@ -261,21 +261,21 @@ class BlueForsFridge_Driver(Connectable):
         return self._post_fse_heater_values(payload)
 
     def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
+        import time
         data = {
             f"{self._FSE_HEATER_VALUES_PATH}.{key}": {
-                "content": {"value": str(int(value)) if isinstance(value, bool) else str(value)}
+                "content": {"value": int(value) if isinstance(value, bool) else value}
             }
             for key, value in updates.items()
         }
         response = self._post_values({"data": data})
 
-        # We also check if the driver responds with an error
         if "error" in response or "Error" in response.get("data", {}):
             raise RuntimeError(f"API Error on push: {response}")
 
-        # Tell the mapping software to push ("read" from local, write to hardware) these values.
         print("BlueFors POST response:", response)
-        # This is required because bftc parameters are 'Delayed device values' that only queue updates.
+
+        # Tell the mapping software to push ("read" from local, write to hardware) these values.
         push_command = {
             "data": {
                 f"{self._FSE_HEATER_VALUES_PATH}.read": {
@@ -290,6 +290,8 @@ class BlueForsFridge_Driver(Connectable):
         response2 = self._post_values(push_command)
         if "error" in response2 or "Error" in response2.get("data", {}):
             raise RuntimeError(f"API Error on call: {response2}")
+            
+        print("BlueFors READ trigger response:", response2)
 
         return response
     
