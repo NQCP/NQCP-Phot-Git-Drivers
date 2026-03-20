@@ -266,7 +266,20 @@ class BlueForsFridge_Driver(Connectable):
             }
             for key, value in updates.items()
         }
-        return self._post_values({"data": data})
+        response = self._post_values({"data": data})
+
+        # Tell the mapping software to push ("read" from local, write to hardware) these values.
+        # This is required because bftc parameters are 'Delayed device values' that only queue updates.
+        push_command = {
+            "data": {
+                f"{self._FSE_HEATER_VALUES_PATH}.read": {
+                    "content": {"call": 1}
+                }
+            }
+        }
+        self._post_values(push_command)
+
+        return response
     
     def _post_values(self, payload:dict) -> dict:
         self._validate_values_write_payload(payload)
