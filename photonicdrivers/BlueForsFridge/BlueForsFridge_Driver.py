@@ -293,6 +293,18 @@ class BlueForsFridge_Driver(Connectable):
             
         print("BlueFors READ trigger response:", response2)
 
+        time.sleep(0.5)
+        # Also trigger the 'write' method (which means "read from hardware to local") so our tree updates
+        pull_command = {
+            "data": {
+                f"{self._FSE_HEATER_VALUES_PATH}.write": {
+                    "content": {"call": 1}
+                }
+            }
+        }
+        self._post_values(pull_command)
+        time.sleep(0.2)
+
         return response
     
     def _post_values(self, payload:dict) -> dict:
