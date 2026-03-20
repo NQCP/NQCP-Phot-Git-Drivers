@@ -37,6 +37,8 @@ def convert_to_python_type(value: str, typ: str):
         return bool(int(value))
     if typ == "Value.Number.Integer.Enumeration.onOffError":
         return OnOffError(int(value))
+    if "Value.Number.Integer" in typ:
+        return int(value)
     
     raise ValueError(f"No conversion for {typ} exists")
 
@@ -162,9 +164,9 @@ class BlueForsFridge_Driver(Connectable):
             "setpoint": extract_value("setpoint"),
             "control_algorithm": extract_value("control_algorithm"),
             "control_algorithm_settings": {
-                "proportional": extract_value("control_algorithm_settings.proportional"),
-                "integral": extract_value("control_algorithm_settings.integral"),
-                "derivative": extract_value("control_algorithm_settings.derivative"),
+                "proportional": extract_value("pid_p"),
+                "integral": extract_value("pid_i"),
+                "derivative": extract_value("pid_d"),
             },
             "max_power": extract_value("max_power"),
             "power": extract_value("power"),
@@ -229,9 +231,9 @@ class BlueForsFridge_Driver(Connectable):
             "pid_mode": 1,
             "control_algorithm": 1,
             "setpoint": setpoint,
-            "control_algorithm_settings.proportional": proportional,
-            "control_algorithm_settings.integral": integral,
-            "control_algorithm_settings.derivative": derivative,
+            "pid_p": proportional,
+            "pid_i": integral,
+            "pid_d": derivative,
             "active": active,
         }
         if max_power is not None:
@@ -259,7 +261,9 @@ class BlueForsFridge_Driver(Connectable):
 
     def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
         data = {
-            f"{self._FSE_HEATER_VALUES_PATH}.{key}": {"content": {"value": value}}
+            f"{self._FSE_HEATER_VALUES_PATH}.{key}": {
+                "content": {"value": int(value) if isinstance(value, bool) else value}
+            }
             for key, value in updates.items()
         }
         return self._post_values({"data": data})

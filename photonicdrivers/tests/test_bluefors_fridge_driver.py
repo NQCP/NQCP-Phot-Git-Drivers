@@ -96,9 +96,10 @@ def test_configure_fse_pid_uses_hardcoded_fse_heater_and_never_recouples() -> No
     assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_mode"]["content"]["value"] == 1
     assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm"]["content"]["value"] == 1
     assert post_json["data"]["driver.bftc2.data.heaters.heater_4.setpoint"]["content"]["value"] == 0.9
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.proportional"]["content"]["value"] == 0.01
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.integral"]["content"]["value"] == 50.0
-    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.control_algorithm_settings.derivative"]["content"]["value"] == 0.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_p"]["content"]["value"] == 0.01
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_i"]["content"]["value"] == 50.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.pid_d"]["content"]["value"] == 0.0
+    assert post_json["data"]["driver.bftc2.data.heaters.heater_4.active"]["content"]["value"] == 1
     assert all("channel/heater/update" not in call_url for call_url, _ in session.post_calls)
 
 
@@ -115,7 +116,7 @@ def test_disable_fse_pid_uses_hardcoded_fse_heater() -> None:
     assert post_json == {
         "data": {
             "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 0}},
-            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": False}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": 0}},
         },
     }
 
@@ -133,6 +134,6 @@ def test_enable_fse_pid_reuses_existing_configuration() -> None:
     assert post_json == {
         "data": {
             "driver.bftc2.data.heaters.heater_4.pid_mode": {"content": {"value": 1}},
-            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": True}},
+            "driver.bftc2.data.heaters.heater_4.active": {"content": {"value": 1}},
         },
     }
