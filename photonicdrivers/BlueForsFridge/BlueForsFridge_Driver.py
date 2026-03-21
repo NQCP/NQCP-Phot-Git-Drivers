@@ -2,10 +2,10 @@ from typing import Any, Literal
 from photonicdrivers.Abstract.Connectable import Connectable
 import requests
 from enum import Enum
-import time
-# Lan port is only open to the computer running the control software. 
-# If enabled in the control software, access remotely via port 49098 
+# Lan port is only open to the computer running the control software.
+# If enabled in the control software, access remotely via port 49098
 LAN_PORT = 49099
+TC_PORT = 5001
 
 class OnOffError(Enum):
     Off = 0
@@ -55,17 +55,20 @@ class BlueForsFridge_Driver(Connectable):
     _FORBIDDEN_VALVES = {"v15", "v17", "v18"}
     _NO_PROMPT_VALVES = {"v13"}
     _FSE_HEATER_NR = 4
-    _FSE_HEATER_VALUES_PATH = "driver.bftc2.data.heaters.heater_4"
 
-    def __init__(self, host="http://localhost", port=LAN_PORT):
+    def __init__(self, host="http://localhost", port=LAN_PORT, tc_host: str | None = None, tc_port: int = TC_PORT):
         self.port = port
         self.url = f"{host}:{self.port}"
         self.session: requests.Session | None = None
+        self.tc_url: str | None = f"{tc_host}:{tc_port}" if tc_host is not None else None
+        self.tc_session: requests.Session | None = None
 
     def connect(self, jumpstart=True):
         self.session = requests.Session()
         if jumpstart:
             self._jumpstart_connection()
+        if self.tc_url is not None:
+            self.tc_session = requests.Session()
     
     def _jumpstart_connection(self):
         # The timeout is a simple hack. The first request attempt in the HTTP session seems to always fail
@@ -83,6 +86,7 @@ class BlueForsFridge_Driver(Connectable):
 
     def disconnect(self):
         self.session = None
+        self.tc_session = None
 
     def is_connected(self) -> bool:
         session = self.session
@@ -130,50 +134,8 @@ class BlueForsFridge_Driver(Connectable):
         return filter_type(node_values, [OnOffError])
 
     def get_pid_settings(self) -> dict[str, Any]:
-        """Return PID-related settings for the FSE heater only."""
-        response = self.get_from_root(f"values/{self._FSE_HEATER_VALUES_PATH}")
-        data = response.get("data", response)
-
-        if not isinstance(data, dict):
-            return {}
-
-        def extract_value(value_suffix: str) -> Any:
-            expected_suffix = f".{value_suffix}"
-            for key, node in data.items():
-                if not isinstance(key, str) or not key.endswith(expected_suffix):
-                    continue
-                if not isinstance(node, dict):
-                    continue
-                content = node.get("content")
-                if not isinstance(content, dict):
-                    continue
-                latest_value = content.get("latest_value")
-                if not isinstance(latest_value, dict):
-                    continue
-                value = latest_value.get("value")
-                if value in (None, ""):
-                    return None
-                typ = node.get("type")
-                if not isinstance(typ, str):
-                    return value
-                return convert_to_python_type(value, typ)
-            return None
-
-        return {
-            "active": extract_value("active"),
-            "pid_mode": extract_value("pid_mode"),
-            "setpoint": extract_value("setpoint"),
-            "control_algorithm": extract_value("control_algorithm"),
-            "control_algorithm_settings": {
-                "proportional": extract_value("pid_p"),
-                "integral": extract_value("pid_i"),
-                "derivative": extract_value("pid_d"),
-            },
-            "max_power": extract_value("max_power"),
-            "power": extract_value("power"),
-            "resistance": extract_value("resistance"),
-            "target_temperature": extract_value("target_temperature"),
-        }
+        """Return PID-related settings for the FSE heater from the TC API."""
+        return self._tc_post("heater", {"heater_nr": self._FSE_HEATER_NR})
     
     def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
         payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
@@ -227,14 +189,17 @@ class BlueForsFridge_Driver(Connectable):
         resistance: float | None = None,
         active: bool = False,
     ) -> dict[str, Any]:
-        """Configure PID control parameters for the FSE heater only."""
+        """Configure PID control parameters for the FSE heater via the TC API."""
         payload: dict[str, Any] = {
+            "heater_nr": self._FSE_HEATER_NR,
             "pid_mode": 1,
             "control_algorithm": 1,
             "setpoint": setpoint,
-            "pid_p": proportional,
-            "pid_i": integral,
-            "pid_d": derivative,
+            "control_algorithm_settings": {
+                "proportional": proportional,
+                "integral": integral,
+                "derivative": derivative,
+            },
             "active": active,
         }
         if max_power is not None:
@@ -242,132 +207,45 @@ class BlueForsFridge_Driver(Connectable):
         if resistance is not None:
             payload["resistance"] = resistance
 
-        return self._post_fse_heater_values(payload)
+        return self._tc_post("heater/update", payload)
 
     def enable_fse_temperature_pid_loop(self) -> dict[str, Any]:
-        """Enable PID mode on the FSE heater using the existing PID configuration."""
-        payload = {
+        """Enable PID mode on the FSE heater."""
+        return self._tc_post("heater/update", {
+            "heater_nr": self._FSE_HEATER_NR,
             "pid_mode": 1,
             "active": True,
-        }
-        return self._post_fse_heater_values(payload)
+        })
 
     def disable_fse_temperature_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
-        """Disable PID mode for the FSE heater only."""
-        payload = {
+        """Disable PID mode for the FSE heater."""
+        return self._tc_post("heater/update", {
+            "heater_nr": self._FSE_HEATER_NR,
             "pid_mode": 0,
             "active": keep_heater_active,
-        }
-        return self._post_fse_heater_values(payload)
+        })
 
-    def _post_fse_heater_values(self, updates: dict[str, Any]) -> dict[str, Any]:
-        """Write PID/heater values to the bftc2 driver tree and push them to hardware.
+    def _tc_get(self, endpoint: str) -> dict[str, Any]:
+        """HTTP GET to the Temperature Controller API."""
+        if self.tc_session is None:
+            raise RuntimeError("Temperature controller not connected. Provide tc_host and call connect().")
+        response = self.tc_session.get(f"{self.tc_url}/{endpoint}")
+        response.raise_for_status()
+        result = response.json()
+        if result.get("status") == "ERROR":
+            raise RuntimeError(f"TC API error: {result.get('error', {}).get('message', result)}")
+        return result
 
-        These are 'delayed device values': writing sets status to CHANGED,
-        then the .read method pushes them to the physical device.
-
-        NOTE: Does NOT automatically pull values back from hardware afterwards,
-        because doing so can race with the push and overwrite CHANGED values.
-        Call refresh_fse_heater_values() after ~3-5 seconds to confirm the
-        hardware accepted the new settings.
-        """
-        data = {
-            f"{self._FSE_HEATER_VALUES_PATH}.{key}": {
-                "content": {"value": str(int(value)) if isinstance(value, bool) else str(value)}
-            }
-            for key, value in updates.items()
-        }
-
-        # Step 1: POST values with must_exist=1 so missing paths cause errors
-        response = self._post_values({"data": data}, must_exist=True)
-
-        if "error" in response or "Error" in response.get("data", {}):
-            raise RuntimeError(f"API Error setting values: {response}")
-
-        # Step 2: Verify values were accepted as CHANGED
-        statuses = self._extract_response_statuses(response, set(data.keys()))
-        non_changed = {k: s for k, s in statuses.items() if s != "CHANGED"}
-        if non_changed:
-            import warnings
-            warnings.warn(
-                f"Not all values accepted as CHANGED (may already match device or were rejected): {non_changed}"
-            )
-        print(f"BlueFors POST statuses: {statuses}")
-
-        # Step 3: Push CHANGED values to hardware via the .read method
-        # (.read = "Write configurations to the device" from the TC's perspective)
-        time.sleep(0.3)
-        push_command = {
-            "data": {
-                f"{self._FSE_HEATER_VALUES_PATH}.read": {
-                    "content": {"call": 1}
-                }
-            }
-        }
-        push_response = self._post_values(push_command)
-        if "error" in push_response:
-            raise RuntimeError(f"API Error on push call: {push_response}")
-        print("BlueFors push (.read) response:", push_response)
-
-        return response
-
-    def refresh_fse_heater_values(self) -> dict[str, Any]:
-        """Pull current heater values from hardware back into the value tree.
-
-        Call this after allowing sufficient time (~3-5 s) for the push
-        triggered by _post_fse_heater_values to propagate to the device.
-        """
-        pull_command = {
-            "data": {
-                f"{self._FSE_HEATER_VALUES_PATH}.write": {
-                    "content": {"call": 1}
-                }
-            }
-        }
-        return self._post_values(pull_command)
-
-    def verify_fse_heater_values(
-        self,
-        expected: dict[str, Any],
-        timeout_s: float = 5.0,
-        poll_interval_s: float = 1.0,
-    ) -> tuple[bool, dict[str, Any]]:
-        """Poll PID settings until they match *expected* or timeout.
-
-        Returns (success, actual_settings).
-        *expected* keys should match those returned by get_pid_settings().
-        """
-        deadline = time.time() + timeout_s
-        actual: dict[str, Any] = {}
-        while time.time() < deadline:
-            self.refresh_fse_heater_values()
-            time.sleep(poll_interval_s)
-            actual = self.get_pid_settings()
-            if all(actual.get(k) == v for k, v in expected.items()):
-                return True, actual
-        mismatches = {k: (v, actual.get(k)) for k, v in expected.items() if actual.get(k) != v}
-        print(f"BlueFors verify failed. Mismatches (expected, actual): {mismatches}")
-        return False, actual
-    
-    def _extract_response_statuses(self, response: dict, expected_keys: set[str]) -> dict[str, str]:
-        """Extract the latest_value status for each key from a POST response."""
-        data = response.get("data", {})
-        statuses: dict[str, str] = {}
-        for key in expected_keys:
-            node = data.get(key, {})
-            if not isinstance(node, dict):
-                statuses[key] = "MISSING"
-                continue
-            content = node.get("content", {})
-            if not isinstance(content, dict):
-                statuses[key] = "MISSING"
-                continue
-            latest = content.get("latest_value", {})
-            if isinstance(latest, dict):
-                statuses[key] = latest.get("status", "MISSING")
-            else:
-                statuses[key] = "MISSING"
-        return statuses
+    def _tc_post(self, endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """HTTP POST to the Temperature Controller API."""
+        if self.tc_session is None:
+            raise RuntimeError("Temperature controller not connected. Provide tc_host and call connect().")
+        response = self.tc_session.post(f"{self.tc_url}/{endpoint}", json=payload)
+        response.raise_for_status()
+        result = response.json()
+        if result.get("status") == "ERROR":
+            raise RuntimeError(f"TC API error: {result.get('error', {}).get('message', result)}")
+        return result
 
     def _post_values(self, payload: dict, must_exist: bool = False) -> dict:
         self._validate_values_write_payload(payload)
