@@ -173,6 +173,14 @@ class BlueForsFridge_Driver(Connectable):
                 print("Aborting valve control.")
                 raise ValueError(f"Aborting control of valve {normalized_name} as per user request.")
 
+        # Check to not contaminate external trap
+        if (normalized_name == "v3") and (state == 1):
+            valve_state = self.get_valves()
+            if (valve_state.get("v7") == 1) and (valve_state.get("v9") == 1):
+                raise ValueError("Aborting control of v3 to prevent contamination of external trap.")
+            
+        
+
         payload = {"data": {f"mapper.bf.valves.{normalized_name}": {"content": {"value": int(state)}}}}
         response = self._post_values(payload)
         return response
