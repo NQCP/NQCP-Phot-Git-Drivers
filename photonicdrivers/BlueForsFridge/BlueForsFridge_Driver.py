@@ -53,7 +53,7 @@ def filter_type(data: dict, filter_types: list[type] | None = None):
 class BlueForsFridge_Driver(Connectable):
     """Driver for interacting with the BlueFors Control Software application programmatically"""
     _FORBIDDEN_VALVES = {"v15", "v17", "v18"}
-    _NO_PROMPT_VALVES = {"v13"}
+    _NO_PROMPT_VALVES = {"v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v11", "v12", "v13"}
     _FSE_HEATER_NR = 4
 
     def __init__(self, host="http://localhost", port=LAN_PORT, tc_host: str | None = None, tc_port: int = TC_PORT):
