@@ -208,15 +208,31 @@ class BlueForsFridge_Driver(Connectable):
     def configure_fse_temperature_pid_loop(
         self,
         setpoint: float,
+    ) -> dict[str, Any]:
+        """Configure PID control parameters from the lookup table based on setpoint."""
+        from photonicdrivers.BlueForsFridge.FSE_PID_LUT import get_pid_parameters
+        params = get_pid_parameters(setpoint)
+        return self.configure_fse_temperature_pid_loop_manual(
+            setpoint=setpoint,
+            proportional=params["P"],
+            integral=params["I"],
+            derivative=params["D"],
+            max_power=params["max_power"],
+            active=self.get_pid_settings().get("active", False)
+        )
+
+    def configure_fse_temperature_pid_loop_manual(
+        self,
+        setpoint: float,
         proportional: float,
         integral: float,
         derivative: float,
         *,
         max_power: float | None = None,
         resistance: float | None = None,
-        active: bool = False,
+        active: bool | None = None,
     ) -> dict[str, Any]:
-        """Configure PID control parameters for the FSE heater via the TC API."""
+        """Configure PID control parameters for the FSE heater via the TC API manually."""
         payload: dict[str, Any] = {
             "heater_nr": self._FSE_HEATER_NR,
             "pid_mode": 1,
@@ -227,7 +243,7 @@ class BlueForsFridge_Driver(Connectable):
                 "integral": integral,
                 "derivative": derivative,
             },
-            "active": active,
+            "active": active if active is not None else self.get_pid_settings().get("active", False),
         }
         if max_power is not None:
             payload["max_power"] = max_power
