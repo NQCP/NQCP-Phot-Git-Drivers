@@ -125,9 +125,28 @@ class BlueForsFridge_Driver(Connectable):
         node_values = self.get_values("valves")
         return filter_type(node_values, [OnOffError])
     
-    def get_pumps(self) -> dict[str, OnOffError]:
+    def get_pumps(self) -> dict[str, OnOffError | float | int | None]:
         node_values = self.get_values("pumps")
-        return filter_type(node_values, [OnOffError])
+        pumps = filter_type(node_values, [OnOffError, float, int])
+        
+        # Attempt to get turbo pump speeds from legacy wrapper
+        try:
+            legacy_data = self.get_from_root("values/mapper/bflegacy/double")["data"]
+            legacy_values = flatten_value_nodes(legacy_data)
+            
+            # Map tc400 speeds to their turbo counterparts
+            if "tc400actualspd" in legacy_values and legacy_values["tc400actualspd"] is not None:
+                pumps["turbo1_speed"] = legacy_values["tc400actualspd"]
+            if "tc400actualspd_2" in legacy_values and legacy_values["tc400actualspd_2"] is not None:
+                pumps["turbo2_speed"] = legacy_values["tc400actualspd_2"]
+            if "tc400actualspd_3" in legacy_values and legacy_values["tc400actualspd_3"] is not None:
+                pumps["turbo3_speed"] = legacy_values["tc400actualspd_3"]
+            if "tc400actualspd_4" in legacy_values and legacy_values["tc400actualspd_4"] is not None:
+                pumps["turbo4_speed"] = legacy_values["tc400actualspd_4"]
+        except Exception:
+            pass # Failsafe in case bflegacy gets removed
+            
+        return pumps
 
     def get_heaters(self) -> dict[str, OnOffError]:
         node_values = self.get_values("heaters")
