@@ -9,11 +9,36 @@ class PIDParameters(TypedDict):
 # Define temperature thresholds (in Kelvin) and corresponding PID parameters.
 # The `get_pid_parameters` function will pick the lowest threshold such that `setpoint <= threshold`.
 FSE_PID_LUT: list[tuple[float, PIDParameters]] = [
-    (1.5, {"P": 0.005, "I": 100.0, "D": 0.0, "max_power": 0.020}),
-    (1.0, {"P": 0.003, "I": 100.0, "D": 0.0, "max_power": 0.002}),
-    (0.1, {"P": 0.001, "I": 50.0,  "D": 0.0, "max_power": 0.0005}),
-    # Add more mapping tuples by hand here as needed:
-    # (threshold, {"P": ..., "I": ..., "D": ..., "max_power": ...}),
+    (0.05,  {"P": 2e-5 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.001}),
+    (0.100, {"P": 8e-5 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.002}),
+    (0.150, {"P": 1e-4 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.004}),
+    (0.225, {"P": 2e-4 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.008}),
+    (0.325, {"P": 4e-4 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.02}),
+    (0.425, {"P": 6e-4 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.04}),
+    (0.55,  {"P": 1e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.08}),
+    (0.725, {"P": 2e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 0.1}),
+    (0.85,  {"P": 3e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.0,   {"P": 4e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.1,   {"P": 5e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.2,   {"P": 6e-3 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.3,   {"P": 7.5e-3 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.35,  {"P": 1e-2 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.425, {"P": 1.1e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.475, {"P": 1.2e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.525, {"P": 1.3e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.625, {"P": 1.35e-2 * 0.85, "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.675, {"P": 1.4e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.7,   {"P": 1.5e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.75,  {"P": 1.55e-2 * 0.85, "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (1.85,  {"P": 1.6e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (2.0,   {"P": 1.65e-2 * 0.85, "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (2.15,  {"P": 1.75e-2 * 0.85, "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (2.25,  {"P": 1.9e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (2.5,   {"P": 2.2e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (2.75,  {"P": 2.4e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (3.0,   {"P": 2.7e-2 * 0.85,  "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (5.0,   {"P": 3e-2 * 0.85,    "I": 100.0, "D": 0.0, "max_power": 1.0}),
+    (float('inf'), {"P": 5e-2 * 0.85, "I": 100.0, "D": 0.0, "max_power": 1.0}),
 ]
 
 def get_pid_parameters(setpoint: float) -> PIDParameters:
