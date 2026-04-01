@@ -24,3 +24,6 @@ class Lakeshore350_Driver(Connectable):
 
     def get_all_kelvin(self) -> list[float]:
         return [float(self.connection.query('KRDG?'))]
+
+    def get_all_ohms(self) -> list[float]:
+        return [float(self.connection.query('SRDG?'))]
