@@ -210,8 +210,27 @@ class BlueForsFridge_Driver(Connectable):
         setpoint: float,
     ) -> dict[str, Any]:
         """Configure PID control parameters from the lookup table based on setpoint."""
-        from photonicdrivers.BlueForsFridge.FSE_PID_LUT import get_pid_parameters
-        params = get_pid_parameters(setpoint)
+        import json
+        import os
+        
+        lut_path = os.path.join(os.path.dirname(__file__), "FSE_PID_LUT.json")
+        with open(lut_path, 'r') as f:
+            lut_data = json.load(f)
+            
+        parsed_lut = []
+        for row in lut_data:
+            t = float('inf') if row['threshold'] == 'inf' else float(row['threshold'])
+            p = {"P": row["P"], "I": row["I"], "D": row["D"], "max_power": row["max_power"]}
+            parsed_lut.append((t, p))
+            
+        sorted_lut = sorted(parsed_lut, key=lambda x: x[0])
+        
+        params = sorted_lut[-1][1]
+        for threshold, p_vals in sorted_lut:
+            if setpoint <= threshold:
+                params = p_vals
+                break
+                
         return self.configure_fse_temperature_pid_loop_manual(
             setpoint=setpoint,
             proportional=params["P"],
