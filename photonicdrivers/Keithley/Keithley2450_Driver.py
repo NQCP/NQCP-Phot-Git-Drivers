@@ -81,7 +81,7 @@ class Keithley2450_Driver(Connectable):
             response = self.socket.recv(4096)  # Adjust buffer size if needed
             return response.decode('ascii').strip()
         except socket.error as e:
-            print(f"Socket error: {e}")
+            print(f"Socket error on query '{command}': {e}")
             return None
     
     def read(self):
@@ -97,7 +97,7 @@ class Keithley2450_Driver(Connectable):
             response = self.socket.recv(4096)  # Adjust buffer size if needed
             return response.decode('ascii').strip()
         except socket.error as e:
-            print(f"Socket error: {e}")
+            print(f"Socket error on read: {e}")
             return None
 
     def identify(self):
@@ -156,7 +156,7 @@ class Keithley2450_Driver(Connectable):
         """
         Set voltage limit in volts
         """
-        self.write(f":SOUR:CURR:ILIM {str(value)}")
+        self.write(f":SOUR:CURR:VLIM {str(value)}")
 
     def set_current_output_limit(self,value):
         """
