@@ -51,11 +51,23 @@ class RS_ZNL20_Driver(Connectable):
         return int(self.query("*STB?"))
     
     def wait(self) -> None:
-        """Fire and forget synchronization of the device. Will not process further commands until all previous are done"""
+        """Issue SCPI ``*WAI`` to enforce instrument-side command ordering.
+
+        This does not itself return a completion token to Python. It is useful for
+        sequencing commands in the instrument parser but is less explicit than
+        ``*OPC?`` for host-side blocking logic.
+        """
         self.write("*WAI")
     
     def wait_operation_complete(self) -> int:
-        """Wait for the operation complete to be written to output buffer"""
+        """Block until pending operations complete using SCPI ``*OPC?``.
+
+        Returns:
+            int: Typically ``1`` when the instrument reports operation complete.
+
+        Use this after ``start_sweep()`` when you must ensure sweep results are
+        ready before reading data.
+        """
         result = self.query("*OPC?")
         return int(result)
 
@@ -102,6 +114,12 @@ class RS_ZNL20_Driver(Connectable):
         self.write(f"SENS:BAND:RES {bandwidth_Hz}")
 
     def start_sweep(self) -> None:
+        """Trigger a sweep using ``INIT:IMM`` and return immediately.
+
+        This method does not wait for measurement completion. Call
+        ``wait_operation_complete()`` when deterministic blocking is required
+        before data readout.
+        """
         self.write("INIT:IMM")
     
     def set_data_format(self) -> None:
@@ -112,11 +130,17 @@ class RS_ZNL20_Driver(Connectable):
 
     def select_s_parameter(self, s_param: str) -> None:
         self.write(f"CALC:PAR:MEAS 'Trc1', '{s_param}'")
+
+    def select_s_parameter_list(self, s_param_list: list[str]) -> None:
+        for i, s_param in enumerate(s_param_list):
+            self.write(f"CALC:PAR:SDEF 'Trc{i+1}', '{s_param}'")
+        # print('VNA traces: ' + self.query("CALC:PAR:CAT?"))
     
     def read_formatted_data(self) -> str:
         return self.query("CALC:DATA? FDAT")
     
-    def read_formatted_data_complex(self) -> str:
+    def read_formatted_data_complex(self, trace_index: int = 1) -> str:
+        self.write(f"CALC:PAR:SEL 'Trc{trace_index}'")
         return self.query("CALC:DATA? SDAT")
     
     def create_channel(self, channel_type: str, channel_name: str) -> None:

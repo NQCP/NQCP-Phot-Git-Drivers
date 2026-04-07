@@ -129,7 +129,7 @@ class Keithley2450_Driver(Connectable):
 
     def set_current(self,value):
         """
-        Set output current in Amps
+        Set output current in amps
         """
         self.write(f":SOUR:CURR:LEV:IMM:AMPL {str(value)}")
 
@@ -145,7 +145,19 @@ class Keithley2450_Driver(Connectable):
         Set output voltage range in volts
         """
         self.write(f":SOUR:VOLT:RANG {str(value)}")
+
+    def set_current_output_range(self,value):
+        """
+        Set output current range in amps
+        """
+        self.write(f":SOUR:CURR:RANG {str(value)}")
     
+    def set_voltage_output_limit(self,value):
+        """
+        Set voltage limit in volts
+        """
+        self.write(f":SOUR:CURR:ILIM {str(value)}")
+
     def set_current_output_limit(self,value):
         """
         Set current limit in amps
@@ -164,14 +176,26 @@ class Keithley2450_Driver(Connectable):
         """
         self.write(f":SENS:CURR:RANG {str(value)}")
 
-# Example usage:
-if __name__ == "__main__":
-    # Replace with the actual IP address of your Keithley 2450
-    device = Keithley2450_Driver()
+    def get_voltage_source_level(self):
+        """
+        Get voltage source level in volts
+        """
+        return self.query(":SOUR:VOLT:LEV:IMM:AMPL?")
 
-    try:
-        device.connect()
-
-        print("Identification:", device.identify())
-    finally:
-        device.disconnect()
+    def get_current_source_level(self):
+        """
+        Get current source level in amps
+        """
+        return self.query(":SOUR:CURR:LEV:IMM:AMPL?")
+    
+    def get_voltage_output_limit(self):
+        """
+        Get voltage limit in volts
+        """
+        return self.query(":SOUR:CURR:ILIM?")
+    
+    def get_current_output_limit(self):
+        """
+        Get current limit in amps
+        """
+        return self.query(":SOUR:VOLT:ILIM?")
