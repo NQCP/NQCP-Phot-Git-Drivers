@@ -129,10 +129,9 @@ class BlueForsFridge_Driver(Connectable):
         node_values = self.get_values("pumps")
         pumps = filter_type(node_values, [OnOffError, float, int])
 
-        # Fetch live turbo pump speeds directly from driver value tree
         turbo_value_paths = {
-            "turbo1_speed": "driver.tc400.active_rotational_speed",
-            "turbo2_speed": "driver.tc4002.active_rotational_speed",
+            "turbo1.1_speed": "driver.tc400.active_rotational_speed",
+            "turbo1.2_speed": "driver.tc4002.active_rotational_speed",
         }
         for key, path in turbo_value_paths.items():
             try:
