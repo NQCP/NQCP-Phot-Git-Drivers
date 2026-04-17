@@ -22,7 +22,10 @@ class AtlasCamera_Driver(Connectable):
         self.ip = ip
 
     def is_connected(self):
-        return self.camera.is_connected()
+        try:
+            return self.camera.is_connected()
+        except Exception:
+            return False
     
     def connect(self):
         relevant_infos = [x for x in system.device_infos if x['ip'] == self.ip]

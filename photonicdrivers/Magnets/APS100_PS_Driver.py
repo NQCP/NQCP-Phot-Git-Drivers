@@ -280,3 +280,91 @@ class APS100_PS_Driver(Connectable):
         response = self.__read()
         
         return response
+
+class APS100_PS_Driver_Stub(Connectable):
+    def __init__(self) -> None:
+        pass
+
+    def connect(self) -> None:
+        pass
+   
+    def disconnect(self) -> None:
+        pass
+
+    def is_connected(self) -> bool:
+        return True
+
+    def get_id(self) -> None:
+        return "Mock APS100 Power Supply Driver"
+
+    def get_channel(self) -> str:
+        '''
+        Returns which output channel is currently controlled (1 or 2)
+        '''
+        return 1
+    
+    def set_channel(self, channel_number:int) -> str:
+        pass
+       
+    def set_control_remote(self) -> str:
+        pass
+    
+    def set_control_local(self) -> str:
+        pass
+    
+    def get_control_mode(self) -> str:
+        return "There is no way of asking the PS whether it is in LOCAL or REMOTE mode. Look at the front panel"
+
+    def get_unit(self) -> str:
+        return "T"
+    
+    def set_unit(self, unit:str) -> str:
+        pass
+
+    def get_lower_limit(self) -> str:
+        return 0
+
+    def set_lower_limit(self, limit:float, unit:str):
+        pass
+
+    def get_upper_limit(self) -> tuple[float, str]:
+        return 2
+
+    def set_upper_limit(self, limit:float, unit:str):
+        pass
+    
+    def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> str:
+        pass  
+      
+    def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> None:
+        pass
+    
+    def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
+        pass
+    
+    def get_sweep_mode(self) -> str:
+        '''
+        Returns: "Sweeping up", "Standby", "Pause", "Sweeping to zero", "Sweeping down"
+        '''
+        return "Mock APS100 Power Supply Driver"     
+    
+    def get_current(self, channel:int=None) -> float:
+        '''
+        Returns the current in A
+        '''
+        return 0
+    
+    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
+    # def set_field(self, field_T:float, channel:int=None) -> None:
+    #     if channel != None:
+    #         self.set_channel(str(channel))
+    #     field_kG = field_T*10
+    #     return self.__query(f"IMAG {field_kG} G")
+
+    def get_field(self, channel:int=None) -> float:
+        '''
+        Returns the field in kG. This number is derived from the current used a factor determined at the factory
+        '''
+        return 0
+    
+
