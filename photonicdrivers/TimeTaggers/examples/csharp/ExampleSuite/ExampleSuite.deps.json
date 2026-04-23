@@ -1,0 +1,122 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "ExampleSuite/1.0.0": {
+        "dependencies": {
+          "AvalonEdit": "6.3.0.90",
+          "MeasurementExamples": "1.0.0",
+          "OxyPlot.Wpf": "2.1.2",
+          "SwabianInstruments.TimeTagger": "2.17.4.0"
+        },
+        "runtime": {
+          "ExampleSuite.dll": {}
+        }
+      },
+      "AvalonEdit/6.3.0.90": {
+        "runtime": {
+          "lib/net7.0-windows7.0/ICSharpCode.AvalonEdit.dll": {
+            "assemblyVersion": "6.3.0.90",
+            "fileVersion": "6.3.0.90"
+          }
+        }
+      },
+      "OxyPlot.Core/2.1.2": {
+        "runtime": {
+          "lib/netstandard2.0/OxyPlot.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "OxyPlot.Wpf/2.1.2": {
+        "dependencies": {
+          "OxyPlot.Core": "2.1.2",
+          "OxyPlot.Wpf.Shared": "2.1.2"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OxyPlot.Wpf.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "OxyPlot.Wpf.Shared/2.1.2": {
+        "dependencies": {
+          "OxyPlot.Core": "2.1.2"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OxyPlot.Wpf.Shared.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "MeasurementExamples/1.0.0": {
+        "dependencies": {
+          "OxyPlot.Wpf": "2.1.2"
+        },
+        "runtime": {
+          "MeasurementExamples.dll": {}
+        }
+      },
+      "SwabianInstruments.TimeTagger/2.17.4.0": {
+        "runtime": {
+          "SwabianInstruments.TimeTagger.dll": {
+            "assemblyVersion": "2.17.4.0",
+            "fileVersion": "2.17.4.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ExampleSuite/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AvalonEdit/6.3.0.90": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WVTb5MxwGqKdeasd3nG5udlV4t6OpvkFanziwI133K0/QJ5FvZmfzRQgpAjGTJhQfIA8GP7AzKQ3sTY9JOFk8Q==",
+      "path": "avalonedit/6.3.0.90",
+      "hashPath": "avalonedit.6.3.0.90.nupkg.sha512"
+    },
+    "OxyPlot.Core/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/BuPL1Wa7ZhpKA2DBe72md+S8PgIHF+UP/NsKfO9BiheXnbns1/tqS7s2MWIR1xFy5i+PWVC67KziGPY48mNgA==",
+      "path": "oxyplot.core/2.1.2",
+      "hashPath": "oxyplot.core.2.1.2.nupkg.sha512"
+    },
+    "OxyPlot.Wpf/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-udX9T1YC5BnnTZkVSNgJqvzXLaBcZDYG32YHWlDELk1UDWQeJi0Z2jBLoIiv4hcW16N4ptYO5cGC3e8m5/z0hw==",
+      "path": "oxyplot.wpf/2.1.2",
+      "hashPath": "oxyplot.wpf.2.1.2.nupkg.sha512"
+    },
+    "OxyPlot.Wpf.Shared/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6Cj7UET7AS5gVf77+avKG+PzaKQhTdqRYbyBTCPWW9JEbAsojpNdLICjVXO+5o/HP+DjshZJ6oCFw8eyRnHtCA==",
+      "path": "oxyplot.wpf.shared/2.1.2",
+      "hashPath": "oxyplot.wpf.shared.2.1.2.nupkg.sha512"
+    },
+    "MeasurementExamples/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SwabianInstruments.TimeTagger/2.17.4.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
