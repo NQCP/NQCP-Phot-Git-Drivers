@@ -125,7 +125,7 @@ class RS_ZNL20_Driver(Connectable):
     def set_data_format(self) -> None:
         self.write(f"CALC:FORM {format}")
 
-    def select_channel(self, channel_name: str) -> None:
+    def sw_channel(self, channel_name: str) -> None:
         self.write(f"INST:SEL '{channel_name}'")
 
     def select_s_parameter(self, s_param: str) -> None:

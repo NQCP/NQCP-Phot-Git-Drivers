@@ -192,8 +192,7 @@ class Keithley2450_Driver(Connectable):
         """
         Get voltage limit in volts
         """
-        # return self.query(":SOUR:CURR:VLIM?")
-        return self.query(":SOUR:VOLT:ILIM?")
+        return self.query(":SOUR:CURR:VLIM?")
     
     def get_current_output_limit(self):
         """
