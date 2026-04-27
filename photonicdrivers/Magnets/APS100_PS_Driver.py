@@ -7,7 +7,9 @@ from photonicdrivers.Abstract.Connectable import Connectable
 
 class APS100_PS_Driver(Connectable):
     def __init__(self, com_port:str = None, IP_address:str=None, IP_port:float=None,) -> None:
-        print("Initialising an APS100 PS Driver. Make sure to set it to REMOTE mode to control it.")
+        print("Initialising an APS100 PS Driver. Make sure to set it to REMOTE mode by executing \"set_control_remote\" to control it.")
+        print("Also make sure that the PS does not display LOCAL on teh front panel, otherwise it will not accept commands from the computer.")
+        print("If it does, press the remote button on the front panel.")
         
         self.port = com_port
         self.baud_rate = 9600
@@ -41,6 +43,7 @@ class APS100_PS_Driver(Connectable):
 
         else:
             print("Insufficient arguments for connecting the APS100_PS_Driver class")
+
    
     def disconnect(self) -> None:
         self.connection.close()
@@ -134,13 +137,15 @@ class APS100_PS_Driver(Connectable):
         return self.__write(f"ULIM {limit}")
     
     def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> str:
-        return self.__ramp("SWEEP UP", wait_while_ramping, target_relative_tolerance)
+        target = self.get_upper_limit()[0]
+        return self.__ramp("SWEEP UP", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance)
     
     def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> None:
-        return self.__ramp("SWEEP DOWN", wait_while_ramping, target_relative_tolerance)
+        target = self.get_lower_limit()[0]
+        return self.__ramp("SWEEP DOWN", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance)
     
     def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
-        return self.__ramp("SWEEP ZERO", wait_while_ramping)
+        return self.__ramp("SWEEP ZERO", wait_while_ramping=wait_while_ramping, target=0)
     
     def get_sweep_mode(self) -> str:
         '''
@@ -155,10 +160,12 @@ class APS100_PS_Driver(Connectable):
         if channel != None:
             self.set_channel(str(channel))        
         
-        if self.unit != "A":
+        unit = self.get_unit()
+
+        if unit != "A":
             print("Changing unit to A")
             self.set_unit("A")
-            print(self.get_unit())
+            # print(self.get_unit())
         
         response = self.__get_output()
         current = response.rstrip('A')
@@ -179,13 +186,16 @@ class APS100_PS_Driver(Connectable):
             print("Changing unit to kG")
             self.set_channel(str(channel))
 
-        if self.get_unit() != "kG":
+        unit = self.get_unit()
+
+        if unit != "kG":
             print("Changing unit to kG")
             self.set_unit("kG")
-            print(self.get_unit())        
+            # print(self.get_unit())   
+                 
         response = self.__get_output()
-        print(response)
-        print(self.get_unit())
+        # print(response)
+        # print(self.get_unit())
         field_kG = float(response.rstrip('kG'))
         return field_kG
     
@@ -204,35 +214,50 @@ class APS100_PS_Driver(Connectable):
         '''
         Returns the output of the power supply in whatever unit it is in.
         '''
-        return self.__query("IMAG?")
+        return self.__query("IOUT?")
+        # return self.__query("IMAG?")
 
-    def __ramp(self, command:str, wait_while_ramping:bool, target_relative_tolerance:float=0) -> str:
+    def __ramp(self, command:str, wait_while_ramping:bool, target:float, target_relative_tolerance:float=0) -> str:
         self.__write(command)
         status = "unknown"
         if wait_while_ramping: 
-            print("Check if with the current ramp rates, the PS never really reaches the target field") # Can be removed later if ramp rates are made less cautious
-            within_tolerance = False
-            target = self.get_upper_limit()[0]
+            print("Checking if with the current ramp rates, the PS never really reaches the target field") # Can be removed later if ramp rates are made less cautious
+            within_tolerance = False            
+            
             if target==0:
                 print("Warning: Target is zero, so the relative tolerance check is invalid as a stop ramp condition")
+
+            ps_unit = self.get_unit()
 
             while status != "Standby" and not within_tolerance:
                 time.sleep(0.5)
                 status = self.get_sweep_mode()
 
-                raw_output = self.__get_output()
-                ps_unit = self.get_unit()
-                if ps_unit == "A":
-                    output, unit = raw_output.split("A")
-                elif ps_unit == "kG":
-                    output, unit = raw_output.split("kG")
+                # raw_output = self.__get_output()
+                # print(f"Raw output from __get_output: {raw_output}")
+
+                
+                # output = None
+                # unit = None                
+                # if ps_unit == "A":
+                #     output, unit = raw_output.split("A")
+                # elif ps_unit == "kG":
+                #     output, unit = raw_output.split("kG")
+                # print("unit = {}".format(unit))
+
+                output = self.get_field()
+                # print(f"Output from get_field: {output} {ps_unit}")
 
                 if target != 0:
                     relative_deviation = abs((float(output) - float(target)) / float(target))            
                     if relative_deviation < target_relative_tolerance:
                         within_tolerance = True
 
-                print(f"Status: {status}, Output: {output} {unit}, Tolerance: {target_relative_tolerance}, Deviation: {relative_deviation}")
+                    print(f"Status: {status}, Output: {output} {ps_unit}, Tolerance: {target_relative_tolerance}, Deviation: {relative_deviation}")
+                else:
+                    print(f"Status: {status}, Output: {output} {ps_unit}, Target is zero, so relative tolerance check is invalid.")
+
+                
 
     def __read(self) -> str:
         '''
@@ -241,6 +266,8 @@ class APS100_PS_Driver(Connectable):
         if self.connectionType == 'USB':
             response_raw = self.connection.readline()
             response = response_raw.decode('utf-8').strip()
+            # print(f"Raw response: {response_raw}")     
+            # print(f"Received response: {response}")
 
         elif self.connectionType == 'Ethernet':
             response = self.connection.recv(1024)
@@ -265,6 +292,8 @@ class APS100_PS_Driver(Connectable):
         if self.connectionType == 'USB':                
             self.connection.write(command.encode('utf-8'))            
             reflected_command = self.connection.readline() # The power supply first returns the command that was sent to it:
+
+            # print(f"Reflected command: {reflected_command.decode('utf-8').strip()}")
 
         elif self.connectionType == 'Ethernet':
             self.connection.sendall(command.encode())
