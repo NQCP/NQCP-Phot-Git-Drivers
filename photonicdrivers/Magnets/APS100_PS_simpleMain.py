@@ -4,7 +4,7 @@ from time import sleep
 # COM6 is PS Y, COM4 is XZ
 
 # com_port = 'COM6'
-ip = '10.209.69.180'
+ip = '10.209.67.152'
 port = 4444
 ps = APS100_PS_Driver(IP_address=ip, IP_port=port)
 ps.connect()
