@@ -116,6 +116,19 @@ class Swabian_TimeTagger_Driver(Connectable):
         return gated_g2_correlation, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2, histogram_1, histogram_2
     
 
+    def initialise_gated_g2_2D_histogram(self, trigger_channel_number, click_1_channel_number, click_2_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins):
+        gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_start_delay_ps)
+        gate_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_stop_delay_ps)
+        gate_start_channel_number = gate_start_channel.getChannel()
+        gate_stop_channel_number = gate_stop_channel.getChannel()
+        gated_channel_1=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_1_channel_number, gate_start_channel=gate_start_channel_number, gate_stop_channel=gate_stop_channel_number)
+        gated_channel_2=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_2_channel_number, gate_start_channel=gate_start_channel_number, gate_stop_channel=gate_stop_channel_number)
+        gated_channel_1_number = gated_channel_1.getChannel()
+        gated_channel_2_number = gated_channel_2.getChannel()
+        gated_g2_2D_histogram = TimeTagger.Histogram2D(tagger=self.connection, start_channel=trigger_channel_number, stop_channel_1=gated_channel_1_number, stop_channel_2=gated_channel_2_number, binwidth_1=bin_width_ps, binwidth_2=bin_width_ps, n_bins_1=num_bins, n_bins_2=num_bins)
+        return gated_g2_2D_histogram, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2
+    
+
     def getSerial(self) -> str:
         return self.connection.getSerial()
     
@@ -157,7 +170,10 @@ class Swabian_TimeTagger_Driver(Connectable):
         return self.connection.autoCalibration()
     
     def disable_leds(self) -> None:
-        self.connection.disableLEDs()
+        self.connection.disableLEDs(disabled=True)
+
+    def enable_leds(self) -> None:
+        self.connection.disableLEDs(disabled=False)
 
     def set_input_channel_delay(self, channel: int, delay_ps: int) -> None:
         self.connection.setInputDelay(channel, delay_ps)

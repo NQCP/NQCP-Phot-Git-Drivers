@@ -1,11 +1,12 @@
 import serial
 import time
 import socket
+import threading
 
 from photonicdrivers.Abstract.Connectable import Connectable
 
 
-class APS100_PS_Driver(Connectable):
+class APS100_PS_Stub(Connectable):
     def __init__(self, com_port:str = None, IP_address:str=None, IP_port:float=None,) -> None:
         print("Initialising an APS100 PS Driver. Make sure to set it to REMOTE mode by executing \"set_control_remote\" to control it.")
         print("Also make sure that the PS does not display LOCAL on teh front panel, otherwise it will not accept commands from the computer.")
@@ -14,11 +15,15 @@ class APS100_PS_Driver(Connectable):
         self.port = com_port
         self.baud_rate = 9600
         self.timeout = 1
+        self.channel = None
 
         self.termination_char = '\r'
 
         self.ip_address = IP_address
         self.port_number = IP_port
+
+        self.connected= None
+        self.unit = "kG"
 
         if self.port is not None:
             print('Connection will be via USB')
@@ -33,20 +38,20 @@ class APS100_PS_Driver(Connectable):
 
     def connect(self) -> None:
         if self.connectionType == 'USB':
-            self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+            print("Fake connecting via USB on port {}".format(self.port) )
+            self.connected = True
 
         elif self.connectionType == 'Ethernet':
-            self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.connection.settimeout(5)  # sets the timeout of the receive command.
-            self.server_address = (self.ip_address, self.port_number)  # IP address, port
-            self.connection.connect(self.server_address)
+            print("Fake connecting via Ethernet to {}:{}".format(self.ip_address, self.port_number))
+            self.connected = True
 
         else:
             print("Insufficient arguments for connecting the APS100_PS_Driver class")
+            self.connected = False
 
    
     def disconnect(self) -> None:
-        self.connection.close()
+        pass
 
     def is_connected(self) -> bool:
         try:
@@ -56,7 +61,8 @@ class APS100_PS_Driver(Connectable):
             return False
 
     def get_id(self) -> None:
-        return self.__query("*IDN?;*ESE 12;*ESE?")
+        if self.connected:
+            return "aps_driver"
 
     def get_channel(self) -> str:
         '''
@@ -68,19 +74,19 @@ class APS100_PS_Driver(Connectable):
         '''
         Sets which output channel is currently controlled (1 or 2)
         '''
-        return self.__write(f"CHAN {channel_number}")
+        self.channel = channel_number
        
     def set_control_remote(self) -> str:
-        return self.__write("REMOTE")
+        self.mode = "remote"
     
     def set_control_local(self) -> str:
-        return self.__write("LOCAL")
+        self.mode = "local"
     
     def get_control_mode(self) -> str:
         return "There is no way of asking the PS whether it is in LOCAL or REMOTE mode. Look at the front panel"
 
     def get_unit(self) -> str:
-        return self.__query("UNITS?")
+        return self.unit
     
     def set_unit(self, unit:str) -> str:
         '''
@@ -89,16 +95,7 @@ class APS100_PS_Driver(Connectable):
         '''
         # The PS will also accept T and G as an input, but it will set the unit to kG
         if unit == "A" or unit == "kG":
-            print(f"Changing unit to {unit}")
-            try:
-                response = self.__write(f"UNITS {unit}")
-                time.sleep(0.5)  # wait for the command to be processed
-                print(f"Unit set to {self.get_unit()}")
-                return response
-            except:
-                warning_str = "Set unit failed"
-                print(warning_str)
-                return warning_str
+            self.unit = unit
         else:
             print(f"Trying to set unit to {unit}, but it must be kG or A.")
 
@@ -111,9 +108,7 @@ class APS100_PS_Driver(Connectable):
         '''
         ps_unit = self.get_unit()
         if  ps_unit != unit:
-            warning_str = f"Trying to set the lower limit to {limit} {unit}, but the power supply unit is {ps_unit}. Ignoring command."
-            print(warning_str)
-            return warning_str
+            self.lower_limit = limit
         return self.__write(f"LLIM {limit}")
 
     def get_upper_limit(self) -> tuple[float, str]:
@@ -312,88 +307,208 @@ class APS100_PS_Driver(Connectable):
 
 class APS100_PS_Driver_Stub(Connectable):
     def __init__(self) -> None:
-        pass
+        self.connected = False
+        self.connectionType = "STUB"
+        self.mode = "local"
+        self.unit = "kG"
+        self.channel = 1
+
+        self._lock = threading.RLock()
+        self._stop_events = {1: threading.Event(), 2: threading.Event()}
+        self._ramp_threads = {1: None, 2: None}
+        self._sweep_mode = {1: "Standby", 2: "Standby"}
+
+        self._current_kG = {1: 0.0, 2: 0.0}
+        self._lower_limit_kG = {1: -10.0, 2: -10.0}
+        self._upper_limit_kG = {1: 10.0, 2: 10.0}
+        self._ramp_rate_kG_per_s = 0.25
 
     def connect(self) -> None:
-        pass
-   
+        self.connected = True
+
     def disconnect(self) -> None:
-        pass
+        with self._lock:
+            self.connected = False
+            for ev in self._stop_events.values():
+                ev.set()
 
     def is_connected(self) -> bool:
-        return True
+        return self.connected
 
-    def get_id(self) -> None:
+    def get_id(self) -> str:
         return "Mock APS100 Power Supply Driver"
 
     def get_channel(self) -> str:
-        '''
-        Returns which output channel is currently controlled (1 or 2)
-        '''
-        return 1
-    
-    def set_channel(self, channel_number:int) -> str:
-        pass
-       
+        return str(self.channel)
+
+    def set_channel(self, channel_number: int) -> str:
+        if channel_number not in (1, 2):
+            raise ValueError("APS100 stub only supports channels 1 and 2")
+        self.channel = int(channel_number)
+        return "OK"
+
     def set_control_remote(self) -> str:
-        pass
-    
+        self.mode = "remote"
+        return "OK"
+
     def set_control_local(self) -> str:
-        pass
-    
+        self.mode = "local"
+        return "OK"
+
     def get_control_mode(self) -> str:
-        return "There is no way of asking the PS whether it is in LOCAL or REMOTE mode. Look at the front panel"
+        return self.mode
 
     def get_unit(self) -> str:
-        return "T"
-    
-    def set_unit(self, unit:str) -> str:
-        pass
+        return self.unit
+
+    def set_unit(self, unit: str) -> str:
+        if unit in ("A", "kG", "G", "T"):
+            self.unit = "kG" if unit in ("G", "T") else unit
+            return "OK"
+        raise ValueError("unit must be A or kG")
 
     def get_lower_limit(self) -> str:
-        return 0
+        return f"{self._lower_limit_kG[self.channel]}{self.unit}"
 
-    def set_lower_limit(self, limit:float, unit:str):
-        pass
+    def set_lower_limit(self, limit: float, unit: str):
+        if unit != self.unit:
+            warning_str = (
+                f"Trying to set the lower limit to {limit} {unit}, but the power supply unit is {self.unit}. "
+                "Ignoring command."
+            )
+            print(warning_str)
+            return warning_str
+        self._lower_limit_kG[self.channel] = float(limit)
+        return "OK"
 
     def get_upper_limit(self) -> tuple[float, str]:
-        return 2
+        return self._upper_limit_kG[self.channel], self.unit
 
-    def set_upper_limit(self, limit:float, unit:str):
-        pass
-    
-    def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> str:
-        pass  
-      
-    def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> None:
-        pass
-    
-    def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
-        pass
-    
+    def set_upper_limit(self, limit: float, unit: str):
+        if unit != self.unit:
+            warning_str = (
+                f"Trying to set the upper limit to {limit} {unit}, but the power supply unit is {self.unit}. "
+                "Ignoring command."
+            )
+            print(warning_str)
+            return warning_str
+        self._upper_limit_kG[self.channel] = float(limit)
+        return "OK"
+
+    def ramp_up(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0) -> str:
+        target = self.get_upper_limit()[0]
+        return self.__ramp("SWEEP UP", wait_while_ramping=wait_while_ramping, target=target,
+                           target_relative_tolerance=target_relative_tolerance)
+
+    def ramp_down(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0) -> None:
+        target = self._lower_limit_kG[self.channel]
+        return self.__ramp("SWEEP DOWN", wait_while_ramping=wait_while_ramping, target=target,
+                           target_relative_tolerance=target_relative_tolerance)
+
+    def ramp_to_zero(self, wait_while_ramping: bool = True) -> None:
+        return self.__ramp("SWEEP ZERO", wait_while_ramping=wait_while_ramping, target=0.0)
+
     def get_sweep_mode(self) -> str:
-        '''
-        Returns: "Sweeping up", "Standby", "Pause", "Sweeping to zero", "Sweeping down"
-        '''
-        return "Mock APS100 Power Supply Driver"     
-    
-    def get_current(self, channel:int=None) -> float:
-        '''
-        Returns the current in A
-        '''
-        return 0
-    
-    # Attocube says the IMAG command should be avoided, as it ignores ramp rate limits.
-    # def set_field(self, field_T:float, channel:int=None) -> None:
-    #     if channel != None:
-    #         self.set_channel(str(channel))
-    #     field_kG = field_T*10
-    #     return self.__query(f"IMAG {field_kG} G")
+        return self._sweep_mode[self.channel]
 
-    def get_field(self, channel:int=None) -> float:
-        '''
-        Returns the field in kG. This number is derived from the current used a factor determined at the factory
-        '''
-        return 0
-    
+    def get_current(self, channel: int = None) -> float:
+        if channel is not None:
+            self.set_channel(channel)
+        if self.unit != "A":
+            self.set_unit("A")
+        return float(self._current_kG[self.channel])
+
+    def get_field(self, channel: int = None) -> float:
+        if channel is not None:
+            self.set_channel(channel)
+        if self.unit != "kG":
+            self.set_unit("kG")
+        return float(self._current_kG[self.channel])
+
+    def query_custom_command(self, command: str) -> str:
+        return self.__query(command)
+
+    def __ramp(self, command: str, wait_while_ramping: bool, target: float, target_relative_tolerance: float = 0) -> str:
+        channel = self.channel
+
+        with self._lock:
+            self._stop_events[channel].set()
+            self._stop_events[channel] = threading.Event()
+            stop_event = self._stop_events[channel]
+            self._sweep_mode[channel] = self._command_to_mode(command)
+
+        thread = threading.Thread(
+            target=self._ramp_worker,
+            args=(channel, float(target), stop_event),
+            daemon=True,
+        )
+        self._ramp_threads[channel] = thread
+        thread.start()
+
+        if wait_while_ramping:
+            thread.join()
+
+        return "OK"
+
+    def _ramp_worker(self, channel: int, target: float, stop_event: threading.Event) -> None:
+        dt = 0.05
+        step = self._ramp_rate_kG_per_s * dt
+
+        while not stop_event.is_set():
+            with self._lock:
+                current = self._current_kG[channel]
+
+            delta = target - current
+            if abs(delta) <= step:
+                next_value = target
+            else:
+                next_value = current + step if delta > 0 else current - step
+
+            with self._lock:
+                self._current_kG[channel] = next_value
+
+            if next_value == target:
+                break
+
+            time.sleep(dt)
+
+        with self._lock:
+            self._current_kG[channel] = target
+            self._sweep_mode[channel] = "Standby"
+
+    def _command_to_mode(self, command: str) -> str:
+        if command == "SWEEP UP":
+            return "Sweeping up"
+        if command == "SWEEP DOWN":
+            return "Sweeping down"
+        if command == "SWEEP ZERO":
+            return "Sweeping to zero"
+        return "Pause"
+
+    def __get_output(self, channel: int = None) -> str:
+        return f"{self._current_kG[self.channel]}{self.unit}"
+
+    def __read(self) -> str:
+        return self._last_response
+
+    def __write(self, command_str: str) -> None:
+        self._last_response = "OK"
+
+    def __query(self, command: str) -> str:
+        if command == "SWEEP?":
+            return self.get_sweep_mode()
+        if command == "UNITS?":
+            return self.unit
+        if command == "CHAN?":
+            return str(self.channel)
+        if command == "LLIM?":
+            return self.get_lower_limit()
+        if command == "ULIM?":
+            return f"{self._upper_limit_kG[self.channel]}{self.unit}"
+        if command == "IOUT?":
+            return f"{self._current_kG[self.channel]}{self.unit}"
+        if command == "*IDN?;*ESE 12;*ESE?":
+            return self.get_id()
+        return "OK"
+
 

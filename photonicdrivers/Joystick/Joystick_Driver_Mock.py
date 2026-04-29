@@ -14,6 +14,4 @@ class Joystick_Driver_Mock(Connectable):
         return self.connected
     
     def get_state(self) -> PSControllerState:
-        if self.connected:
-            return no_input_state()
-        raise Exception()
+        return no_input_state()

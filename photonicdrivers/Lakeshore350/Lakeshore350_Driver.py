@@ -23,4 +23,9 @@ class Lakeshore350_Driver(Connectable):
             return False
 
     def get_all_kelvin(self) -> list[float]:
-        return [float(self.connection.query('KRDG?'))]
+        """acutally just channel A"""
+        return [float(self.connection.query('KRDG? A'))]
+
+    def get_all_ohms(self) -> list[float]:
+        """acutally just channel A"""
+        return [float(self.connection.query('SRDG? A'))]
