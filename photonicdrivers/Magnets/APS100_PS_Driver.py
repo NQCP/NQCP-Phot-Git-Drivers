@@ -11,7 +11,7 @@ class APS100_PS_Driver(Connectable):
         print("Also make sure that the PS does not display LOCAL on teh front panel, otherwise it will not accept commands from the computer.")
         print("If it does, press the remote button on the front panel.")
         
-        self.port = com_port
+        self.com_port = com_port
         self.baud_rate = 9600
         self.timeout = 1
 
@@ -20,7 +20,7 @@ class APS100_PS_Driver(Connectable):
         self.ip_address = IP_address
         self.port_number = IP_port
 
-        if self.port is not None:
+        if self.com_port is not None:
             print('Connection will be via USB')
             self.connectionType = 'USB'
 
@@ -33,7 +33,7 @@ class APS100_PS_Driver(Connectable):
 
     def connect(self) -> None:
         if self.connectionType == 'USB':
-            self.connection = serial.Serial(port=self.port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
+            self.connection = serial.Serial(port=self.com_port, baudrate=self.baud_rate, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=self.timeout)
 
         elif self.connectionType == 'Ethernet':
             self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,8 +102,14 @@ class APS100_PS_Driver(Connectable):
         else:
             print(f"Trying to set unit to {unit}, but it must be kG or A.")
 
-    def get_lower_limit(self) -> str:
-        return self.__query("LLIM?")
+    def get_lower_limit(self) -> tuple[float, str]:
+        ps_unit = self.get_unit()
+        raw_response = self.__query("LLIM?")
+        if ps_unit == "A":
+            limit, unit = raw_response.split("A")
+        elif ps_unit == "kG":
+            limit, unit = raw_response.split("kG")
+        return limit, unit
 
     def set_lower_limit(self, limit:float, unit:str):
         '''
@@ -223,15 +229,12 @@ class APS100_PS_Driver(Connectable):
         if wait_while_ramping: 
             print("Checking if with the current ramp rates, the PS never really reaches the target field") # Can be removed later if ramp rates are made less cautious
             within_tolerance = False            
-            
-            if target==0:
-                print("Warning: Target is zero, so the relative tolerance check is invalid as a stop ramp condition")
 
             ps_unit = self.get_unit()
 
             while status != "Standby" and not within_tolerance:
                 time.sleep(0.5)
-                status = self.get_sweep_mode()
+                status = self.get_sweep_mode().strip()
 
                 # raw_output = self.__get_output()
                 # print(f"Raw output from __get_output: {raw_output}")
@@ -255,7 +258,12 @@ class APS100_PS_Driver(Connectable):
 
                     print(f"Status: {status}, Output: {output} {ps_unit}, Tolerance: {target_relative_tolerance}, Deviation: {relative_deviation}")
                 else:
-                    print(f"Status: {status}, Output: {output} {ps_unit}, Target is zero, so relative tolerance check is invalid.")
+                    # Absolute threshold: exit when within 0.005 kG of zero.
+                    # This handles both positive and negative starting fields, and acts
+                    # as a fallback if the device never returns "Standby".
+                    if abs(float(output)) < 0.005:
+                        within_tolerance = True
+                    print(f"Status: {status}, Output: {output} {ps_unit}, Target is zero (exit when |output| < 0.005 kG).")
 
                 
 
@@ -276,7 +284,7 @@ class APS100_PS_Driver(Connectable):
                 response, dummy = response.split(b'\r\n')
 
             # convert from byte string to string
-            response = response.decode('utf-8')
+            response = response.decode('utf-8').strip()
         else:
             raise Exception("ERROR in APS100_PS_Driver class - connection has not been initialised properly")
         # print(f"Received response: {response}")

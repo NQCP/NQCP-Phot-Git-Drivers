@@ -3,7 +3,7 @@ from time import sleep
 
 # COM6 is PS Y, COM4 is XZ
 
-com_port = 'COM6'
+com_port = 'COM4'
 ip = '10.209.67.152'
 port = 4444
 
@@ -12,7 +12,7 @@ ps = APS100_PS_Driver(com_port=com_port)
 # ps = APS100_PS_Driver(IP_address=ip, IP_port=port)
 
 ps.connect()
-
+ps.set_control_remote()
 
 
 print("getting ID:")
@@ -23,11 +23,11 @@ print("getting channel:")
 print(ps.get_channel())
 
 # print(ps.get_current())
-# ps.set_unit("kG")
-# print("unit: ", ps.get_unit())
+ps.set_unit("kG")
+print("unit: ", ps.get_unit())
 
 ps.set_upper_limit(0.5, "kG")
-print("upper limit: ", ps.get_upper_limit()[0])
+print("upper limit: ", ps.get_upper_limit()[1])
 
 ps.ramp_up(wait_while_ramping=True, target_relative_tolerance=0.05)
 # # print(ps.get_current())
