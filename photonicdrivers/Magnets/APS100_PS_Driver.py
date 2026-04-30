@@ -142,13 +142,13 @@ class APS100_PS_Driver(Connectable):
             return warning_str
         return self.__write(f"ULIM {limit}")
     
-    def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> str:
+    def ramp_up(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0, target_absolute_tolerance:float=0) -> str:
         target = self.get_upper_limit()[0]
-        return self.__ramp("SWEEP UP", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance)
+        return self.__ramp("SWEEP UP", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance, target_absolute_tolerance=target_absolute_tolerance)
     
-    def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0) -> None:
+    def ramp_down(self, wait_while_ramping:bool=True, target_relative_tolerance:float=0, target_absolute_tolerance:float=0) -> None:
         target = self.get_lower_limit()[0]
-        return self.__ramp("SWEEP DOWN", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance)
+        return self.__ramp("SWEEP DOWN", wait_while_ramping=wait_while_ramping, target=target, target_relative_tolerance=target_relative_tolerance, target_absolute_tolerance=target_absolute_tolerance)
     
     def ramp_to_zero(self, wait_while_ramping:bool=True) -> None:
         return self.__ramp("SWEEP ZERO", wait_while_ramping=wait_while_ramping, target=0)
@@ -223,7 +223,7 @@ class APS100_PS_Driver(Connectable):
         return self.__query("IOUT?")
         # return self.__query("IMAG?")
 
-    def __ramp(self, command:str, wait_while_ramping:bool, target:float, target_relative_tolerance:float=0) -> str:
+    def __ramp(self, command:str, wait_while_ramping:bool, target:float, target_relative_tolerance:float=0, target_absolute_tolerance:float=0) -> str:
         self.__write(command)
         status = "unknown"
         if wait_while_ramping: 
@@ -252,8 +252,9 @@ class APS100_PS_Driver(Connectable):
                 # print(f"Output from get_field: {output} {ps_unit}")
 
                 if target != 0:
-                    relative_deviation = abs((float(output) - float(target)) / float(target))            
-                    if relative_deviation < target_relative_tolerance:
+                    relative_deviation = abs((float(output) - float(target)) / float(target))        
+                    absolute_deviation = abs(float(output) - float(target))    
+                    if relative_deviation < target_relative_tolerance and absolute_deviation < target_absolute_tolerance:
                         within_tolerance = True
 
                     print(f"Status: {status}, Output: {output} {ps_unit}, Tolerance: {target_relative_tolerance}, Deviation: {relative_deviation}")

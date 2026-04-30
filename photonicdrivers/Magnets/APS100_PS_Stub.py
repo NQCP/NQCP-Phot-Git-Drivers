@@ -186,35 +186,37 @@ class APS100_PS_Stub(Connectable):
         self._upper_limit_kG[self.channel] = float(limit)
         return "OK"
 
-    def ramp_up(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0) -> str:
+    def ramp_up(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0, target_absolute_tolerance: float = 0) -> str:
         """
         Ramp the field up to the upper limit.
         
         Args:
             wait_while_ramping: Whether to block until ramping completes
             target_relative_tolerance: Tolerance for reaching target (as fraction)
+            target_absolute_tolerance: Absolute tolerance for reaching target
             
         Returns:
             "OK" on success
         """
         target = self.get_upper_limit()[0]
         return self._ramp("SWEEP UP", wait_while_ramping=wait_while_ramping, target=target,
-                          target_relative_tolerance=target_relative_tolerance)
+                          target_relative_tolerance=target_relative_tolerance, target_absolute_tolerance=target_absolute_tolerance)
 
-    def ramp_down(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0) -> str:
+    def ramp_down(self, wait_while_ramping: bool = True, target_relative_tolerance: float = 0, target_absolute_tolerance: float = 0) -> str:
         """
         Ramp the field down to the lower limit.
         
         Args:
             wait_while_ramping: Whether to block until ramping completes
             target_relative_tolerance: Tolerance for reaching target (as fraction)
+            target_absolute_tolerance: Absolute tolerance for reaching target
             
         Returns:
             "OK" on success
         """
         target = self._lower_limit_kG[self.channel]
         return self._ramp("SWEEP DOWN", wait_while_ramping=wait_while_ramping, target=target,
-                          target_relative_tolerance=target_relative_tolerance)
+                          target_relative_tolerance=target_relative_tolerance, target_absolute_tolerance=target_absolute_tolerance)
 
     def ramp_to_zero(self, wait_while_ramping: bool = True) -> str:
         """
@@ -304,7 +306,7 @@ class APS100_PS_Stub(Connectable):
     ################################ PRIVATE METHODS ################################
 
     def _ramp(self, command: str, wait_while_ramping: bool, target: float, 
-              target_relative_tolerance: float = 0) -> str:
+              target_relative_tolerance: float = 0, target_absolute_tolerance: float = 0) -> str:
         """
         Internal method to perform a ramp operation.
         
@@ -312,7 +314,8 @@ class APS100_PS_Stub(Connectable):
             command: Ramp command ("SWEEP UP", "SWEEP DOWN", "SWEEP ZERO")
             wait_while_ramping: Whether to block until complete
             target: Target field value
-            target_relative_tolerance: Tolerance for reaching target
+            target_relative_tolerance: Tolerance for reaching target (as fraction)
+            target_absolute_tolerance: Absolute tolerance for reaching target
             
         Returns:
             "OK"
@@ -329,7 +332,7 @@ class APS100_PS_Stub(Connectable):
         # Start ramp in background thread
         thread = threading.Thread(
             target=self._ramp_worker,
-            args=(channel, float(target), stop_event),
+            args=(channel, float(target), stop_event, target_relative_tolerance, target_absolute_tolerance),
             daemon=True,
         )
         self._ramp_threads[channel] = thread
@@ -340,11 +343,13 @@ class APS100_PS_Stub(Connectable):
 
         return "OK"
 
-    def _ramp_worker(self, channel: int, target: float, stop_event: threading.Event) -> None:
+    def _ramp_worker(self, channel: int, target: float, stop_event: threading.Event, 
+                     target_relative_tolerance: float = 0, target_absolute_tolerance: float = 0) -> None:
         """
         Worker thread for performing ramp operations.
         
         Simulates smooth ramping from current value to target at the configured ramp rate.
+        Stops when target is reached within the specified tolerances.
         """
         dt = 0.05  # timestep in seconds
         step = self._ramp_rate_kG_per_s * dt
@@ -355,6 +360,17 @@ class APS100_PS_Stub(Connectable):
 
             delta = target - current
             
+            # Check if we've reached target within tolerances
+            relative_error = abs(delta) / abs(target) if target != 0 else abs(delta)
+            absolute_error = abs(delta)
+            
+            if relative_error <= target_relative_tolerance or absolute_error <= target_absolute_tolerance:
+                # Close enough to target
+                with self._lock:
+                    self._current_kG[channel] = target
+                    self._sweep_mode[channel] = "Standby"
+                break
+            
             # Calculate next value
             if abs(delta) <= step:
                 next_value = target
@@ -363,10 +379,6 @@ class APS100_PS_Stub(Connectable):
 
             with self._lock:
                 self._current_kG[channel] = next_value
-
-            # If we've reached target, exit loop
-            if next_value == target:
-                break
 
             time.sleep(dt)
 
