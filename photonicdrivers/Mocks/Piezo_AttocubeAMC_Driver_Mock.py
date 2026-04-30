@@ -1,4 +1,5 @@
 from photonicdrivers.Abstract.Connectable import Connectable
+from photonicdrivers.Piezo_AttocubeAMC.Piezo_AttocubeAMC_Driver import axis_to_id
 import numpy as np
 
 
@@ -30,6 +31,8 @@ class Piezo_AttocubeAMC_Driver_Mock(Connectable):
         self.command_history: list[tuple[float, float, float, bool, bool, bool]] = []
         self.actual_position_history: list[tuple[float, float, float]] = []
         self.position_error_history: list[tuple[float, float, float]] = []
+        self.control_move_enabled = [False, False, False]
+        self.ground_enabled = [False, False, False]
 
     def connect(self) -> None:
         self.connected = True
@@ -63,7 +66,6 @@ class Piezo_AttocubeAMC_Driver_Mock(Connectable):
         move_x: bool = False,
         move_y: bool = False,
         move_z: bool = False,
-        wait_while_moving: bool = True,
     ) -> None:
         x0, y0, z0 = self.position
         x_error = self._sample_position_error(self.x_position_error_std_nm) if move_x else 0.0
@@ -78,44 +80,14 @@ class Piezo_AttocubeAMC_Driver_Mock(Connectable):
         self.actual_position_history.append(self.position)
         self.position_error_history.append((x_error, y_error, 0.0))
 
-    def set_position_relative(
-        self,
-        x_nm: int = 0,
-        y_nm: int = 0,
-        z_nm: int = 0,
-        move_x: bool = False,
-        move_y: bool = False,
-        move_z: bool = False,
-        wait_while_moving: bool = True,
-    ) -> None:
-        x0, y0, z0 = self.position
-        self.set_position(
-            x_nm=int(x0 + x_nm),
-            y_nm=int(y0 + y_nm),
-            z_nm=int(z0 + z_nm),
-            move_x=move_x,
-            move_y=move_y,
-            move_z=move_z,
-            wait_while_moving=wait_while_moving,
-        )
-
-    def set_x(self, position: int) -> None:
-        self.set_position(x_nm=int(position), move_x=True)
-
-    def set_y(self, position: int) -> None:
-        self.set_position(y_nm=int(position), move_y=True)
-
-    def set_z(self, position: int) -> None:
-        self.set_position(z_nm=int(position), move_z=True)
-
     def is_axis_moving(self) -> tuple[bool, bool, bool]:
         return False, False, False
 
-    def set_ground(self, axis: str, ground: bool) -> None:
-        return None
+    def set_control_move(self, axis: str | int, move: bool) -> None:
+        self.control_move_enabled[axis_to_id(axis)] = bool(move)
 
-    def set_ground_all(self, ground: bool) -> None:
-        return None
+    def set_ground(self, axis: str | int, ground: bool) -> None:
+        self.ground_enabled[axis_to_id(axis)] = bool(ground)
 
     def _sample_position_error(self, std_nm: float) -> float:
         if std_nm <= 0.0:
