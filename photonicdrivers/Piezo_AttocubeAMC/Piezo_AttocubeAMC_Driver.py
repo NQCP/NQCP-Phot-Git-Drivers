@@ -70,18 +70,6 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         else:
             print("Requested piezo position was outside the limits. Did not execute the move command.")
 
-    def get_x(self):
-        x, y, z = self.get_position()
-        return x
-        
-    def get_y(self):
-        x, y, z = self.get_position()
-        return y
-    
-    def get_z(self):
-        x, y, z = self.get_position()
-        return z
-    
     def set_x(self, position: int):
         self.set_position(x_nm=int(position), y_nm=int(0), z_nm=int(0), move_x=True, move_y=False, move_z=False, wait_while_moving=True)
 
