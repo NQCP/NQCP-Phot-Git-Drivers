@@ -70,6 +70,12 @@ import numpy as np
 
 rm = pyvisa.ResourceManager()
 
+ip_address = "10.209.69.95"
+port_number = 5000
+
+portstr = f"TCPIP0::{ip_address}::{port_number}::SOCKET"
+old = "TCPIP0::10.209.69.95::5000::SOCKET"
+
 try:
     santec = rm.open_resource(
         "TCPIP0::10.209.69.95::5000::SOCKET",

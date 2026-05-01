@@ -1,17 +1,27 @@
 from photonicdrivers.AttocubeAPI import AMC
 from photonicdrivers.Abstract.Connectable import Connectable
 
-from time import sleep
-import numpy as np 
-def axis_to_id(axis: str) -> int:
-    axis_lower = axis.lower()
-    if axis_lower == 'x':
-        return 0
-    if axis_lower == 'y':
-        return 1
-    if axis_lower == 'z':
-        return 2
-    raise ValueError(f"axis '{axis}' is not a valid axis. Should be ")
+
+def axis_to_id(axis: str | int) -> int:
+    if isinstance(axis, str):
+        axis_lower = axis.lower()
+        if axis_lower == 'x':
+            return 0
+        if axis_lower == 'y':
+            return 1
+        if axis_lower == 'z':
+            return 2
+        raise ValueError(f"axis '{axis}' is not a valid axis. Use 'x', 'y', 'z', 0, 1, or 2.")
+
+    if isinstance(axis, bool) or not isinstance(axis, int):
+        raise TypeError("axis must be one of 'x', 'y', 'z', 0, 1, or 2.")
+
+    if axis in (0, 1, 2):
+        return axis
+
+    raise ValueError(f"axis {axis} is not a valid axis. Use 'x', 'y', 'z', 0, 1, or 2.")
+
+
 class Piezo_AttocubeAMC_Driver(Connectable):
 
     def __init__(self,ip_string: str, x_min_nm:int=100000, x_max_nm:int=4900000, y_min_nm:int=100000, y_max_nm:int=4900000, z_min_nm:int=300000, z_max_nm:int=4700000) -> None:
@@ -46,82 +56,59 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         x, y, z, v1, v2, v3 = self.amc.control.getPositionsAndVoltages()
         return x, y, z
     
-    def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False, wait_while_moving:bool=True) -> None:
+    def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False) -> None:
         '''
         Moves the piezo to the position specified by x_nm, y_nm,z_nm
         '''
-        if self.__check_position_limits(x_nm,y_nm,z_nm,move_x,move_y,move_z):
-            self.amc.control.MultiAxisPositioning(int(move_x), int(move_y), int(move_z), x_nm, y_nm, z_nm)
-            if wait_while_moving:
-                stages_moving = True
-                while stages_moving:
-                    sleep(0.1)
-                    status = self.is_axis_moving()
-                    stages_moving = np.any(status)
+        if not self.__check_position_limits(x_nm, y_nm, z_nm, move_x, move_y, move_z):
+            error_details = self.__position_limit_error_message(x_nm, y_nm, z_nm, move_x, move_y, move_z)
+            raise ValueError(
+                "Requested piezo position is outside the allowed limits: "
+                + error_details
+                + ". Did not execute the move command."
+            )
 
-        else:
-            print("Requested piezo position was outside the limits. Did not execute the move command.")
-
-    def get_x(self):
-        x, y, z = self.get_position()
-        return x
-        
-    def get_y(self):
-        x, y, z = self.get_position()
-        return y
-    
-    def get_z(self):
-        x, y, z = self.get_position()
-        return z
-    
-    def set_x(self, position: int):
-        self.set_position(x_nm=int(position), y_nm=int(0), z_nm=int(0), move_x=True, move_y=False, move_z=False, wait_while_moving=True)
-
-    def set_y(self, position: int):
-        self.set_position(x_nm=int(0), y_nm=int(position), z_nm=int(0), move_x=False, move_y=True, move_z=False, wait_while_moving=True)
- 
-    def set_z(self, position: int):
-        self.set_position(x_nm=int(0), y_nm=int(0), z_nm=int(position), move_x=False, move_y=False, move_z=True, wait_while_moving=True)
-
-
-    def set_position_relative(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False, wait_while_moving:bool=True) -> None:
-        '''
-        Moves the piezo with an amount specified by x_nm, y_nm,z_nm relative to the current position
-        '''
-        x0, y0, z0 = self.get_position()
-        x = x0 + x_nm
-        y = y0 + y_nm
-        z = z0 + z_nm
-
-        self.set_position(int(x), int(y), int(z), move_x, move_y, move_z, wait_while_moving)
+        for ax, mov in zip([0, 1, 2], [move_x, move_y, move_z]):
+            if mov:
+                self.set_control_move(ax, True)
+        self.amc.control.MultiAxisPositioning(int(move_x), int(move_y), int(move_z), x_nm, y_nm, z_nm)
 
     def is_axis_moving(self) -> tuple[bool,  bool,  bool]:
         x_moving, y_moving, z_moving = self.amc.control.getStatusMovingAllAxes()
         return bool(x_moving), bool(y_moving), bool(z_moving)
 
-    def set_ground(self, axis: str, ground: bool):
-        self.amc.move.setGroundAxis(axis_to_id(axis), ground)
-    
-    def set_ground_all(self, ground: bool):
-        for axis in ['x', 'y', 'z']:
-            self.set_ground(axis, ground)
+    def set_control_move(self, axis: str | int, move: bool) -> None:
+        self.amc.control.setControlMove(axis_to_id(axis), bool(move))
+
+    def set_ground(self, axis: str | int, ground: bool):
+        self.amc.move.setGroundAxis(axis_to_id(axis), bool(ground))
 
     ##################################### PRIVATE METHODS #####################################
 
     def __check_position_limits(self, x:int, y:int, z:int, move_x:bool, move_y:bool, move_z:bool) -> bool:
         if move_x:
-            if x<self.x_min or x>self.x_max:
-                print("Cannot move x to " + str(x) + " as it is outside the piezo limits of [" + str(self.x_min) + ", " + str(self.x_max) + "] nm." )
+            if x < self.x_min or x > self.x_max:
                 return False
-            
+
         if move_y:
-            if y<self.y_min or y>self.y_max:
-                print("Cannot move y to " + str(y) + " as it is outside the piezo limits of [" + str(self.y_min) + ", " + str(self.y_max) + "] nm." )
+            if y < self.y_min or y > self.y_max:
                 return False
 
         if move_z:
-            if z<self.z_min or z>self.z_max:
-                print("Cannot move z to " + str(z) + " as it is outside the piezo limits of [" + str(self.z_min) + ", " + str(self.z_max) + "] nm." )
+            if z < self.z_min or z > self.z_max:
                 return False
-            
+
         return True
+
+    def __position_limit_error_message(self, x:int, y:int, z:int, move_x:bool, move_y:bool, move_z:bool) -> str:
+        messages = []
+        if move_x and (x < self.x_min or x > self.x_max):
+            messages.append(f"x target {x} nm is outside [{self.x_min}, {self.x_max}] nm")
+
+        if move_y and (y < self.y_min or y > self.y_max):
+            messages.append(f"y target {y} nm is outside [{self.y_min}, {self.y_max}] nm")
+
+        if move_z and (z < self.z_min or z > self.z_max):
+            messages.append(f"z target {z} nm is outside [{self.z_min}, {self.z_max}] nm")
+
+        return "; ".join(messages)

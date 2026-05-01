@@ -6,6 +6,9 @@ Created on Thu Nov  7 14:38:25 2024
 """
 import os
 import sys
+from photonicdrivers.Abstract.Connectable import Connectable
+
+
 current_directory = os.path.dirname(__file__)
 sys.path.insert(0, current_directory)
 

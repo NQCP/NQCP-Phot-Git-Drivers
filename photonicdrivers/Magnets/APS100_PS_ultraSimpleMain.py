@@ -1,5 +1,8 @@
 import serial
 import time
+import socket
+
+################### USB BASED CONNECTION ###################
 
 COM_PORT = 'COM6'
 BAUD_RATE = 9600
@@ -9,6 +12,7 @@ device = serial.Serial(COM_PORT, BAUD_RATE, stopbits=serial.STOPBITS_ONE, parity
 # device = serial.Serial(COM_PORT, BAUD_RATE, timeout=1)
 # device.write(b'*IDN?\n')
 device.write(b'*IDN?;*ESE 12;*ESE?\r')
+
 
 time.sleep(0.5)
 # response = device.readline().decode('utf-8').strip()
@@ -65,3 +69,50 @@ device.close()
 # else:
 #     print("No COM ports found.")
 
+
+################### ETHERNET BASED CONNECTION ###################
+
+# IPAddress='10.209.67.152'
+# Port=4444
+
+# print('Connecting via ethernet')
+# connectionType = 'Ethernet'
+
+# # Create a TCP/IP socket
+# sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# sock.settimeout(5) # sets the timeout of the receive command. 
+# server_address = (IPAddress, Port) #IP address, port
+# sock.connect(server_address)
+
+# commandString = "*IDN?;*ESE 12;*ESE?\r\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
+
+# # commandString = "ULIM 1\n"
+# # sock.sendall(commandString.encode())
+
+# commandString = "*ESR?\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
+
+# commandString = "ULIM?\n"
+# sock.sendall(commandString.encode())
+# response = sock.recv(100)
+# print(response)
+
+# # commandString = "UNITS?\n"
+# # sock.sendall(commandString.encode())
+# # response = sock.recv(100)
+# # print(response)
+
+# # commandString = "UNITS A\n"
+# # sock.sendall(commandString.encode())
+
+# # commandString = "UNITS?\n"
+# # sock.sendall(commandString.encode())
+# # response = sock.recv(100)
+# # print(response)
+
+# sock.close()

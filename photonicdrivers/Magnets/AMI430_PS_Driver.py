@@ -1,0 +1,461 @@
+import socket
+import time
+from photonicdrivers.Abstract.Connectable import Connectable
+
+
+class AMI430_PS_Driver(Connectable):
+    """
+    Driver for the American Magnetics Inc. Model 430 Power Supply
+    Communication via TCP/IP socket connection.
+
+    All commands are sent as a query. If the command ends with a '?', a response is expected.
+    If the command does not end with a '?', the function returns 0 upon successful sending to avoid a timeout waiting for a response.
+    """
+
+    def __init__(self, ip_address: str, port: int = 7180) -> None:
+        self.ip_address = ip_address
+        self.port = port
+        self.timeout = 10
+        self.termination_char = "\n"
+        self._buffer = ""  # Buffer to store incomplete responses
+
+    def connect(self) -> None:
+        self._buffer = ""  # Reset buffer on connect
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.settimeout(self.timeout)
+        self.connection.connect((self.ip_address, self.port))
+
+        # Read and discard the "Hello" message using proper line reading
+        # The AMI430 sends a welcome message upon connection
+        hello_msg = self.__read_line()
+        print(f"Connected: {hello_msg.strip()}")
+        
+        # Clear any additional data that might be in the buffer
+        self.__clear_buffer()
+
+        self.field_unit = self.get_field_unit()
+        self.__set_field_unit("T")
+        self.field_unit = self.get_field_unit()
+
+        self.time_unit = self.get_time_unit()
+        self.__set_time_unit("sec")
+        self.time_unit = self.get_time_unit()
+
+        
+
+    def disconnect(self) -> None:
+        self._buffer = ""  # Clear buffer on disconnect
+        self.connection.close()
+
+    def is_connected(self) -> bool:
+        try:
+            self.get_id()
+            return True
+        except Exception:
+            return False
+
+    def get_id(self) -> str:
+        return self.__query("*IDN?")
+
+    def set_control_remote(self) -> str:
+        return self.__query("SYSTem:REMote")
+
+    def set_control_local(self) -> str:
+        return self.__query("SYSTem:LOCal")
+
+    def get_field_unit(self) -> str:
+        """
+        Returns "kG" for kilogauss or "T" for tesla
+        """
+        response = self.__query("FIELD:UNITS?")
+
+        if response == "0":
+            return "kG"
+        elif response == "1":
+            return "T"
+        else:
+            warning_str = f"get_field_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_field_unit(self, unit: str) -> str:
+        """
+        Unit options are "kG" or "T".  CONFigure:RAMP:RATE:UNITS
+        """
+        if unit == "kG":
+            response = self.__query("CONFigure:FIELD:UNITS 0")
+        elif unit == "T":
+            response = self.__query("CONFigure:FIELD:UNITS 1")
+        else:
+            warning_str = f"Unit must be kG or T, not {unit}"
+            print(warning_str)
+            return warning_str
+
+        self.field_unit = self.get_field_unit()
+        return response
+    
+    def get_time_unit(self) -> str:
+        """
+        Returns "sec" for seconds or "min" for minutes
+        """
+        response = self.__query("RAMP:RATE:UNITS?")
+
+        if response == "0":
+            return "sec"
+        elif response == "1":
+            return "min"
+        else:
+            warning_str = f"get_time_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_time_unit(self, unit: str) -> str:
+        """
+        Unit options are "sec" for seconds or "min" for minutes.
+        """
+        if unit == "sec":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 0")
+        elif unit == "min":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 1")
+        else:
+            warning_str = f"Unit must be sec or min, not {unit}"
+            print(warning_str)
+            return warning_str
+
+        self.field_unit = self.get_time_unit()
+        return response
+
+    def get_limit(self) -> str:
+        """
+        Returns the current limit (used as both upper and lower limit for 4-quadrant supplies)
+        """
+        return self.__query("CURRent:LIMit?")
+
+    def set_limit(self, limit: float, unit: str):
+        """
+        Note: AMI 430 uses Current Limit which functions as both positive and negative limit.
+        unit: should be A
+        """
+        if unit != "A":
+            warning_str = f"Limit must be set in amperes (A), not {unit}"
+            print(warning_str)
+            return warning_str
+        return self.__query(f"CONFigure:CURRent:LIMit {limit}")
+
+    def ramp(self, wait_while_ramping: bool = True) -> str:
+        """
+        Ramps to the target setpoint
+        """
+        response = self.__query("RAMP")
+        if wait_while_ramping:
+            self.__wait_for_state([2, 8])  # HOLDING or AT ZERO
+        return response
+
+
+    def ramp_to_zero(self, wait_while_ramping: bool = True) -> str:
+        """
+        Ramps to zero current
+        """
+        response = self.__query("ZERO")
+        if wait_while_ramping:
+            self.__wait_for_state([8])  # AT ZERO
+        return response
+
+    def pause(self) -> str:
+        """
+        Pauses ramping at current field/current
+        """
+        return self.__query("PAUSE")
+
+    def get_sweep_mode(self) -> str:
+        """
+        Returns ramping state:
+        1=RAMPING, 2=HOLDING, 3=PAUSED, 4=MANUAL UP, 5=MANUAL DOWN,
+        6=ZEROING, 7=QUENCH, 8=AT ZERO, 9=HEATING SWITCH, 10=COOLING SWITCH, 11=RAMPDOWN
+        and its corresponding code
+        """
+        state_code = self.__query("STATE?")
+        state_map = {
+            "1": "RAMPING to target",
+            "2": "HOLDING at target",
+            "3": "PAUSED",
+            "4": "MANUAL UP",
+            "5": "MANUAL DOWN",
+            "6": "ZEROING CURRENT",
+            "7": "QUENCH detected",
+            "8": "AT ZERO",
+            "9": "HEATING switch",
+            "10": "COOLING switch",
+            "11": "RAMPDOWN active",
+        }
+        return state_map.get(state_code, f"Unknown state: {state_code}"), state_code
+
+    def __wait_for_state(self, target_states: list, timeout: float = 1800):
+        """
+        Wait for the magnet to reach one of the target states
+        """
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > timeout:
+                print(f"Timeout waiting for state {target_states}")
+                break
+
+            state = self.__query("STATE?")
+            print(f"\rCurrent state: {self.get_sweep_mode()} | Current field: {self.get_field()} T", end="", flush=True)
+
+            try:
+                if int(state) in target_states:
+                    break
+            except ValueError:
+                print(f"Invalid state received: {state}")
+
+            time.sleep(1)
+
+    def get_current(self) -> float:
+        """
+        Returns the magnet current in A
+        """
+        response = self.__query("CURRent:MAGnet?")
+        return float(response)
+
+    def set_current_target(self, current_A: float) -> str:
+        """
+        Sets the target current in amperes
+        """
+        return self.__query(f"CONFigure:CURRent:TARGet {current_A}")
+
+    def get_current_target(self) -> float:
+        """
+        Returns the target current in amperes
+        """
+        response = self.__query("CURRent:TARGet?")
+        return float(response)
+
+    def get_field(self) -> float:
+        """
+        Returns the magnet field in kG or T (depending on unit setting)
+        """
+        response = self.__query("FIELD:MAGnet?")
+        return float(response)
+
+    def set_field_target(self, field: float) -> str:
+        """
+        Sets the target field in kG or T (depending on unit setting)
+        """
+        return self.__query(f"CONFigure:FIELD:TARGet {field}")
+
+    def get_field_target(self) -> float:
+        """
+        Returns the target field in kG or T (depending on unit setting)
+        """
+        response = self.__query("FIELD:TARGet?")
+        return float(response)
+
+    def get_magnet_voltage(self) -> float:
+        """
+        Returns the magnet voltage in V
+        """
+        response = self.__query("VOLTage:MAGnet?")
+        return float(response)
+
+    def get_supply_voltage(self) -> float:
+        """
+        Returns the supply voltage in V
+        """
+        response = self.__query("VOLTage:SUPPly?")
+        return float(response)
+
+    def set_ramp_rate_current(
+        self, segment: int, rate: float, upper_bound: float
+    ) -> str:
+        """
+        Sets ramp rate for a segment in A/s or A/min (depending on rate units)
+        segment: 1 to number of configured segments
+        rate: ramp rate
+        upper_bound: upper current bound for this segment in A
+        """
+        return self.__query(
+            f"CONFigure:RAMP:RATE:CURRent {segment},{rate},{upper_bound}"
+        )
+
+    def get_ramp_rate_current(self, segment: int) -> str:
+        """
+        Returns ramp rate and upper bound for specified segment
+        """
+        return self.__query(f"RAMP:RATE:CURRent:{segment}?")
+
+    def set_ramp_rate_field(self, segment: int, rate: float, upper_bound: float) -> str:
+        """
+        Sets ramp rate for a segment in kG/s, kG/min, T/s, or T/min
+        segment: 1 to number of configured segments
+        rate: ramp rate
+        upper_bound: upper field bound for this segment
+        """
+        return self.__query(f"CONFigure:RAMP:RATE:FIELD {segment},{rate},{upper_bound}")
+
+    def get_ramp_rate_field(self, segment: int) -> str:
+        """
+        Returns ramp rate and upper bound for specified segment
+        """
+        return self.__query(f"RAMP:RATE:FIELD:{segment}?")
+
+    def get_coil_constant(self) -> float:
+        """
+        Returns the coil constant in kG/A or T/A (depending on field units)
+        """
+        response = self.__query("COILconst?")
+        return float(response)
+
+    def set_coil_constant(self, value: float) -> str:
+        """
+        Sets the coil constant in kG/A or T/A (depending on field units)
+        """
+        return self.__query(f"RAMP {value}")
+
+    def get_persistent_switch_state(self) -> str:
+        """
+        Returns "0" if switch heater is OFF, "1" if ON
+        """
+        return self.__query("PSwitch?")
+
+    def set_persistent_switch(self, state: int) -> str:
+        """
+        Turns persistent switch heater ON (1) or OFF (0)
+        """
+        if state not in [0, 1]:
+            warning_str = "State must be 0 (OFF) or 1 (ON)"
+            print(warning_str)
+            return warning_str
+        return self.__query(f"PSwitch {state}")
+
+    def get_quench_state(self) -> str:
+        """
+        Returns "0" if no quench, "1" if quench detected
+        """
+        return self.__query("QUench?")
+
+    def reset_quench(self) -> str:
+        """
+        Clears quench condition
+        """
+        return self.__query("QUench 0")
+
+    def get_error(self) -> str:
+        """
+        Returns next error from error buffer
+        """
+        return self.__query("SYSTem:ERRor?")
+
+    def get_error_count(self) -> str:
+        """
+        Returns number of errors in buffer
+        """
+        return self.__query("SYSTem:ERRor:COUNt?")
+
+    def send_custom_command(self, command: str) -> str:
+        return self.__query(command)
+
+    def get_all_settings(self) -> dict:
+        settings = {
+            "ID": self.get_id(),
+            "Unit": self.get_field_unit(),
+            "Limit": self.get_limit(),
+            "Current": self.get_current(),
+            "Current_Target": self.get_current_target(),
+            "Field": self.get_field(),
+            "Field_Target": self.get_field_target(),
+            "Magnet_Voltage_V": self.get_magnet_voltage(),
+            "Supply_Voltage_V": self.get_supply_voltage(),
+            "Coil_Constant": self.get_coil_constant(),
+            "Persistent_Switch_State": self.get_persistent_switch_state(),
+            "Quench_State": self.get_quench_state(),
+            "Sweep_Mode": self.get_sweep_mode(),
+            "RampRate_Current_Segment1": self.get_ramp_rate_current(1),
+            "RampRate_Field_Segment1": self.get_ramp_rate_field(1),
+        }
+        return settings
+
+    ################################ PRIVATE METHODS ################################
+
+    def __read_line(self) -> str:
+        """
+        Read a single line from the socket, properly handling the termination character.
+        This prevents reading multiple responses at once and ensures proper parsing.
+        
+        Returns:
+            str: A single line response with termination characters stripped.
+        """
+        while True:
+            # Check if we already have a complete line in the buffer
+            if "\r\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\r\n", 1)
+                return line.strip()
+            elif "\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\n", 1)
+                return line.strip()
+            
+            # Need to read more data from socket
+            try:
+                chunk = self.connection.recv(1024).decode("utf-8")
+                if not chunk:
+                    # Connection closed
+                    if self._buffer:
+                        line = self._buffer.strip()
+                        self._buffer = ""
+                        return line
+                    return ""
+                self._buffer += chunk
+            except socket.timeout:
+                # Timeout - return whatever we have
+                if self._buffer:
+                    line = self._buffer.strip()
+                    self._buffer = ""
+                    return line
+                raise
+
+    def __clear_buffer(self) -> None:
+        """
+        Clear any pending data in the receive buffer.
+        Useful after connect or when recovering from errors.
+        """
+        self.connection.setblocking(False)
+        try:
+            while True:
+                data = self.connection.recv(1024)
+                if not data:
+                    break
+        except BlockingIOError:
+            pass  # No more data available
+        finally:
+            self.connection.setblocking(True)
+            self.connection.settimeout(self.timeout)
+        self._buffer = ""
+
+    def __query(self, command_str: str) -> str:
+        """
+        Send a command and optionally read the response.
+        
+        For commands ending with '?', reads and returns the response.
+        For other commands, returns 0 after sending.
+        
+        Args:
+            command_str: The command to send (with or without '?')
+            
+        Returns:
+            str: The response for queries, or 0 for commands.
+        """
+        # Clear any stale data before sending a new command
+        self.__clear_buffer()
+        
+        command = f"{command_str}{self.termination_char}"
+        self.connection.sendall(command.encode("utf-8"))
+
+        if not command_str.endswith("?"):
+            # Small delay to allow command processing
+            time.sleep(0.05)
+            return 0
+
+        # Read exactly one response line
+        response = self.__read_line()
+        
+        return response
