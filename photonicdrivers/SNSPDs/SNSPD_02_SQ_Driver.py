@@ -23,31 +23,27 @@ class SNSPD_02_SQ_Driver(Connectable):
                 status = False
         return status       
      
-    def get_ip_address(self):
+    def get_ip_address(self) -> str:
         return self.ip_address    
     
-    def getTemperature_stage_1(self) -> float:
+    def get_temperature_stage_1(self) -> float:
         # This function returns the latest temperature for stage 1. See the WebSQController.py script from the manufacturer        
         latest_temperature = self.websq_retina.getTemperatures()
         return latest_temperature[1]
     
-    def getTemperature_stage_2(self) -> float:
+    def get_temperature_stage_2(self) -> float:
         # This function returns the latest temperature for stage 2. See the WebSQController.py script from the manufacturer        
         latest_temperature = self.websq_retina.getTemperatures()
         return latest_temperature[0]
     
-    #def getCounts(self, numberOfMeasurements: int):
-    #    data = self.websq.acquire_cnts(numberOfMeasurements)
-    #    print(data)
-    #    return data
-    
-    #def setMeasurementPeriod(self, integrationtime_ms:int) -> None:
-    #    self.websq.set_measurement_periode(integrationtime_ms)
+    def set_integration_time(self, integration_time_ms:int) -> None:
+        #intTime in (ms) should be in steps of 10ms.
+        self.websq_retina.setIntTime(integration_time_ms)
 
-    #def getMeasurementPeriod(self) -> float:
-     #   return self.websq.get_measurement_periode()
-    
-    def get_bias_currents(self):
+    def get_integration_time(self) -> float:
+        return self.websq_retina.getIntTime()
+ 
+    def get_bias_currents(self) -> list:
         return self.websq_retina.getBiasI()
     
  
