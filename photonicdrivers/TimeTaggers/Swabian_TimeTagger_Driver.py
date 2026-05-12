@@ -139,7 +139,6 @@ class Swabian_TimeTagger_Driver(Connectable):
     def setTestSignal(self, channelNo: int, status: bool) -> None:
         self.connection.setTestSignal(channelNo,status)
         
-    
     def reset(self):
         # Reset the Time Tagger to the start-up state
         print("The reset function clims to not exist for the time tagger network. Setup and better function")
