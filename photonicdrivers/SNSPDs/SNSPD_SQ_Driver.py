@@ -20,20 +20,17 @@ class SNSPD_SQ_Driver(Connectable):
             return self.websq.connected
         except: 
             return False
+        
+    def get_ip_address(self):
+        return self.ip_address    
 
-    def getNumberOfDetectors(self) -> int:
-        return self.websq.get_number_of_detectors()
-    
     def get_control_port(self):
         return self.control_port
 
-    def get_ip_address(self):
-        return self.ip_address
-    
     def get_counts_port(self):
         return self.counts_port
     
-    def getTemperatures(self) -> float:
+    def get_temperatures(self) -> float:
         # This function returns all kind of temperatures. See the WebSQControl.py script from the manufacturer
         # Each return type is an array of the last 200 measurements
         time, T, T_40K, v_av, board_T1, board_T2 = self.websq.get_cryo_temperature()
@@ -42,15 +39,21 @@ class SNSPD_SQ_Driver(Connectable):
         latest_temperature = T[199]
         return latest_temperature
     
+    def get_temperature_unit(self) -> str:
+        return "K"
+    
+    def get_number_of_detectors(self) -> int:
+        return self.websq.get_number_of_detectors()
+    
     def getCounts(self, numberOfMeasurements: int):
         data = self.websq.acquire_cnts(numberOfMeasurements)
         print(data)
         return data
     
-    def setMeasurementPeriod(self, integrationtime_ms:int) -> None:
+    def set_measurement_period(self, integrationtime_ms:int) -> None:
         self.websq.set_measurement_periode(integrationtime_ms)
 
-    def getMeasurementPeriod(self) -> float:
+    def get_measurement_period(self) -> float:
         return self.websq.get_measurement_periode()
     
     def get_bias_voltages(self):
