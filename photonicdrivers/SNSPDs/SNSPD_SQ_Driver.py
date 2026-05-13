@@ -2,10 +2,10 @@ from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQContr
 from photonicdrivers.Abstract.Connectable import Connectable
 
 class SNSPD_SQ_Driver(Connectable):
-    def __init__(self,_ip_string: str, _control_port: int=12000, _counts_port: int=12345) -> None:
-        self.ip_address = _ip_string
-        self.control_port = _control_port
-        self.counts_port = _counts_port
+    def __init__(self, ip_address: str, control_port: int, counts_port: int) -> None:
+        self.ip_address = ip_address
+        self.control_port = control_port
+        self.counts_port = counts_port
 
         self.websq = WebSQControl(TCP_IP_ADR=self.ip_address, CONTROL_PORT=self.control_port, COUNTS_PORT=self.counts_port)
 
@@ -18,7 +18,8 @@ class SNSPD_SQ_Driver(Connectable):
     def is_connected(self):    
         try:    
             return self.websq.connected
-        except: 
+        except Exception as error: 
+            print(f"Error occurred while checking connection: {error}")
             return False
         
     def get_ip_address(self):
