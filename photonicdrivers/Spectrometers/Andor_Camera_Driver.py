@@ -35,6 +35,8 @@ class Andor_Camera_Driver(Connectable):
             print("Camera not initialized. Please connect to the camera first.")
         elif ret_value == errors.DRV_TEMPERATURE_OFF:
             print("Camera temperature is off. Please turn on the cooler to get temperature readings.")
+        elif ret_value == errors.DRV_TEMPERATURE_STABILIZED:
+            print("Camera temperature stabilized.")
         elif ret_value != errors.DRV_SUCCESS:
             raise AndorException(("Error " + str(self.error_num_to_str(ret_value))), ret_value)
         return ret_value
@@ -69,6 +71,9 @@ class Andor_Camera_Driver(Connectable):
     # Methods for connecting and disconnecting the camera, and checking connection status
 
     def connect(self):
+        """
+        Method to connect to the Andor camera.
+        """
 
         ret= self.camera.Initialize("")
         # Check whether we have connection, using serial number to verify that we can get non-zero results.
@@ -82,7 +87,10 @@ class Andor_Camera_Driver(Connectable):
             self.handle_return(ret_value=ret)
 
     def disconnect(self):
-        if self.get_acquisition_progress()[0] != 0 or self.get_acquisition_progress()[1] != 0:
+        """
+        Method to disconnect from the Andor camera. We check if there is an acquisition in progress or if the cooler is on, and if so we stop the acquisition and turn off the cooler before disconnecting. We also check the temperature, and if it's too cold to safely shut down, we wait until it warms up.
+        """
+        if self.is_acquiring():
             print("Acquisition in progress, aborting acquisition before disconnecting...")
             self.abort_acquisition()
         if self.is_cooler_on():
@@ -101,22 +109,41 @@ class Andor_Camera_Driver(Connectable):
         if self.verbose:
             print("ShutDown returned: ",errors(value=ret).name)
 
+    # is-methods to check the status of the camera, cooler and acquisition
+
     def is_connected(self):
         try:
             return bool(self.get_serial_number())
         except Exception:
             return False
 
+    def is_cooler_on(self):
+        (ret, cooler_status) = self.camera.IsCoolerOn()
+        self.handle_return(ret_value=ret)
+        return bool(cooler_status)
+
+    def is_acquiring(self):
+        return self.get_status() == errors.DRV_ACQUIRING
+
+    def is_cooling(self):
+        return self.is_cooler_on() and self.get_temperature_retval() in (errors.DRV_TEMP_NOT_STABILIZED, errors.DRV_TEMP_NOT_REACHED)
+
     def get_settings(self) -> dict:
-        setting_dict: dict[str, str|float]={
+        setting_dict: dict[str, str|float|bool|None]={
             "id": self.get_serial_number(),
-            "temperature": self.get_temperature(),
+            "actual_temperature": self.get_temperature(),
             "gain": self.get_gain(),
-            "exposure_time": self.get_exposure_time_s(),
+            "exposure_time": self.get_acquisition_timings()[0],
+            "accumulation_cycle_time": self.get_acquisition_timings()[1],
             "num_pixel_x": self.num_pixel_x,
             "num_pixel_y":self.num_pixel_y,
             "size_pixel_x": self.size_pixel_x,
             "size_pixel_y":self.size_pixel_y,
+            "acquisition_mode": self.acquisition_mode if hasattr(self, 'acquisition_mode') else None,
+            "is_cooler_on": self.is_cooler_on(),
+            "is_acquiring": self.is_acquiring(),
+            "read_mode": self.read_mode if hasattr(self, 'read_mode') else None,
+            "max_exposure_time": self.get_max_exposure_time(),
         }
         try:
             setting_dict.update({"acquisition_mode": self.acquisition_mode})
@@ -128,15 +155,42 @@ class Andor_Camera_Driver(Connectable):
             pass
         return setting_dict
 
+    # Getter methods for camera parameters and data acquisition
+
+    def get_status(self):
+        (ret, status) = self.camera.GetStatus()
+        self.handle_return(ret_value=ret)
+        return status
+
     def get_acquisition_progress(self):
         (ret, acc, series) = self.camera.GetAcquisitionProgress()
         self.handle_return(ret_value=ret)
         return acc, series
 
-    def get_exposure_time_s(self):
+    def get_temperature_retval(self):
+        # one cannot handle the return value of this function with the usual error handling, because it returns DRV_TEMP_NOT_REACHED or DRV_TEMP_NOT_STABILIZED when the cooler is on and cooling, which is not an error but rather a status. So we just return the raw values and let the user handle them as they see fit.
+        return self.camera.GetTemperature()[0]
+
+    def get_temperature(self):
+        (ret, temperature) = self.camera.GetTemperature()
+        if ret == errors.DRV_TEMP_OFF or ret == errors.DRV_NOT_INITIALIZED:
+            print("Camera temperature is off. Please turn on the cooler to get temperature readings.")
+            return None
+        if ret not in (errors.DRV_TEMPERATURE_NOT_REACHED, errors.DRV_TEMPERATURE_NOT_STABILIZED):
+            self.handle_return(ret_value=ret)
+        if self.verbose:
+            print("GetTemperature returned: ", errors(value=ret).name)
+        return temperature
+
+    def get_max_exposure_time(self):
         (ret, exposure_time) = self.camera.GetMaximumExposure()
         self.handle_return(ret_value=ret)
         return exposure_time
+
+    def get_acquisition_timings(self):
+        (ret, exposure, accumulate, kinetic) = self.camera.GetAcquisitionTimings()
+        self.handle_return(ret_value=ret)
+        return exposure, accumulate, kinetic
 
     def get_image(self):
         self.camera.PrepareAcquisition()
@@ -156,34 +210,6 @@ class Andor_Camera_Driver(Connectable):
         image = self.get_image()
         trace = np.sum(image, axis=0)
         return trace
-
-    def is_cooler_on(self):
-        (ret, cooler_status) = self.camera.IsCoolerOn()
-        self.handle_return(ret_value=ret)
-        return bool(cooler_status)
-
-    def set_cooler_on(self):
-        ret = self.camera.CoolerON()
-        self.handle_return(ret_value=ret)
-        if self.verbose:
-            print("cooler_on returned: ", errors(value=ret).name)
-
-    def set_cooler_off(self):
-        ret = self.camera.CoolerOFF()
-        self.handle_return(ret_value=ret)
-
-    def set_temperature(self, temperature_celsius):
-        ret = self.camera.SetTemperature(temperature_celsius)
-        self.handle_return(ret_value=ret)
-
-    def get_temperature(self):
-        (ret, temperature) = self.camera.GetTemperature()
-        if ret == errors.DRV_TEMP_OFF or ret == errors.DRV_NOT_INITIALIZED:
-            print()
-        self.handle_return(ret_value=ret)
-        if self.verbose:
-            print("GetTemperature returned: ", errors(value=ret).name)
-        return temperature
 
     def get_temperature_range(self):
         (ret, min_temp, max_temp) = self.camera.GetTemperatureRange()
@@ -215,6 +241,27 @@ class Andor_Camera_Driver(Connectable):
             print("get_available_cameras returned: ", errors(value=ret).name)
         return cameras
 
+    def get_current_camera(self):
+        ret, handle = self.camera.GetCurrentCamera()
+        self.handle_return(ret_value=ret)
+        return handle
+
+    # Setter methods for camera parameters and acquisition settings
+
+    def set_cooler_on(self):
+        ret = self.camera.CoolerON()
+        self.handle_return(ret_value=ret)
+        if self.verbose:
+            print("cooler_on returned: ", errors(value=ret).name)
+
+    def set_cooler_off(self):
+        ret = self.camera.CoolerOFF()
+        self.handle_return(ret_value=ret)
+
+    def set_temperature(self, temperature_celsius):
+        ret = self.camera.SetTemperature(temperature_celsius)
+        self.handle_return(ret_value=ret)
+
     def set_gain(self, gain):
         gain_range = self.get_gain_range()
         if gain_range.contains(gain):
@@ -226,11 +273,6 @@ class Andor_Camera_Driver(Connectable):
     def set_exposure_time_s(self, exposure_time_s):
         ret = self.camera.SetExposureTime(exposure_time_s)
         self.handle_return(ret_value=ret)
-
-    def get_current_camera(self):
-        ret, handle = self.camera.GetCurrentCamera()
-        self.handle_return(ret_value=ret)
-        return handle
 
     def set_active_camera(self,index):
         ret, handle = self.camera.GetCameraHandle(index)
