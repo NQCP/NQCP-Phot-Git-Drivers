@@ -5,6 +5,8 @@ import numpy as np
 from instruments.utils.Range import Range
 from photonicdrivers.Abstract.Connectable import Connectable
 
+from labserver.Server.remote_logger import RemoteLogger, RemoteLoggerDummy
+
 from .Kymera328i.pyAndorSDK2.pyAndorSDK2 import atmcd, atmcd_codes, atmcd_errors
 codes = atmcd_codes
 errors = atmcd_errors.Error_Codes
@@ -24,19 +26,28 @@ class Andor_Camera_Driver(Connectable):
         Connectable (class): abstract class that defines the connect, disconnect and is_connected methods that all drivers should have.
     """
 
-    def __init__(self, verbose = False) -> None:
+    def __init__(self,
+            verbose = False,
+            logger: RemoteLogger | RemoteLoggerDummy = RemoteLoggerDummy(),
+            acquisition_mode: int = codes.Acquisition_Mode.SINGLE_SCAN.value,
+            read_mode: int = codes.Read_Mode.FULL_VERTICAL_BINNING.value,
+        ) -> None:
         self.camera = atmcd(userPath=os.path.join(os.path.dirname(__file__), r"Kymera328i/pyAndorSDK2/pyAndorSDK2/libs/Windows/64"))
-        self.verbose = verbose
+        self.verbose: bool = verbose
+        self.logger: RemoteLogger | RemoteLoggerDummy = logger
+        self.num_accumulations: int | None = None
+        self.set_acquisition_mode(acquisition_mode)
+        self.set_read_mode(read_mode)
 
     # Basic configuration methods
 
     def handle_return(self, ret_value: int):
         if ret_value == errors.DRV_NOT_INITIALIZED:
-            print("Camera not initialized. Please connect to the camera first.")
+            self.logger.warning("Camera not initialized. Please connect to the camera first.")
         elif ret_value == errors.DRV_TEMPERATURE_OFF:
-            print("Camera temperature is off. Please turn on the cooler to get temperature readings.")
+            self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
         elif ret_value == errors.DRV_TEMPERATURE_STABILIZED:
-            print("Camera temperature stabilized.")
+            self.logger.info("Camera temperature stabilized.")
         elif ret_value != errors.DRV_SUCCESS:
             raise AndorException(("Error " + str(self.error_num_to_str(ret_value))), ret_value)
         return ret_value
@@ -79,11 +90,11 @@ class Andor_Camera_Driver(Connectable):
         # Check whether we have connection, using serial number to verify that we can get non-zero results.
         self.init_detector_params()
         if ret == errors.DRV_SUCCESS and self.get_serial_number() != 0:
-            print('Camera Initialization Successful')
+            self.logger.info('Camera Initialization Successful')
         elif ret == errors.DRV_NOT_AVAILABLE and self.camera.GetCameraSerialNumber()[0]==errors.DRV_SUCCESS:
-            print('Camera Already Initialized')
+            self.logger.info('Camera Already Initialized')
         else:
-            print('ERROR WHEN INITIALIZING CAMERA')
+            self.logger.error('ERROR WHEN INITIALIZING CAMERA')
             self.handle_return(ret_value=ret)
 
     def disconnect(self):
@@ -91,23 +102,23 @@ class Andor_Camera_Driver(Connectable):
         Method to disconnect from the Andor camera. We check if there is an acquisition in progress or if the cooler is on, and if so we stop the acquisition and turn off the cooler before disconnecting. We also check the temperature, and if it's too cold to safely shut down, we wait until it warms up.
         """
         if self.is_acquiring():
-            print("Acquisition in progress, aborting acquisition before disconnecting...")
+            self.logger.info("Acquisition in progress, aborting acquisition before disconnecting...")
             self.abort_acquisition()
         if self.is_cooler_on():
-             print("Cooler is on, turning off cooler before disconnecting...")
+             self.logger.info("Cooler is on, turning off cooler before disconnecting...")
              self.set_cooler_off()
         temp=self.get_temperature()
         if temp < -20:
-            print ("Too cold to safely shut down, waiting...")
+            self.logger.info("Too cold to safely shut down, waiting...")
         while temp < -20:
-            print("T=",temp)
+            self.logger.info(f"T={temp}")
             temp=self.get_temperature()
             time.sleep(10)
 
         ret = self.camera.ShutDown()
         self.handle_return(ret_value=ret)
         if self.verbose:
-            print("ShutDown returned: ",errors(value=ret).name)
+            self.logger.info(f"ShutDown returned: {errors(value=ret).name}")
 
     # is-methods to check the status of the camera, cooler and acquisition
 
@@ -132,17 +143,18 @@ class Andor_Camera_Driver(Connectable):
         setting_dict: dict[str, str|float|bool|None]={
             "id": self.get_serial_number(),
             "actual_temperature": self.get_temperature(),
-            "gain": self.get_gain(),
+            "is_cooler_on": self.is_cooler_on(),
+            "is_acquiring": self.is_acquiring(),
+            "acquisition_mode": self.acquisition_mode,
+            "read_mode": self.read_mode,
             "exposure_time": self.get_acquisition_timings()[0],
+            "num_accumulations": self.num_accumulations,
             "accumulation_cycle_time": self.get_acquisition_timings()[1],
+            "gain": self.get_gain(),
             "num_pixel_x": self.num_pixel_x,
             "num_pixel_y":self.num_pixel_y,
             "size_pixel_x": self.size_pixel_x,
             "size_pixel_y":self.size_pixel_y,
-            "acquisition_mode": self.acquisition_mode if hasattr(self, 'acquisition_mode') else None,
-            "is_cooler_on": self.is_cooler_on(),
-            "is_acquiring": self.is_acquiring(),
-            "read_mode": self.read_mode if hasattr(self, 'read_mode') else None,
             "max_exposure_time": self.get_max_exposure_time(),
         }
         try:
@@ -162,6 +174,19 @@ class Andor_Camera_Driver(Connectable):
         self.handle_return(ret_value=ret)
         return status
 
+    def get_status_string(self):
+        status = self.get_status()
+        try:
+            return errors(status).name
+        except ValueError:
+            return f"UNKNOWN_STATUS_{status}"
+
+    def get_acquisition_mode(self):
+        return self.acquisition_mode
+
+    def get_read_mode(self):
+        return self.read_mode
+
     def get_acquisition_progress(self):
         (ret, acc, series) = self.camera.GetAcquisitionProgress()
         self.handle_return(ret_value=ret)
@@ -174,12 +199,12 @@ class Andor_Camera_Driver(Connectable):
     def get_temperature(self):
         (ret, temperature) = self.camera.GetTemperature()
         if ret == errors.DRV_TEMP_OFF or ret == errors.DRV_NOT_INITIALIZED:
-            print("Camera temperature is off. Please turn on the cooler to get temperature readings.")
+            self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
             return None
         if ret not in (errors.DRV_TEMPERATURE_NOT_REACHED, errors.DRV_TEMPERATURE_NOT_STABILIZED):
             self.handle_return(ret_value=ret)
         if self.verbose:
-            print("GetTemperature returned: ", errors(value=ret).name)
+            self.logger.info(f"GetTemperature returned: {errors(value=ret).name}")
         return temperature
 
     def get_max_exposure_time(self):
@@ -238,7 +263,7 @@ class Andor_Camera_Driver(Connectable):
         ret,cameras=self.camera.GetAvailableCameras()
         self.handle_return(ret_value=ret)
         if self.verbose:
-            print("get_available_cameras returned: ", errors(value=ret).name)
+            self.logger.info(f"get_available_cameras returned: {errors(value=ret).name}")
         return cameras
 
     def get_current_camera(self):
@@ -252,7 +277,7 @@ class Andor_Camera_Driver(Connectable):
         ret = self.camera.CoolerON()
         self.handle_return(ret_value=ret)
         if self.verbose:
-            print("cooler_on returned: ", errors(value=ret).name)
+            self.logger.info(f"cooler_on returned: {errors(value=ret).name}")
 
     def set_cooler_off(self):
         ret = self.camera.CoolerOFF()
@@ -268,10 +293,10 @@ class Andor_Camera_Driver(Connectable):
             ret = self.camera.SetGain(gain)
             self.handle_return(ret_value=ret)
         else:
-            print("Gain out of range: " + gain_range)
+            self.logger.warning(f"Gain out of range: {gain_range}")
 
-    def set_exposure_time_s(self, exposure_time_s):
-        ret = self.camera.SetExposureTime(exposure_time_s)
+    def set_exposure_time(self, exposure_time):
+        ret = self.camera.SetExposureTime(exposure_time)
         self.handle_return(ret_value=ret)
 
     def set_active_camera(self,index):
@@ -280,25 +305,45 @@ class Andor_Camera_Driver(Connectable):
         ret = self.camera.SetCurrentCamera(handle)
         self.handle_return(ret_value=ret)
         if self.verbose:
-            print("set_active_camera returned: ",errors(ret).name)
+            self.logger.info(f"set_active_camera returned: {errors(ret).name}")
 
     def set_verbose(self, boool):
         self.verbose: bool = boool
 
-    def set_read_mode(self, readmode):
-        ret=self.camera.SetReadMode(readmode)
+    def set_read_mode(self, read_mode):
+        if read_mode not in [mode.value for mode in codes.Read_Mode]:
+            self.logger.warning(f"Read mode {read_mode} not recognized. Valid modes are {[mode.value for mode in codes.Read_Mode]}")
+            return
+        ret=self.camera.SetReadMode(read_mode)
         self.handle_return(ret_value=ret)
-        self.read_mode: int = readmode
+        self.read_mode: int = read_mode
         if self.verbose:
-            print("set_read_mode returned: ",errors(ret).name)
+            self.logger.info(f"set_read_mode returned: {errors(ret).name}")
 
     def set_image(self,hbin, vbin, hstart, hend, vstart, vend):
         ret=self.camera.SetImage(hbin, vbin, hstart, hend, vstart, vend)
         self.handle_return(ret_value=ret)
         if self.verbose:
-            print("set_image returned: ",errors(ret).name)
+            self.logger.info(f"set_image returned: {errors(ret).name}")
 
-    def set_camera_acquisition(self, mode):
-        self.acquisition_mode: int = mode
-        ret = self.camera.SetAcquisitionMode(mode)
+    def set_acquisition_mode(self, acquisition_mode: int):
+        if acquisition_mode not in [mode.value for mode in codes.Acquisition_Mode]:
+            self.logger.warning(f"Acquisition mode {acquisition_mode} not recognized. Valid modes are {[mode.value for mode in codes.Acquisition_Mode]}")
+            return
+        ret = self.camera.SetAcquisitionMode(acquisition_mode)
         self.handle_return(ret_value=ret)
+        self.acquisition_mode: int = acquisition_mode
+        if self.acquisition_mode not in (codes.Acquisition_Mode.ACCUMULATE.value, codes.Acquisition_Mode.KINETICS.value, codes.Acquisition_Mode.FAST_KINETICS.value):
+            self.num_accumulations = None
+        if self.verbose:
+            self.logger.info(f"set_acquisition_mode returned: {errors(value=ret).name}")
+
+    def set_number_accumulations(self, num_accumulations):
+        if self.acquisition_mode not in (codes.Acquisition_Mode.ACCUMULATE.value, codes.Acquisition_Mode.KINETICS.value, codes.Acquisition_Mode.FAST_KINETICS.value):
+            self.logger.warning(f"Number of accumulations can only be set in ACCUMULATE or KINETIC_SERIES acquisition modes, not in {self.acquisition_mode}.")
+            return
+        ret = self.camera.SetNumberAccumulations(num_accumulations)
+        self.handle_return(ret_value=ret)
+        self.num_accumulations = num_accumulations
+        if self.verbose:
+            self.logger.info(f"set_number_accumulations returned: {errors(value=ret).name}")
