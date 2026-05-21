@@ -11,7 +11,6 @@ class AttoDry800_Driver(Connectable):
     """
     def __init__(self, ip_address: str):
         self.ip_address = ip_address
-
         self.device = Device(address=self.ip_address)
 
     # Connectable interface methods
@@ -30,7 +29,7 @@ class AttoDry800_Driver(Connectable):
             bool: True if the AttoDry800 is connected, False otherwise.
         """
         return self.device.is_open
-    
+
     # Device interface methods
 
     def _request(self, method: str, params: dict | None = None) -> dict:
@@ -45,7 +44,7 @@ class AttoDry800_Driver(Connectable):
         """
         return self.device.request(method, params)
 
-    
+
     # Pressure methods
 
     def get_sample_space_pressure(self) -> float:
@@ -55,7 +54,7 @@ class AttoDry800_Driver(Connectable):
             float: The sample space pressure in mbar.
         """
         return self.device.pressures.getSampleSpacePressure()
-    
+
     def get_turbo_pump_frequency(self) -> float:
         """Gets the turbo pump frequency from the AttoDry800.
         Note: This method is not implemented in the atto_device library, so it is implemented here using the _request method to send a request to the AttoDry800.
@@ -84,7 +83,7 @@ class AttoDry800_Driver(Connectable):
             list: A list containing the error code, error message, error source, and error timestamp.
         """
         return self.device.system.getLastError()
-    
+
     def get_features(self) -> list[str]:
         """Gets the features of the AttoDry800.
 

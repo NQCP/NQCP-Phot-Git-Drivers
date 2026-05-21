@@ -36,8 +36,8 @@ class Andor_Camera_Driver(Connectable):
         self.verbose: bool = verbose
         self.logger: RemoteLogger | RemoteLoggerDummy = logger
         self.num_accumulations: int | None = None
-        self.set_acquisition_mode(acquisition_mode)
-        self.set_read_mode(read_mode)
+        self.acquisition_mode: int = acquisition_mode
+        self.read_mode: int = read_mode
 
     # Basic configuration methods
 
@@ -73,6 +73,8 @@ class Andor_Camera_Driver(Connectable):
         #get the size of the pixels
         ret,self.size_pixel_x,self.size_pixel_y =self.camera.GetPixelSize()
         self.handle_return(ret_value=ret)
+        self.set_acquisition_mode(self.acquisition_mode)
+        self.set_read_mode(self.read_mode)
 
     def abort_acquisition(self):
         ret = self.camera.AbortAcquisition()
@@ -87,8 +89,6 @@ class Andor_Camera_Driver(Connectable):
         """
 
         ret= self.camera.Initialize("")
-        # Check whether we have connection, using serial number to verify that we can get non-zero results.
-        self.init_detector_params()
         if ret == errors.DRV_SUCCESS and self.get_serial_number() != 0:
             self.logger.info('Camera Initialization Successful')
         elif ret == errors.DRV_NOT_AVAILABLE and self.camera.GetCameraSerialNumber()[0]==errors.DRV_SUCCESS:
@@ -96,6 +96,8 @@ class Andor_Camera_Driver(Connectable):
         else:
             self.logger.error('ERROR WHEN INITIALIZING CAMERA')
             self.handle_return(ret_value=ret)
+        # Check whether we have connection, using serial number to verify that we can get non-zero results.
+        self.init_detector_params()
 
     def disconnect(self):
         """
@@ -216,6 +218,9 @@ class Andor_Camera_Driver(Connectable):
         (ret, exposure, accumulate, kinetic) = self.camera.GetAcquisitionTimings()
         self.handle_return(ret_value=ret)
         return exposure, accumulate, kinetic
+
+    def get_exposure_time(self):
+        return self.get_acquisition_timings()[0]
 
     def get_image(self):
         self.camera.PrepareAcquisition()
