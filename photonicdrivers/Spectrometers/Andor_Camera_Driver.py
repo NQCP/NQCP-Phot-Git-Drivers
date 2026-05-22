@@ -147,8 +147,8 @@ class Andor_Camera_Driver(Connectable):
             "actual_temperature": self.get_temperature(),
             "is_cooler_on": self.is_cooler_on(),
             "is_acquiring": self.is_acquiring(),
-            "acquisition_mode": self.acquisition_mode,
-            "read_mode": self.read_mode,
+            "acquisition_mode": self.get_acquisition_mode_string(),
+            "read_mode": self.get_read_mode_string(),
             "exposure_time": self.get_acquisition_timings()[0],
             "num_accumulations": self.num_accumulations,
             "accumulation_cycle_time": self.get_acquisition_timings()[1],
@@ -159,14 +159,6 @@ class Andor_Camera_Driver(Connectable):
             "size_pixel_y":self.size_pixel_y,
             "max_exposure_time": self.get_max_exposure_time(),
         }
-        try:
-            setting_dict.update({"acquisition_mode": self.acquisition_mode})
-        except Exception:
-            pass
-        try:
-            setting_dict.update({"read_mode":self.read_mode})
-        except Exception:
-            pass
         return setting_dict
 
     # Getter methods for camera parameters and data acquisition
@@ -186,8 +178,20 @@ class Andor_Camera_Driver(Connectable):
     def get_acquisition_mode(self):
         return self.acquisition_mode
 
+    def get_acquisition_mode_string(self):
+        try:
+            return codes.Acquisition_Mode(self.acquisition_mode).name
+        except ValueError:
+            return f"UNKNOWN_ACQUISITION_MODE_{self.acquisition_mode}"
+
     def get_read_mode(self):
         return self.read_mode
+
+    def get_read_mode_string(self):
+        try:
+            return codes.Read_Mode(self.read_mode).name
+        except ValueError:
+            return f"UNKNOWN_READ_MODE_{self.read_mode}"
 
     def get_acquisition_progress(self):
         (ret, acc, series) = self.camera.GetAcquisitionProgress()
