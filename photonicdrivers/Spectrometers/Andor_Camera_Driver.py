@@ -204,9 +204,12 @@ class Andor_Camera_Driver(Connectable):
 
     def get_temperature(self):
         (ret, temperature) = self.camera.GetTemperature()
-        if ret == errors.DRV_TEMP_OFF or ret == errors.DRV_NOT_INITIALIZED:
+        if ret == errors.DRV_NOT_INITIALIZED:
             self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
-            return None
+            return temperature
+        if ret == errors.DRV_TEMPERATURE_OFF:
+            self.logger.warning("Camera temperature is off (warming up?). Please turn on the cooler to get temperature readings.")
+            return temperature
         if ret not in (errors.DRV_TEMPERATURE_NOT_REACHED, errors.DRV_TEMPERATURE_NOT_STABILIZED):
             self.handle_return(ret_value=ret)
         if self.verbose:
