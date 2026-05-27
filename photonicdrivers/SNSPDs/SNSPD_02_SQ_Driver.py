@@ -36,6 +36,9 @@ class SNSPD_02_SQ_Driver(Connectable):
         latest_temperature = self.websq_retina.getTemperatures()
         return latest_temperature[0]
     
+    def get_temperature_unit(self) -> str:
+        return "K"
+    
     def set_integration_time(self, integration_time_ms:int) -> None:
         #intTime in (ms) should be in steps of 10ms.
         self.websq_retina.setIntTime(integration_time_ms)
