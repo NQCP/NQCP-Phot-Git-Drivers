@@ -28,9 +28,9 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         self.ip_address = ip_string
 
         self.x_min = x_min_nm
-        self.x_max = x_max_nm        
+        self.x_max = x_max_nm
         self.y_min = y_min_nm
-        self.y_max = y_max_nm        
+        self.y_max = y_max_nm
         self.z_min = z_min_nm
         self.z_max = z_max_nm
 
@@ -46,16 +46,16 @@ class Piezo_AttocubeAMC_Driver(Connectable):
     def is_connected(self) -> bool:
         try:
             return bool(self.get_device_type())
-        except:
+        except Exception:
             return False
-    
+
     def get_device_type(self):
-        return self.amc.description.getDeviceType()    
+        return self.amc.description.getDeviceType()
 
     def get_position(self) -> tuple[float,  float,  float]:
         x, y, z, v1, v2, v3 = self.amc.control.getPositionsAndVoltages()
         return x, y, z
-    
+
     def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False) -> None:
         '''
         Moves the piezo to the position specified by x_nm, y_nm,z_nm
