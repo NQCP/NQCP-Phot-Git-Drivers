@@ -56,6 +56,15 @@ class Piezo_AttocubeAMC_Driver(Connectable):
         x, y, z, v1, v2, v3 = self.amc.control.getPositionsAndVoltages()
         return x, y, z
 
+    def get_control_amplitude(self, axis: str | int) -> float:
+        return self.amc.control.getControlAmplitude(axis_to_id(axis))
+
+    def get_control_frequency(self, axis: str | int) -> float:
+        return self.amc.control.getControlFrequency(axis_to_id(axis))
+
+    def get_control_dc_value(self, axis: str | int) -> float:
+        return self.amc.control.getControlFixOutputVoltage(axis_to_id(axis))
+
     def set_position(self, x_nm:int=0, y_nm:int=0, z_nm:int=0, move_x:bool=False, move_y:bool=False, move_z:bool=False) -> None:
         '''
         Moves the piezo to the position specified by x_nm, y_nm,z_nm
