@@ -48,6 +48,8 @@ class Andor_Camera_Driver(Connectable):
             self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
         elif ret_value == errors.DRV_TEMPERATURE_STABILIZED:
             self.logger.info("Camera temperature stabilized.")
+        elif ret_value == errors.DRV_ACQUIRING:
+            self.logger.warning("Camera is currently acquiring data. Please wait for the acquisition to finish before sending new commands.")
         elif ret_value != errors.DRV_SUCCESS:
             raise AndorException(("Error " + str(self.error_num_to_str(ret_value))), ret_value)
         return ret_value
@@ -207,10 +209,18 @@ class Andor_Camera_Driver(Connectable):
         if ret == errors.DRV_NOT_INITIALIZED:
             self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
             return temperature
-        if ret == errors.DRV_TEMPERATURE_OFF:
+        elif ret == errors.DRV_TEMPERATURE_OFF:
             self.logger.warning("Camera temperature is off (warming up?). Please turn on the cooler to get temperature readings.")
             return temperature
-        if ret not in (errors.DRV_TEMPERATURE_NOT_REACHED, errors.DRV_TEMPERATURE_NOT_STABILIZED):
+        elif ret == errors.DRV_ACQUIRING:
+            # try to wait for 3 seconds, and try again to fetch the temperature. Try this up to three times, and if it still doesn't work, raise an exception. This is to handle the case where the camera is temporarily busy with an acquisition, but we still want to get the temperature reading.
+            for i in range(3):
+                self.logger.warning("Camera is currently acquiring data. Waiting for acquisition to finish to get temperature reading...")
+                time.sleep(3)
+                ret, temperature = self.camera.GetTemperature()
+                if ret == errors.DRV_SUCCESS:
+                    break
+        else:
             self.handle_return(ret_value=ret)
         if self.verbose:
             self.logger.info(f"GetTemperature returned: {errors(value=ret).name}")
