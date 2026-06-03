@@ -48,8 +48,8 @@ class Andor_Camera_Driver(Connectable):
             self.logger.warning("Camera temperature is off. Please turn on the cooler to get temperature readings.")
         elif ret_value == errors.DRV_TEMPERATURE_STABILIZED:
             self.logger.info("Camera temperature stabilized.")
-        elif ret_value == errors.DRV_TEMPERATURE_NOT_STABILIZED:
-            self.logger.warning("Camera temperature not stabilized. Please wait for the cooler to stabilize the temperature.")
+        elif ret_value == errors.DRV_TEMPERATURE_NOT_STABILIZED or ret_value == errors.DRV_TEMPERATURE_NOT_REACHED:
+            self.logger.warning("Camera temperature not stabilized/reached. Please wait for the cooler to stabilize the temperature.")
         elif ret_value == errors.DRV_ACQUIRING:
             self.logger.warning("Camera is currently acquiring data. Please wait for the acquisition to finish before sending new commands.")
         elif ret_value != errors.DRV_SUCCESS:
