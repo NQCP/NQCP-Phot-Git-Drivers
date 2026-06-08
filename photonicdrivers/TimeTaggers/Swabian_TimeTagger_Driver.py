@@ -113,8 +113,9 @@ class Swabian_TimeTagger_Driver(Connectable):
         gated_g2_correlation = TimeTagger.Correlation(tagger=self.connection, channel_1=gated_channel_1_number, channel_2=gated_channel_2_number, binwidth=bin_width_ps, n_bins=num_bins)
         histogram_1 = TimeTagger.Histogram(tagger=self.connection, click_channel=click_1_channel_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
         histogram_2 = TimeTagger.Histogram(tagger=self.connection, click_channel=click_2_channel_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
-        return gated_g2_correlation, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2, histogram_1, histogram_2
-    
+        gated_histogram_1 = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_channel_1_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        gated_histogram_2 = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_channel_2_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        return gated_g2_correlation, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2, histogram_1, histogram_2, gated_histogram_1, gated_histogram_2
 
     def initialise_gated_g2_2D_histogram(self, trigger_channel_number, click_1_channel_number, click_2_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins):
         gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_start_delay_ps)
