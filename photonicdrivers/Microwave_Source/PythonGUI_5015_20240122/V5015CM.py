@@ -327,7 +327,7 @@ class Main( tk.Tk ):
 if __name__ == "__main__":
 
     # Instantiate the Serial Port
-    Main.sp = VSerialPort.VSerialPort()
+    Main.sp = VSerialPort.VSerialPort('COM13')
 
     # instantiate our root class
     app = Main()
