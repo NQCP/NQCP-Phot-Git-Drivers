@@ -116,6 +116,38 @@ class Swabian_TimeTagger_Driver(Connectable):
         gated_histogram_1 = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_channel_1_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
         gated_histogram_2 = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_channel_2_number, start_channel=trigger_channel_number, binwidth = bin_width_ps, n_bins=histogram_num_bins)
         return gated_g2_correlation, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2, histogram_1, histogram_2, gated_histogram_1, gated_histogram_2
+    
+    def initialise_check_probe_correlation(self, trigger_channel_number, click_channel_number, global_delay_ps, probe_check_delay_ps, check_laser_width_ps, probe_laser_width_ps,  check_collections_width_ps, probe_collections_width_ps, bin_width_ps, num_bins, histogram_num_bins):
+        gate_check_laser_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps)
+        gate_check_collection_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps + check_laser_width_ps)
+        gate_check_collection_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps + check_laser_width_ps + check_collections_width_ps)
+        gate_check_laser_start_channel_number = gate_check_laser_start_channel.getChannel()
+        gate_check_collection_start_channel_number = gate_check_collection_start_channel.getChannel()
+        gate_check_collection_stop_channel_number = gate_check_collection_stop_channel.getChannel()
+
+        gate_probe_laser_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps + probe_check_delay_ps)
+        gate_probe_collection_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps + probe_check_delay_ps + probe_laser_width_ps)
+        gate_probe_collection_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=global_delay_ps + probe_check_delay_ps + probe_laser_width_ps + probe_collections_width_ps)
+        gate_probe_laser_start_channel_number = gate_probe_laser_start_channel.getChannel()
+        gate_probe_collection_start_channel_number = gate_probe_collection_start_channel.getChannel()
+        gate_probe_collection_stop_channel_number = gate_probe_collection_stop_channel.getChannel()
+        
+        gated_check_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=gate_check_laser_start_channel_number, gate_stop_channel=gate_check_collection_stop_channel_number)
+        gated_probe_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=gate_probe_laser_start_channel_number, gate_stop_channel=gate_probe_collection_stop_channel_number)
+        gated_check_collection_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=gate_check_collection_start_channel_number, gate_stop_channel=gate_check_collection_stop_channel_number)
+        gated_probe_collection_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=gate_probe_collection_start_channel_number, gate_stop_channel=gate_probe_collection_stop_channel_number)
+        gated_check_channel_number = gated_check_channel.getChannel()
+        gated_probe_channel_number = gated_probe_channel.getChannel()
+        gated_check_collection_channel_number = gated_check_collection_channel.getChannel()
+        gated_probe_collection_channel_number = gated_probe_collection_channel.getChannel()
+
+        gated_check_histogram = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_check_channel, start_channel=gate_check_laser_start_channel, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        gated_probe_histogram = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_probe_channel, start_channel=gate_probe_laser_start_channel, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        gated_check_collection_histogram = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_check_collection_channel, start_channel=gate_check_collection_start_channel, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        gated_probe_collection_histogram = TimeTagger.Histogram(tagger=self.connection, click_channel=gated_probe_collection_channel, start_channel=gate_probe_collection_start_channel, binwidth = bin_width_ps, n_bins=histogram_num_bins)
+        gated_check_probe_correlation = TimeTagger.Correlation(tagger=self.connection, channel_1=gated_check_collection_channel_number, channel_2=gated_probe_collection_channel_number, binwidth=bin_width_ps, n_bins=num_bins)
+
+        return gated_check_probe_correlation, gated_check_histogram, gated_probe_histogram, gated_check_collection_histogram, gated_probe_collection_histogram, gate_check_laser_start_channel, gate_check_collection_start_channel, gate_check_collection_stop_channel, gate_probe_laser_start_channel, gate_probe_collection_start_channel, gate_probe_collection_stop_channel, gated_check_channel, gated_probe_channel, gated_check_collection_channel, gated_probe_collection_channel
 
     def initialise_gated_g2_2D_histogram(self, trigger_channel_number, click_1_channel_number, click_2_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins):
         gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=trigger_gate_start_delay_ps)
