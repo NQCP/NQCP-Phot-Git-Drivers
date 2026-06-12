@@ -151,10 +151,11 @@ class Andor_Camera_Driver(Connectable):
             "actual_temperature": self.get_temperature(),
             "is_cooler_on": self.is_cooler_on(),
             "is_acquiring": self.is_acquiring(),
+            "status": self.get_status_string(),
             "acquisition_mode": self.get_acquisition_mode_string(),
             "read_mode": self.get_read_mode_string(),
             "exposure_time": self.get_exposure_time(),
-            "num_accumulations": self.num_accumulations,
+            "num_accumulations": self.get_number_accumulations(),
             "accumulation_cycle_time": self.get_accumulation_cycle_time(),
             "gain": self.get_gain(),
             "num_pixel_x": self.num_pixel_x,
@@ -243,6 +244,9 @@ class Andor_Camera_Driver(Connectable):
 
     def get_accumulation_cycle_time(self):
         return self.get_acquisition_timings()[1]
+
+    def get_number_accumulations(self):
+        return self.num_accumulations
 
     def get_image(self):
         self.camera.PrepareAcquisition()
