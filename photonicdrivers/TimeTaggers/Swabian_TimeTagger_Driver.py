@@ -219,7 +219,7 @@ class Swabian_TimeTagger_Driver(Connectable):
         probe_cond_ch = probe_detection_conditional.getChannel()
 
         # Pass probe_detection_conditional events only when check_detection fired
-        self.connection.setConditionalFilter(trigger=TimeTagger.IntVector([check_ch]), filtered=TimeTagger.IntVector([probe_cond_ch]))
+        self.connection.setConditionalFilter(trigger=[check_ch], filtered=[probe_cond_ch])
 
         probe_histogram = TimeTagger.Histogram(
             tagger=self.connection,
