@@ -568,119 +568,52 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.magnet.getVolt(channel=channel_number)
 
+    # setters for magnet methods
 
-class AttoDry2100_Magnet_Driver(Connectable):
-    """Driver for interfacing with the magnet of the AttoDry2100. Inherits from Connectable and Device.
-
-    Args:
-        Connectable (Abstract): abstract class for devices that can be connected to and disconnected from.
-        Device (Device): device class from the atto_device library that provides methods for communicating with the AttoDry2100.
-    """
-    def __init__(self, ip_address: str):
-        self.ip_address = ip_address
-
-        self.device = Device(address=self.ip_address)
-
-    # Connectable interface methods
-    def connect(self) -> None:
-        """Connects to the AttoDry2100 using the connect method from the Device class."""
-        self.device.connect()
-
-    def disconnect(self) -> None:
-        """Disconnects from the AttoDry2100 using the close method from the Device class."""
-        self.device.close()
-
-    def is_connected(self) -> bool:
-        """Checks if the AttoDry2100 is connected using the is_open attribute from the Device class.
-
-        Returns:
-            bool: True if the AttoDry2100 is connected, False otherwise.
-        """
-        return self.device.is_open
-
-        # Magnet methods
-
-    def get_magnet_field(self, channel_number: int) -> float:
-        """Gets the magnetic field from the specified channel of the magnet.
+    def set_magnet_setpoint(self, channel_number: int, set_point: float) -> None:
+        """Sets the magnet set point for the specified channel of the magnet.
 
         Args:
             channel_number (int): The channel number of the magnet.
-
-        Returns:
-            float: The magnetic field of the specified channel in Tesla.
+            set_point (float): The magnet set point to be set in Tesla.
         """
-        return self.device.magnet.getH(channel=channel_number)
+        return self.device.magnet.setHSetPoint(channel=channel_number, setPoint=set_point)
 
-    def get_magnet_set_point_channel(self, channel_number: int) -> float:
-        """Gets the magnet set point from the specified channel of the magnet.
-
-        Args:
-            channel_number (int): The channel number of the magnet.
-
-        Returns:
-            float: The magnet set point of the specified channel in Tesla.
+    def set_magnet_driven_mode(self, channel_number: int, status: bool) -> None:
+        # type: (int, bool) -> ()
         """
-        return self.device.magnet.getHSetPoint(channel=channel_number)
+        Set driven mode for a specific channel
 
-    def get_magnet_set_point(self) -> tuple[float, float, float]:
-        """Gets the magnet set point 3D of the magnet.
+        Parameters:
+            channel_number: a number between 1 and 3 corresponding to the magnet channel
+            status: True to turn on driven mode, False to turn off
 
-        Args:
-            channel_number (int): The channel number of the magnet.
-
-        Returns:
-            float: The magnet set point 3D of the specified channel in Tesla.
         """
-        return self.device.magnet.getHSetPoint3D()
+        
+        return self.device.magnet.setDrivenMode(channel=channel_number, onOrOff=status)
 
-    def get_magnet_state(self, channel_number: int) -> str:
-        """Gets the magnet state from the AttoDry2100.
-
-        Args:
-            channel_number (int): The channel number of the magnet.
-
-        Returns:
-            str: The magnet state of the AttoDry2100.
+    def start_field_control(self, channel_number: int) -> None:
+        # type: (int) -> ()
         """
-        return self.device.magnet.getHState(channel=channel_number)
+        Starts the magnetic field control
 
-    def get_magnet_is_in_quench_state(self) -> bool:
-        """Gets the magnet quench state from the AttoDry2100.
-
-        Returns:
-            bool: True if the magnet is in a quench state, False otherwise.
+        Parameters:
+            channel: 
+                    
         """
-        return self.device.magnet.getIsInQuenchState()
+        
+        return self.device.magnet.startFieldControl(channel=channel_number)
+        self.device.handleError(response)          
 
-    def get_magnet_ramp_rate(self, channel_number: int, index: int) -> tuple[float, float]:
-        """Gets the magnet ramp rate from the AttoDry2100.
-
-        Args:
-            channel_number (int): The channel number of the magnet.
-            index (int): The index of the ramp rate to retrieve.
-
-        Returns:
-            float: The magnet ramp rate of the AttoDry2100 in Tesla/s.
-            float: The magnet ramp rate of the AttoDry2100 in Tesla/s.
+    def stop_field_control(self, channel_number: int) -> None:
+        # type: (int) -> ()
         """
-        return self.device.magnet.getRampRate(channel=channel_number, index=index)
+        Stops the magnetic field control
 
-    def get_magnet_temperature(self) -> float:
-        """Gets the magnet temperature from the AttoDry2100.
-
-        Returns:
-            float: The magnet temperature of the AttoDry2100 in K.
+        Parameters:
+            channel: 
+                    
         """
-        return self.device.magnet.getTemperature()
-
-    def get_magnet_voltage(self, channel_number: int) -> float:
-        """Gets the magnet voltage from the AttoDry2100.
-
-        Args:
-            channel_number (int): The channel number of the magnet.
-
-        Returns:
-            float: The magnet voltage of the AttoDry2100 in V.
-        """
-        return self.device.magnet.getVolt(channel=channel_number)
-
+        
+        return self.device.magnet.stopFieldControl(channel=channel_number)
+  
