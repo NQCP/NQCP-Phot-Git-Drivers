@@ -41,10 +41,8 @@ class Andor_Spectrograph_Driver(Connectable):
         self.device_index = 0
         self.verbose = verbose
 
-    # Basic configuration methods
 
-    def get_function_return_description(self, error_num):
-        return self.spectrograph.GetFunctionReturnDescription(error=error_num, MaxDescStrLen=64)[1]
+    # Basic methods for connecting to the spectrograph and error handling. These are used by the getter and setter methods below.
 
     def error_num_to_str(self, error_num: int) -> str:
         try:
@@ -64,14 +62,6 @@ class Andor_Spectrograph_Driver(Connectable):
         if self.verbose:
             print("Function Initialize returned {}".format(self.get_function_return_description(ret)))
 
-    def get_serial_number(self):
-        (ret, serial_number) = self.spectrograph.GetSerialNumber(self.device_index, maxSerialStrLen=20)
-        self.handle_return(ret_value=ret)
-        return serial_number
-
-    def get_id(self):
-        return self.get_serial_number()
-
     def disconnect(self):
         ret = self.spectrograph.Close()
         self.handle_return(ret_value=ret)
@@ -83,10 +73,24 @@ class Andor_Spectrograph_Driver(Connectable):
         except Exception:
             return False
 
+    # Getter methods for the spectrograph
+
+    def get_function_return_description(self, error_num):
+        return self.spectrograph.GetFunctionReturnDescription(error=error_num, MaxDescStrLen=64)[1]
+
+    def get_serial_number(self):
+        (ret, serial_number) = self.spectrograph.GetSerialNumber(self.device_index, maxSerialStrLen=20)
+        self.handle_return(ret_value=ret)
+        return serial_number
+
+    def get_id(self):
+        return self.get_serial_number()
+
     def get_settings(self) -> dict:
         return {
             "id": self.get_id(),
             "grating": self.get_grating(),
+            "grating_info": self.get_grating_info(self.get_grating()),
             "center_wavelength": self.get_center_wavelength()
         }
 
@@ -95,13 +99,10 @@ class Andor_Spectrograph_Driver(Connectable):
         self.handle_return(ret_value=ret)
         return grating
 
-    def set_grating(self, grating):
-        ret = self.spectrograph.SetGrating(self.device_index, grating)
+    def get_grating_info(self, grating):
+        (ret, groove_density, blaze_wavelength, grating_home_steps, grating_offset_steps) = self.spectrograph.GetGratingInfo(self.device_index, grating, maxBlazeStrLen=64)
         self.handle_return(ret_value=ret)
-
-    def set_center_wavelength(self, wavelength):
-        ret = self.spectrograph.SetWavelength(self.device_index, wavelength=wavelength)
-        self.handle_return(ret_value=ret)
+        return groove_density, blaze_wavelength
 
     def get_center_wavelength(self):
         (ret, wavelength) = self.spectrograph.GetWavelength(self.device_index)
@@ -118,10 +119,6 @@ class Andor_Spectrograph_Driver(Connectable):
         self.handle_return(ret_value=ret)
         return position
 
-    def set_focus_mirror_position(self,position):
-        ret = self.spectrograph.SetFocusMirror(self.device_index,position)
-        self.handle_return(ret_value=ret)
-
     def get_calibration_coefficients(self,xpixels,xsize):
         # Returns a tuple of the 4 coefficients for the third order polynomial in the function:
         # lambda = c0+c1*pixel+c2*pixel**2+c3pixel**3
@@ -130,7 +127,7 @@ class Andor_Spectrograph_Driver(Connectable):
         self.handle_return(ret_value=ret)
         ret = self.spectrograph.SetPixelWidth(0, xsize)
         self.handle_return(ret_value=ret)
-        (shm, c0, c1, c2, c3) = self.spectrograph.GetPixelCalibrationCoefficients(0)
+        (shm, c0, c1, c2, c3) = self.spectrograph.GetPixelCalibrationCoefficients(self.device_index)
         return (c0,c1,c2,c3)
 
     def get_calibration_array(self,xpixels,xsize):
@@ -139,3 +136,18 @@ class Andor_Spectrograph_Driver(Connectable):
         pixels=np.arange(0,xpixels,1)
         wavelengths=coeffs[0]+coeffs[1]*pixels+coeffs[2]*pixels**2+coeffs[3]*pixels**3
         return wavelengths
+
+
+    # Setter methods for the spectrograph
+
+    def set_focus_mirror_position(self,position):
+        ret = self.spectrograph.SetFocusMirror(self.device_index,position)
+        self.handle_return(ret_value=ret)
+
+    def set_grating(self, grating):
+        ret = self.spectrograph.SetGrating(self.device_index, grating)
+        self.handle_return(ret_value=ret)
+
+    def set_center_wavelength(self, wavelength):
+        ret = self.spectrograph.SetWavelength(self.device_index, wavelength=wavelength)
+        self.handle_return(ret_value=ret)

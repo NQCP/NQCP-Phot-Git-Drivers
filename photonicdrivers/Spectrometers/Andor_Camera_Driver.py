@@ -153,9 +153,9 @@ class Andor_Camera_Driver(Connectable):
             "is_acquiring": self.is_acquiring(),
             "acquisition_mode": self.get_acquisition_mode_string(),
             "read_mode": self.get_read_mode_string(),
-            "exposure_time": self.get_acquisition_timings()[0],
+            "exposure_time": self.get_exposure_time(),
             "num_accumulations": self.num_accumulations,
-            "accumulation_cycle_time": self.get_acquisition_timings()[1],
+            "accumulation_cycle_time": self.get_accumulation_cycle_time(),
             "gain": self.get_gain(),
             "num_pixel_x": self.num_pixel_x,
             "num_pixel_y":self.num_pixel_y,
@@ -240,6 +240,9 @@ class Andor_Camera_Driver(Connectable):
 
     def get_exposure_time(self):
         return self.get_acquisition_timings()[0]
+
+    def get_accumulation_cycle_time(self):
+        return self.get_acquisition_timings()[1]
 
     def get_image(self):
         self.camera.PrepareAcquisition()
