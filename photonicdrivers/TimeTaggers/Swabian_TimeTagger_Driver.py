@@ -211,6 +211,8 @@ class Swabian_TimeTagger_Driver(Connectable):
             delay=probe_gate_delay_ps + probe_gate_width_ps
         )
 
+
+
         check_detection = TimeTagger.GatedChannel(
             tagger=self.connection,
             input_channel=click_channel_number,
@@ -226,6 +228,12 @@ class Swabian_TimeTagger_Driver(Connectable):
 
         check_ch = check_detection.getChannel()
         probe_ch = probe_detection.getChannel()
+
+        check_gate_delayed = TimeTagger.DelayedChannel(
+            tagger=self.connection,
+            input_channel=check_ch,
+            delay=probe_gate_delay_ps + probe_gate_width_ps
+        )
 
         # Unconditional: time from trigger to probe-window detection
         probe_histogram = TimeTagger.Histogram(
@@ -249,7 +257,7 @@ class Swabian_TimeTagger_Driver(Connectable):
         # shows the delay between check and probe detections.
         check_probe_correlation = TimeTagger.Correlation(
             tagger=self.connection,
-            channel_1=check_ch,
+            channel_1=check_gate_delayed,
             channel_2=probe_ch,
             binwidth=bin_width_ps,
             n_bins=num_bins
@@ -260,7 +268,7 @@ class Swabian_TimeTagger_Driver(Connectable):
             start_channel=trigger_channel_number,
             click_channel=click_channel_number,
             binwidth=bin_width_ps,
-            n_bins=num_bins
+            n_bins=num_bins*5
         )
 
         return (
