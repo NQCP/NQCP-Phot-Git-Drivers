@@ -217,6 +217,15 @@ class Swabian_TimeTagger_Driver(Connectable):
             binwidth=bin_width_ps,
             n_bins=num_bins
         )
+
+        # Unconditional: time from trigger to check-window detection
+        check_histogram = TimeTagger.Histogram(
+            tagger=self.connection,
+            start_channel=trigger_channel_number,
+            click_channel=check_ch,
+            binwidth=bin_width_ps,
+            n_bins=num_bins
+        )
         # Cross-correlation between check-window and probe-window gated detections.
         # Only shots containing a detection in both windows contribute; the peak position
         # shows the delay between check and probe detections.
@@ -233,10 +242,11 @@ class Swabian_TimeTagger_Driver(Connectable):
             start_channel=trigger_channel_number,
             click_channel=click_channel_number,
             binwidth=bin_width_ps,
-            n_bins=3*num_bins
+            n_bins=num_bins
         )
 
         return (
+            check_histogram,
             probe_histogram,
             check_probe_correlation,
             raw_histogram,
