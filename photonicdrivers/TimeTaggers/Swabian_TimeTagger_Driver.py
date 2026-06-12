@@ -205,22 +205,11 @@ class Swabian_TimeTagger_Driver(Connectable):
             gate_start_channel=probe_gate_start.getChannel(),
             gate_stop_channel=probe_gate_stop.getChannel()
         )
-        # Separate instance with identical gate so the unconditional histogram is unaffected
-        # by the conditional filter applied below.
-        probe_detection_conditional = TimeTagger.GatedChannel(
-            tagger=self.connection,
-            input_channel=click_channel_number,
-            gate_start_channel=probe_gate_start.getChannel(),
-            gate_stop_channel=probe_gate_stop.getChannel()
-        )
 
         check_ch = check_detection.getChannel()
         probe_ch = probe_detection.getChannel()
-        probe_cond_ch = probe_detection_conditional.getChannel()
 
-        # Pass probe_detection_conditional events only when check_detection fired
-        self.connection.setConditionalFilter(trigger=[check_ch], filtered=[probe_cond_ch])
-
+        # Unconditional: time from trigger to probe-window detection
         probe_histogram = TimeTagger.Histogram(
             tagger=self.connection,
             start_channel=trigger_channel_number,
@@ -228,10 +217,13 @@ class Swabian_TimeTagger_Driver(Connectable):
             binwidth=bin_width_ps,
             n_bins=num_bins
         )
-        probe_histogram_conditional = TimeTagger.Histogram(
+        # Cross-correlation between check-window and probe-window gated detections.
+        # Only shots containing a detection in both windows contribute; the peak position
+        # shows the delay between check and probe detections.
+        check_probe_correlation = TimeTagger.Correlation(
             tagger=self.connection,
-            start_channel=trigger_channel_number,
-            click_channel=probe_cond_ch,
+            channel_1=check_ch,
+            channel_2=probe_ch,
             binwidth=bin_width_ps,
             n_bins=num_bins
         )
@@ -246,11 +238,11 @@ class Swabian_TimeTagger_Driver(Connectable):
 
         return (
             probe_histogram,
-            probe_histogram_conditional,
+            check_probe_correlation,
             raw_histogram,
-            # check_gate_start, check_gate_stop,
-            # probe_gate_start, probe_gate_stop,
-            # check_detection, probe_detection, probe_detection_conditional
+            check_gate_start, check_gate_stop,
+            probe_gate_start, probe_gate_stop,
+            check_detection, probe_detection,
         )
 
     def initialise_gated_g2_2D_histogram(self, trigger_channel_number, click_1_channel_number, click_2_channel_number, trigger_gate_start_delay_ps, trigger_gate_stop_delay_ps, bin_width_ps, num_bins):
