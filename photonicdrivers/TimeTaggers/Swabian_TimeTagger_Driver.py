@@ -149,6 +149,24 @@ class Swabian_TimeTagger_Driver(Connectable):
 
         return gated_check_probe_correlation, gated_check_histogram, gated_probe_histogram, gated_check_collection_histogram, gated_probe_collection_histogram, gate_check_laser_start_channel, gate_check_collection_start_channel, gate_check_collection_stop_channel, gate_probe_laser_start_channel, gate_probe_collection_start_channel, gate_probe_collection_stop_channel, gated_check_channel, gated_probe_channel, gated_check_collection_channel, gated_probe_collection_channel
 
+    def initialize_delayed_histogram(self, trigger_channel_number, click_channel_number, delay_ps, bin_width_ps, num_bins):
+        delayed_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=delay_ps)
+        delayed_channel_number = delayed_channel.getChannel()
+        
+        delayed_histogram = TimeTagger.Histogram(tagger=self.connection, start_channel=delayed_channel_number, click_channel=click_channel_number, binwidth=bin_width_ps, n_bins=num_bins)
+        return delayed_histogram, delayed_channel
+    
+    def initialize_gated_histogram(self, trigger_channel_number, click_channel_number, gate_start_delay_ps, gate_stop_delay_ps, bin_width_ps, num_bins):
+        gate_start_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=gate_start_delay_ps)
+        gate_stop_channel = TimeTagger.DelayedChannel(tagger=self.connection, input_channel=trigger_channel_number, delay=gate_stop_delay_ps)
+        gate_start_channel_number = gate_start_channel.getChannel()
+        gate_stop_channel_number = gate_stop_channel.getChannel()
+        gated_channel=TimeTagger.GatedChannel(tagger=self.connection, input_channel=click_channel_number, gate_start_channel=gate_start_channel_number, gate_stop_channel=gate_stop_channel_number)
+        gated_channel_number = gated_channel.getChannel()
+        print("Gated channel number: ", gated_channel_number, " gate start channel number: ", gate_start_channel_number, " gate stop channel number: ", gate_stop_channel_number)
+        gated_histogram = TimeTagger.Histogram(tagger=self.connection, start_channel=trigger_channel_number, click_channel=gated_channel_number, binwidth=bin_width_ps, n_bins=num_bins)
+        return gated_histogram, gate_start_channel, gate_stop_channel, gated_channel
+
     def initialize_check_probe(self, trigger_channel_number: int, click_channel_number: int, check_gate_delay_ps: int, check_gate_width_ps: int, probe_gate_delay_ps: int, probe_gate_width_ps: int, bin_width_ps: int, num_bins: int):
         """
         Check-probe measurement with conditional filtering.
@@ -233,7 +251,7 @@ class Swabian_TimeTagger_Driver(Connectable):
             start_channel=trigger_channel_number,
             click_channel=click_channel_number,
             binwidth=bin_width_ps,
-            n_bins=3*num_bins
+            n_bins=num_bins
         )
 
         return (
