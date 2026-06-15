@@ -74,13 +74,13 @@ class Valon_5019_Driver():
         if self.connection and self.connection.is_open:
             self.connection.close()
 
-    def connect(self, port_name='COM3', baud_rate=115200, timeout=0.1): # Has to baud rate of 115200 for the Valone 5019
+    def connect(self, port_name='COM3', baud_rate=115200, timeout=1): # Has to baud rate of 115200 for the Valone 5019
 
         try:
             self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
-            self.connection.setDTR(False)
-            self.connection.flushInput()
-            self.connection.setDTR(True)
+            # self.connection.setDTR(False)
+            # self.connection.flushInput()
+            # self.connection.setDTR(True) # don't know why this was here. Worked when removed.
             print(f"Serial port {port_name} opened successfully.")
         except serial.SerialException as e:
             print(f"Error opening serial port: {e}")
