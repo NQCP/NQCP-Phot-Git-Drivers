@@ -78,9 +78,9 @@ class Valon_5019_Driver():
 
         try:
             self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
-            # self.connection.setDTR(False)
-            # self.connection.flushInput()
-            # self.connection.setDTR(True) # don't know why this was here. Worked when removed.
+            self.connection.setDTR(False)
+            self.connection.flushInput()
+            self.connection.setDTR(True) # don't know why this was here. Worked when removed.
             print(f"Serial port {port_name} opened successfully.")
         except serial.SerialException as e:
             print(f"Error opening serial port: {e}")
