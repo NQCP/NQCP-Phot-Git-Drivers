@@ -46,7 +46,9 @@ class WLPhotonicsTunableFilter(Connectable):
         self.port: str = port
         self.baudrate: int = baudrate
         self.timeout: float = timeout
+
         self.wavelength: float = 0.0
+
 
     def connect(self):
         self.instr = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
@@ -137,6 +139,8 @@ class WLPhotonicsTunableFilter(Connectable):
         response = self.send_command(command)
         time.sleep(0.1) # We let the device rest briefly to ensure it has converged
 
+        self.wavelength: float = adjusted_wavelength  # Store the original wavelength for reference
+
         # Read the response, discard the "OK" part
         if response:
             # wavelength_set_value = response.split()[2] # We do not actually need this
@@ -175,13 +179,15 @@ class WLPhotonicsTunableFilter(Connectable):
 
     def get_wavelength(self):
         """Returns the current wavelength set in the device."""
-        return None
+
         # The device fails with error 53 (Error ID) when executing this command
         # command = "WL?"
         # response = self.send_command(command)
         # if response:
         #     return response.splitlines()[0].replace("Wavelength:", "").strip()
         # return None
+        
+        return self.wavelength
 
     def go_to_zero(self):
         """Send 'z' command to go to zero position."""
