@@ -60,7 +60,7 @@ import serial
 """
 
 import time
-class Valon5019_Driver():
+class Valon_5019_Driver():
     def __init__(self, port: str = "COM3", data_saver=None):
         self.port = port
         self.baud_rate = 115200 # The Valon 5019 requires a baud rate of 115200
