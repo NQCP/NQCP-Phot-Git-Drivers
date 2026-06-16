@@ -70,6 +70,10 @@ class Valon_5019_Driver():
     def is_connected(self) -> bool:
         return self.connection is not None and self.connection.is_open
     
+    def get_id(self):
+        response=self._query("ID?")
+        return response
+
     def disconnect(self):        
         if self.connection and self.connection.is_open:
             self.connection.close()
@@ -169,6 +173,35 @@ class Valon_5019_Driver():
     def set_power_dBm(self, power_dBm):
         self._write(f"PWR {power_dBm}")
 
+    def set_output_enabled(self, enabled: bool):
+        """Enable or disable RF output buffers via OEN command.
+        
+        Args:
+            enabled (bool): True to enable RF output, False to disable
+        """
+        self._write(f"OEN {1 if enabled else 0}")
+
+    def get_output_enabled(self) -> bool:
+        """Query the current state of RF output buffers.
+        
+        Returns:
+            bool: True if output is enabled, False if disabled
+        """
+        response = self._query("OEN?")
+
+        for line in response.splitlines():
+            line = line.strip()
+
+            if line.startswith("OEN"):
+                parts = line.replace(";", "").split()
+                if len(parts) >= 2:
+                    try:
+                        return parts[1] == "1"
+                    except ValueError:
+                        pass
+
+        raise RuntimeError(f"No valid OEN response found: {response}")
+
     def get_frequency_MHz(self):
         response = self._query("FREQ?")
 
@@ -191,6 +224,23 @@ class Valon_5019_Driver():
     def set_mode(self, mode):
         self._write(f"MODe {mode}") # CW, SWEep, or LIST
 
+    def set_mode_cw(self):
+        """Sets the synthesizer to CW (continuous wave) mode.
+        
+        In CW mode, the synthesizer operates at a single frequency. All subsequent 
+        commands will be assumed to be single frequency commands.
+        """
+        self._write("MODe CW")
+
+    def set_mode_sweep(self):
+        """Sets the synthesizer to sweep mode.
+        
+        In sweep mode, the synthesizer will sweep between frequencies. A STARt frequency,
+        STOP frequency, STEP frequency, and sweep RATE must also be set before starting
+        the sweep.
+        """
+        self._write("MODe SWEep")
+
     def get_mode(self):
         response = self._query("MODe?")
 
@@ -205,9 +255,19 @@ class Valon_5019_Driver():
         raise RuntimeError(f"No valid mode response found: {response}")
     
     def start_sweep(self):
+        """Start the sweep in the configured sweep mode.
+        
+        Before calling this, ensure:
+        - Synthesizer is in sweep mode (set_mode_sweep())
+        - Start frequency is set (set_sweep_start_frequency_MHz())
+        - Stop frequency is set (set_sweep_stop_frequency_MHz())
+        - Sweep step is set (set_sweep_step_MHz())
+        - Sweep rate is set (set_sweep_rate_ms())
+        """
         self._query("RUN")
     
     def stop_sweep(self):
+        """Stop the current sweep operation."""
         self._query("HALT")
 
     def set_frequency_step_MHz(self, step_MHz):
