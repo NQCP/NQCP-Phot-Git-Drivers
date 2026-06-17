@@ -2,10 +2,10 @@ from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQContr
 from photonicdrivers.Abstract.Connectable import Connectable
 
 class SNSPD_SQ_Driver(Connectable):
-    def __init__(self,_ip_string: str, _control_port: int=12000, _counts_port: int=12345) -> None:
-        self.ip_address = _ip_string
-        self.control_port = _control_port
-        self.counts_port = _counts_port
+    def __init__(self, ip_address: str, control_port: int, counts_port: int) -> None:
+        self.ip_address = ip_address
+        self.control_port = control_port
+        self.counts_port = counts_port
 
         self.websq = WebSQControl(TCP_IP_ADR=self.ip_address, CONTROL_PORT=self.control_port, COUNTS_PORT=self.counts_port)
 
@@ -18,22 +18,20 @@ class SNSPD_SQ_Driver(Connectable):
     def is_connected(self):    
         try:    
             return self.websq.connected
-        except: 
+        except Exception as error: 
+            print(f"Error occurred while checking connection: {error}")
             return False
+        
+    def get_ip_address(self):
+        return self.ip_address    
 
-    def getNumberOfDetectors(self) -> int:
-        return self.websq.get_number_of_detectors()
-    
     def get_control_port(self):
         return self.control_port
 
-    def get_ip_address(self):
-        return self.ip_address
-    
     def get_counts_port(self):
         return self.counts_port
     
-    def getTemperatures(self) -> float:
+    def get_temperatures(self) -> float:
         # This function returns all kind of temperatures. See the WebSQControl.py script from the manufacturer
         # Each return type is an array of the last 200 measurements
         time, T, T_40K, v_av, board_T1, board_T2 = self.websq.get_cryo_temperature()
@@ -42,15 +40,21 @@ class SNSPD_SQ_Driver(Connectable):
         latest_temperature = T[199]
         return latest_temperature
     
+    def get_temperature_unit(self) -> str:
+        return "K"
+    
+    def get_number_of_detectors(self) -> int:
+        return self.websq.get_number_of_detectors()
+    
     def getCounts(self, numberOfMeasurements: int):
         data = self.websq.acquire_cnts(numberOfMeasurements)
         print(data)
         return data
     
-    def setMeasurementPeriod(self, integrationtime_ms:int) -> None:
+    def set_measurement_period(self, integrationtime_ms:int) -> None:
         self.websq.set_measurement_periode(integrationtime_ms)
 
-    def getMeasurementPeriod(self) -> float:
+    def get_measurement_period(self) -> float:
         return self.websq.get_measurement_periode()
     
     def get_bias_voltages(self):

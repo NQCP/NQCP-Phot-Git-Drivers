@@ -1,0 +1,44 @@
+V5019CM Python Version
+
+Date            Version
+22 Jul 19   0.1 Files are V5015.py, CwPanel.py, HeaderPanel.py, Menu.py, ModePanel.py,
+                Power.Panel.py, RefPanel.py, and VSerialPort.py
+                Parts of the menu and Header Labels and some CW Panel and Power Panel 
+                and Reference Panel widgets are implemented.
+                DALL is sent to the 5015 and the reply is partially parsed.
+                New values are written to the widgets.
+                Event Handlers are working for all widget types.
+                        
+26 Jul 20   0.2 The prograam entry point is in V5015.py.
+                It now creates Main class, based on tk, in Main.py. 
+                Main() creates MainWindow, based on tk.Frame, in MainWindow.py
+                Initial values are stored in Defaults.py
+                All CW Panel widgets are implemented.
+                All Dall widget names are parsed, but Sweep and List widgets are not yet declared.
+                New files are Dall.py, Defaults.py, MainWindow.py, Main.py
+
+29 Jul 19   0.3 Lock Line and Two Status Line are added at the bottom of the top-level window.
+                StatusBar.py is a new file.
+
+07 Aug 19   0.4 <CW> and <Sweep> panels are fully functional.
+                When you select a Mode (Main or Sweep) on the Mode Button, 
+                the corresponding panel is displayed.
+                Appropriated units are added to all widgets commands.
+                <Lock> is tested after each command, but isn't on a timer.
+                Commands and responses are displayed on the two status lines.
+                        
+21 Aug 19   1.0 File Menu "Load Config" and "Save Config" are implemented.
+                    Values are stored in text files on disk.
+                Synthesizer Menu "Read Registers", "Reset",
+                    "Save to Flash", "Recall from Flash", and "Cleanse" are implemented.
+                    "Write Registers" DOES NOT WORK in this version.
+                If multiple synthesizers are attached to you computer, you can use
+                    Synthesizer Menu "Select" to choose the one you want to connect to.
+                "Main" and "Sweep" panel-select buttons are added to the Main menu.  
+                    These are used (for example) to view the "Main" panel when 
+                    the synthesizer is in "Sweep Mode"
+
+06 Sep 19   1.1 Synthesizer / Write Registers is implemented.
+
+14 Feb 20   2.0 List Panel is implemented.
+                In this version, File / Read Config and Save Config do NOT contain the LIST values.

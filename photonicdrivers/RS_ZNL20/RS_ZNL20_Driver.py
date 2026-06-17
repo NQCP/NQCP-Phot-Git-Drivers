@@ -123,7 +123,7 @@ class RS_ZNL20_Driver(Connectable):
         self.write("INIT:IMM")
     
     def stop_continuous_sweep(self) -> None:
-        self.write("INIT:CONT FALSE")
+        self.write("INIT:CONT False")
     
     def set_data_format(self) -> None:
         self.write(f"CALC:FORM {format}")
