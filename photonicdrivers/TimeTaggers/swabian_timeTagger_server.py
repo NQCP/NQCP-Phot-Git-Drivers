@@ -1,9 +1,11 @@
 import TimeTagger
 import time
+print(TimeTagger.getVersion())
 
 
 # Connecting to time tagger
-serialNumber = "23010013V4"
+# serialNumber = "23010013V4" # KK2
+serialNumber = "2328001508" # KK4
 
 # Fk5 serialnumber:
 # serialNumber = "2208000ZBU"

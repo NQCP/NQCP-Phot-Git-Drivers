@@ -46,4 +46,6 @@ class SNSPD_02_SQ_Driver(Connectable):
     def get_bias_currents(self) -> list:
         return self.websq_retina.getBiasI()
     
- 
+    def set_bias_currents(self) -> list:
+        return self.websq_retina.setBiasI()
+    
