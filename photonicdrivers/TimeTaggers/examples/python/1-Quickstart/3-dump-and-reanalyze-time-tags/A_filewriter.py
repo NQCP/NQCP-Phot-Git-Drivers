@@ -5,7 +5,7 @@ In this example, we compare the effect of different start methods (autostart, st
 and start by SynchronizedMeasurements) and learn how to configure the FileWriter."""
 
 import os
-import TimeTagger
+from Swabian import TimeTagger
 from time import sleep
 import tempfile
 

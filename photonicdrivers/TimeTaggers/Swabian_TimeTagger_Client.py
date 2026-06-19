@@ -1,4 +1,4 @@
-import TimeTagger
+from Swabian import TimeTagger
 from photonicdrivers.Abstract.Connectable import Connectable
 
 class Swabian_TimeTagger_Client(Connectable):

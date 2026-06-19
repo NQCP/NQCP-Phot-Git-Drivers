@@ -8,7 +8,7 @@ parameters accordingly."""
 import tempfile
 import os
 from matplotlib import pyplot as plt
-import TimeTagger
+from Swabian import TimeTagger
 
 
 def request_values():

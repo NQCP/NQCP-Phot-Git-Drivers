@@ -5,7 +5,7 @@ For a demonstration of Counter.getDataObject(), see example 2-E."""
 
 from matplotlib import pyplot as plt
 from time import sleep
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

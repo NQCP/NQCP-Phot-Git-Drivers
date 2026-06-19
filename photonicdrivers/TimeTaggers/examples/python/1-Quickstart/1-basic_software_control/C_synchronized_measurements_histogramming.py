@@ -6,7 +6,7 @@ The visualization is only getting slow because matplotlib is reaching its limits
 
 from matplotlib import pyplot as plt
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

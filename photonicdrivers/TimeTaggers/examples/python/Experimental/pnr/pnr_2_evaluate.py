@@ -18,7 +18,7 @@ slope: corresponds to the slope of the tilt of the 2D histogram.
 
 from pnr_constants import FRONT_EDGE, REAR_EDGE, LASER_CHANNEL, FOLDER, FILENAME
 from json import dump
-import TimeTagger
+from Swabian import TimeTagger
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks

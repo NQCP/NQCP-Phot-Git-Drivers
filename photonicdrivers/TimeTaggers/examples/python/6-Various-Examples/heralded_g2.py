@@ -6,7 +6,7 @@
 # There is no point to run this example with test signals, so the focus is only on the implementation
 # of a heralded g2 measurement with the Time Tagger 
 
-import TimeTagger
+from Swabian import TimeTagger
 import matplotlib.pyplot as plt
 
 # Here we consider a pulsed experiment. To measure a meaningful second order coherence function (g2)

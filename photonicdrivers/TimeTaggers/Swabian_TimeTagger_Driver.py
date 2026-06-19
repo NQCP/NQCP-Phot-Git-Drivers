@@ -1,5 +1,5 @@
-import TimeTagger
-from TimeTagger import TimeTagStreamBuffer
+from Swabian import TimeTagger
+from Swabian.TimeTagger import TimeTagStreamBuffer
 import time
 from photonicdrivers.Abstract.Connectable import Connectable
 

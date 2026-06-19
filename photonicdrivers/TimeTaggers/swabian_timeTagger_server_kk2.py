@@ -1,4 +1,4 @@
-import TimeTagger
+from Swabian import TimeTagger
 import time
 
 

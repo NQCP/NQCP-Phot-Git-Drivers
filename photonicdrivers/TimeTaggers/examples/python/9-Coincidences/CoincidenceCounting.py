@@ -5,7 +5,7 @@ rate with co-prime dividers. This yield a high input rate, but only a low
 rate of coincidences of higher orders.
 """
 
-from TimeTagger import (createTimeTagger, Countrate, Coincidences,
+from Swabian.TimeTagger import (createTimeTagger, Countrate, Coincidences,
                         ChannelEdge, SynchronizedMeasurements, Correlation,
                         freeTimeTagger)
 from itertools import combinations

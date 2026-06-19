@@ -2,7 +2,7 @@
 no information to save USB bandwidth."""
 
 from matplotlib import pyplot as plt
-import TimeTagger
+from Swabian import TimeTagger
 import sys
 
 

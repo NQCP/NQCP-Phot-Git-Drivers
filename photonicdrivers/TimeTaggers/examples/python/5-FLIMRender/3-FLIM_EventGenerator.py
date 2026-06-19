@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
 from intensity_renderer import IntensityRenderer
-from TimeTagger import createTimeTaggerVirtual, EventGenerator
+from Swabian.TimeTagger import createTimeTaggerVirtual, EventGenerator
 
 data_file = 'Pollen_b.1.ttbin'
 

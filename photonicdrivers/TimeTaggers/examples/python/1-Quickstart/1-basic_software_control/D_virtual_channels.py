@@ -13,7 +13,7 @@ Finally, we compare the Correlations of channel 2 and the two GatedChannel, resp
 
 from matplotlib import pyplot as plt
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

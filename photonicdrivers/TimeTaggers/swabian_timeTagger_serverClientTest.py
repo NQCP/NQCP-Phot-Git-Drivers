@@ -1,4 +1,4 @@
-import TimeTagger
+from Swabian import TimeTagger
 from matplotlib import pyplot as plt
 from time import sleep
 

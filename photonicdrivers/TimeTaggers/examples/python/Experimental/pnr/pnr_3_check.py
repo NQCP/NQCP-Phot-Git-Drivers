@@ -2,7 +2,7 @@
 This script allows you to check your parameters.
 """
 from json import load
-import TimeTagger
+from Swabian import TimeTagger
 from matplotlib import pyplot as plt
 from pnr_constants import FRONT_EDGE, REAR_EDGE, LASER_CHANNEL, FOLDER, FILENAME
 
