@@ -62,7 +62,8 @@ import serial
 
 import time
 class Valon_5019_Driver():
-    def __init__(self, port: str = "COM3", baud_rate: int = 115200, delay: float = 0.1, data_saver=None):
+    # def __init__(self, port: str = "COM3", baud_rate: int = 115200, delay: float = 0.1, data_saver=None):
+    def __init__(self, port: str = "COM3", baud_rate: int = 9600, delay: float = 0.1, data_saver=None):
         self.port = port
         self.baud_rate = baud_rate # The Valon 5019 requires a baud rate of 115200
         self.delay = delay
@@ -70,8 +71,7 @@ class Valon_5019_Driver():
         self.data_saver = data_saver
 
     def is_connected(self) -> bool:
-        response = self._query("ID?")
-        
+        # response = self._query("ID?")
         return self.connection is not None and self.connection.is_open
     
     def get_id(self):
@@ -83,8 +83,9 @@ class Valon_5019_Driver():
             self.connection.close()
 
     def connect(self, port_name='COM3', baud_rate=None, timeout=1): # Has to baud rate of 115200 for the Valon 5019
-        if baud_rate is None:
-            baud_rate = self.baud_rate
+        # if baud_rate is None:
+        #     self.baud_rate = 115200
+        #     baud_rate = self.baud_rate
 
         self.connection = serial.Serial(port_name, 9600, timeout=timeout)
     #     self.connection.setDTR(False)
@@ -92,15 +93,11 @@ class Valon_5019_Driver():
     #     self.connection.setDTR(True) # don't know why this was here. Worked when removed.
         print(f"Serial port {port_name} opened successfully.")
 
-        if self.is_connected():
-            self.set_baud_rate(baud_rate)
-        self.connection.close()
+        # if self.is_connected():
+        #     self.set_baud_rate(baud_rate)
+        # self.connection.close()
 
-        self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
-
-
-        
-        self.set_baud_rate(baud_rate)
+        # self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
 
     def set_baud_rate(self, baud_rate):
         self._write(f"BAUD {baud_rate}")
