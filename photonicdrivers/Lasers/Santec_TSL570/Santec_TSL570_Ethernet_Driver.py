@@ -244,17 +244,44 @@ class Santec_TSL570_driver(Connectable):
         msg = ":WAV:SWE: 1"
         self.laser.write(msg)
 
-    def stop_sweep(self):
+    def get_sweep_status(self) -> int:
         """
-        Stop the current sweep of the laser
+        Get the current sweep status of the laser
 
         Args:
             None
         Returns:
-            None
+            int: 1 if sweep is running, 0 if sweep is stopped
         """
-        msg = ":WAV:SWE: 1"
+        msg = ":WAV:SWE?"
+        return_msg = self.laser.query(msg)
+        sweep_status = int(return_msg)
+        return sweep_status
+
+    def get_sweep_cycles(self) -> int:
+        """
+        Get the number of sweep cycles for the laser
+
+        Args:
+            None
+        Returns:
+            int: Number of sweep cycles
+        """
+        msg = ":WAV:SWE:CYCL?"
+        return_msg = self.laser.query(msg)
+        sweep_cycles = int(return_msg)
+        return sweep_cycles
+
+    def set_sweep_cycles(self, cycles: int):
+        """
+        Set the number of sweep cycles for the laser
+
+        Args:
+            cycles (int): Number of sweep cycles
+        """
+        msg = ":WAV:SWE:CYCL " + str(cycles)
         self.laser.write(msg)
+
 
     def start_repeating_sweep(self):
         """
@@ -334,9 +361,22 @@ class Santec_TSL570_driver(Connectable):
             raise ValueError(
                 "Invalid sweep speed. Must be one of the following: [1, 2, 4, 10, 20, 50, 100, 200] nm/s"
             )
-        msg = ":WAV:SWE:SPD " + str(speed_nm_per_s)
+        msg = ":WAV:SWE:SPD: " + str(speed_nm_per_s)
         self.laser.write(msg)
 
+    def get_sweep_speed(self) -> float:
+        """
+        Get the sweep speed of the laser in nm/s
+
+        Args:
+            None
+        Returns:
+            float: Sweep speed in nm/s
+        """
+        msg = ":WAV:SWE:SPD?"
+        return_msg = self.laser.query(msg)
+        sweep_speed_nm_per_s = float(return_msg)
+        return sweep_speed_nm_per_s
 
     def set_sweep_mode(self, mode: int):
         """
