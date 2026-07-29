@@ -91,7 +91,9 @@ class Andor_Spectrograph_Driver(Connectable):
             "id": self.get_id(),
             "grating": self.get_grating(),
             "grating_info": self.get_grating_info(self.get_grating()),
-            "center_wavelength": self.get_center_wavelength()
+            "center_wavelength": self.get_center_wavelength(),
+            "number_gratings": self.get_number_gratings(),
+            "focus_mirror_position": self.get_focus_mirror_position(),
         }
 
     def get_grating(self):
@@ -103,6 +105,11 @@ class Andor_Spectrograph_Driver(Connectable):
         (ret, groove_density, blaze_wavelength, grating_home_steps, grating_offset_steps) = self.spectrograph.GetGratingInfo(self.device_index, grating, maxBlazeStrLen=64)
         self.handle_return(ret_value=ret)
         return groove_density, blaze_wavelength
+
+    def get_number_gratings(self):
+        (ret, num_gratings) = self.spectrograph.GetNumberGratings(self.device_index)
+        self.handle_return(ret_value=ret)
+        return num_gratings
 
     def get_center_wavelength(self):
         (ret, wavelength) = self.spectrograph.GetWavelength(self.device_index)

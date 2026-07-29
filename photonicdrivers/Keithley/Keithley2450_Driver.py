@@ -46,7 +46,7 @@ class Keithley2450_Driver(Connectable):
 
     def is_connected(self):
         try:
-            self.identify()
+            print(self.identify())
             return True
         except: 
             return False

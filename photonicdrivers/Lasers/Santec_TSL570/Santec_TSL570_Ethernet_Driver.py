@@ -232,6 +232,190 @@ class Santec_TSL570_driver(Connectable):
         msg = ":POW:STAT " + str(emission_int)
         self.laser.write(msg)
 
+    def start_single_sweep(self):
+        """
+        Start a single sweep of the laser
+
+        Args:
+            None
+        Returns:
+            None
+        """
+        msg = ":WAV:SWE: 1"
+        self.laser.write(msg)
+
+    def get_sweep_status(self) -> int:
+        """
+        Get the current sweep status of the laser
+
+        Args:
+            None
+        Returns:
+            int: 1 if sweep is running, 0 if sweep is stopped
+        """
+        msg = ":WAV:SWE?"
+        return_msg = self.laser.query(msg)
+        sweep_status = int(return_msg)
+        return sweep_status
+
+    def get_sweep_cycles(self) -> int:
+        """
+        Get the number of sweep cycles for the laser
+
+        Args:
+            None
+        Returns:
+            int: Number of sweep cycles
+        """
+        msg = ":WAV:SWE:CYCL?"
+        return_msg = self.laser.query(msg)
+        sweep_cycles = int(return_msg)
+        return sweep_cycles
+
+    def set_sweep_cycles(self, cycles: int):
+        """
+        Set the number of sweep cycles for the laser
+
+        Args:
+            cycles (int): Number of sweep cycles
+        """
+        msg = ":WAV:SWE:CYCL " + str(cycles)
+        self.laser.write(msg)
+
+
+    def start_repeating_sweep(self):
+        """
+        Start a repeating sweep of the laser
+
+        Args:
+            None
+        Returns:
+            None
+        """
+        msg = ":WAV:SWE:REP"
+        self.laser.write(msg)
+
+    def set_sweep_start(self, start_wavelength_nm: float):
+        """
+        Set the start wavelength of the sweep in nm
+
+        Args:
+            start_wavelength_nm (float): Start wavelength in nm
+        Returns:
+            None
+        """
+
+        msg = ":WAV:SWE:STAR " + str(start_wavelength_nm * 1e-9)
+        self.laser.write(msg)
+
+    def set_sweep_stop(self, stop_wavelength_nm: float):
+        """
+        Set the stop wavelength of the sweep in nm
+
+        Args:
+            stop_wavelength_nm (float): Stop wavelength in nm
+        Returns:
+            None
+        """
+        msg = ":WAV:SWE:STOP " + str(stop_wavelength_nm * 1e-9)
+        self.laser.write(msg)
+
+    def get_sweep_start(self) -> float:
+        """
+        Get the start wavelength of the sweep in nm
+
+        Args:
+            None
+        Returns:
+            float: Start wavelength in nm
+        """
+        msg = ":WAV:SWE:STAR?"
+        return_msg = self.laser.query(msg)
+        start_wavelength_nm = float(return_msg) * 1e9
+        return start_wavelength_nm
+
+    def get_sweep_stop(self) -> float:
+        """
+        Get the stop wavelength of the sweep in nm
+
+        Args:
+            None
+        Returns:
+            float: Stop wavelength in nm
+        """
+        msg = ":WAV:SWE:STOP?"
+        return_msg = self.laser.query(msg)
+        stop_wavelength_nm = float(return_msg) * 1e9
+        return stop_wavelength_nm
+
+    def set_sweep_speed(self, speed_nm_per_s: float):
+        """
+        Set the sweep speed of the laser in nm/s
+
+        Args:
+            speed_nm_per_s (float): Sweep speed in nm/s [1,2,4,10,20,50,100,200]
+        Returns:
+            None
+        """
+        if speed_nm_per_s not in [1, 2, 4, 10, 20, 50, 100, 200]:
+            raise ValueError(
+                "Invalid sweep speed. Must be one of the following: [1, 2, 4, 10, 20, 50, 100, 200] nm/s"
+            )
+        msg = ":WAV:SWE:SPD: " + str(speed_nm_per_s)
+        self.laser.write(msg)
+
+    def get_sweep_speed(self) -> float:
+        """
+        Get the sweep speed of the laser in nm/s
+
+        Args:
+            None
+        Returns:
+            float: Sweep speed in nm/s
+        """
+        msg = ":WAV:SWE:SPD?"
+        return_msg = self.laser.query(msg)
+        sweep_speed_nm_per_s = float(return_msg)
+        return sweep_speed_nm_per_s
+
+    def set_sweep_mode(self, mode: int):
+        """
+        Set the sweep mode of the laser
+
+        Args:
+            mode (int): 0 for step sweep mode one way, 1 for continuous sweep mode one way, 2 for step sweep mode two way, 3 for continuous sweep mode two way
+        Returns:
+            None
+        """
+        if mode not in [0, 1, 2, 3]:
+            raise ValueError("Invalid mode. Must be 0, 1, 2, or 3.")
+        msg = ":WAV:SWE:MOD " + str(mode)
+        self.laser.write(msg)
+
+    def get_sweep_mode(self):
+        """
+        Get the current sweep mode of the laser
+
+        Args:
+            None
+        Returns:
+            int: 0 for step sweep mode one way, 1 for continuous sweep mode one way, 2 for step sweep mode two way, 3 for continuous sweep mode two way
+            str: Description of the current sweep mode
+        """
+        msg = ":WAV:SWE:MOD?"
+        return_msg = self.laser.query(msg)
+        if return_msg == 0:
+            return 0, "Step sweep mode and One way"
+        elif return_msg == 1:
+            return 1, "Continuous sweep mode and One way"
+        elif return_msg == 2:
+            return 2, "Step sweep mode and Two way"
+        elif return_msg == 3:
+            return 3, "Continuous sweep mode and Two way"
+        else:
+            raise ValueError("Invalid sweep mode received from the laser: {}".format(return_msg))
+        
+
     ####################### BLANKET FUNCTIONS #######################
 
     def write(self, message: str):
