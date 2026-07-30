@@ -22,7 +22,7 @@ If you want to make it available over the network then you will need to
 import base64
 import io
 import numpy
-import TimeTagger as TT
+from Swabian import TimeTagger as TT
 try:
     import Pyro5.api
 except ModuleNotFoundError:

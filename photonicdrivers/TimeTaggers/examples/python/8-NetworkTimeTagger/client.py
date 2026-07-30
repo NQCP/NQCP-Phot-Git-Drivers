@@ -3,7 +3,7 @@
 Network Time Tagger: Client example
 See also: "server.py"
 """
-import TimeTagger
+from Swabian import TimeTagger
 
 print("""
 *****************************

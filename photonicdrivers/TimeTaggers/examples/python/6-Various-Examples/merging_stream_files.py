@@ -8,7 +8,7 @@ as well as the channel number offset.
 
 """
 
-from TimeTagger import (createTimeTagger, createTimeTaggerVirtual, mergeStreamFiles,
+from Swabian.TimeTagger import (createTimeTagger, createTimeTaggerVirtual, mergeStreamFiles,
                         FileWriter, SynchronizedMeasurements, Correlation)
 import matplotlib.pyplot as plt
 

@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 import numpy as np
 
 # all required TimeTagger dependencies
-from TimeTagger import Coincidences, Counter, Correlation, createTimeTagger, freeTimeTagger
+from Swabian.TimeTagger import Coincidences, Counter, Correlation, createTimeTagger, freeTimeTagger
 
 
 class CoincidenceExample(QMainWindow):

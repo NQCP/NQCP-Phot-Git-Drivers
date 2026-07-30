@@ -2,7 +2,7 @@
 This example is using numpy and does not require numba.
 For an example using numba, have a look at '4-Custom-Measurements' -> CustomStartStop.py"""
 
-import TimeTagger
+from Swabian import TimeTagger
 import numpy as np
 
 

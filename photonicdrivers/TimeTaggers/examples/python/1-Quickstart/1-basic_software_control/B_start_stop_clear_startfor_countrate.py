@@ -1,7 +1,7 @@
 """A measurement can be stopped, resumed, started for a defined period of time, or cleared."""
 
 from time import sleep
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

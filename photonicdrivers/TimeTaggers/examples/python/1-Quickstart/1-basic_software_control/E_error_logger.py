@@ -3,7 +3,7 @@ the Time Tagger notifies you. You can register a callback function to handle err
 you like."""
 
 
-import TimeTagger
+from Swabian import TimeTagger
 from time import sleep
 
 # In general, we can register any callable object as logger callback, so a simple function like

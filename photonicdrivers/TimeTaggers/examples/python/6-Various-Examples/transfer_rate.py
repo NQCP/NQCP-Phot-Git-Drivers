@@ -1,7 +1,7 @@
 from math import nan
 import numpy as np
 from time import sleep, perf_counter
-from TimeTagger import ChannelEdge, CustomMeasurement, createTimeTagger, getVersion, freeTimeTagger
+from Swabian.TimeTagger import ChannelEdge, CustomMeasurement, createTimeTagger, getVersion, freeTimeTagger
 
 
 class TransferRate(CustomMeasurement):

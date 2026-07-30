@@ -7,7 +7,7 @@ to determine the noise level."""
 
 from matplotlib import pyplot as plt
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 import sys
 
 # Create a TimeTagger instance to control your hardware

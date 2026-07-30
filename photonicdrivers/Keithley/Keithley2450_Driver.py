@@ -46,7 +46,7 @@ class Keithley2450_Driver(Connectable):
 
     def is_connected(self):
         try:
-            self.identify()
+            print(self.identify())
             return True
         except: 
             return False
@@ -199,3 +199,27 @@ class Keithley2450_Driver(Connectable):
         Get current limit in amps
         """
         return self.query(":SOUR:VOLT:ILIM?")
+
+    def get_voltage_output_range(self):
+        """
+        Get output voltage range in volts
+        """
+        return self.query(":SOUR:VOLT:RANG?")
+
+    def get_current_output_range(self):
+        """
+        Get output current range in amps
+        """
+        return self.query(":SOUR:CURR:RANG?")
+    
+    def get_voltage_measurement_range(self):
+        """
+        Get measurement voltage range in volts
+        """
+        return self.query(":SENS:VOLT:RANG?")
+
+    def get_current_measurement_range(self):
+        """
+        Get measurement current range in amps
+        """
+        return self.query(":SENS:CURR:RANG?")

@@ -1,7 +1,8 @@
+from anyvisa.anyVisa import AnyVisaDeviceWrapper
 from anyvisa import AnyVisa
 from photonicdrivers.Abstract.Thorlabs_Power_Meter_Driver import Thorlabs_Power_Meter_Driver
 from photonicdrivers.Power_Meters.Thorlabs_PM.autoreconnect_pm import auto_reconnect
-import time
+
 """
 Class for interfacing with Thorlab powermeters.
 Supported models: PM103E
@@ -17,24 +18,25 @@ TCPIP0::10.209.67.196::2000::SOCKET
 
 
 class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
-    
-    def __init__(self, port: str) -> None:
+
+    def __init__(self, port: str, auto_disconnecting: bool = True) -> None:
         """
         Initializes the Thorlabs PM103E Driver instance.
 
         Args:
             port (str): The VISA resource string for connecting to the Thorlabs PM103E power meter.
+            auto_disconnecting (bool): Whether to automatically disconnect the power meter.
         """
-        self.port = port
-        self.power_meter = None
+        self.port: str = port
+        self.power_meter: AnyVisaDeviceWrapper | None = None
         self.enabled = False
-        self.auto_disconnecting = True
+        self.auto_disconnecting: bool = auto_disconnecting
 
     def connect(self) -> None:
         """
         Opens a connection to the Thorlabs PM103E power meter and configures it for power measurements.
         """
-        self.power_meter = AnyVisa.TL_Open(self.port)
+        self.power_meter: AnyVisaDeviceWrapper = AnyVisa.TL_Open(rsrStr=self.port)
         self.power_meter.open()
         self.enabled = True
 
@@ -44,6 +46,13 @@ class Thorlabs_PM103E_Driver(Thorlabs_Power_Meter_Driver):
         """
         # The power meter disconnects itself after 120 seconds without interaction
         self.enabled = False
+        if self.power_meter is not None:
+            try:
+                self.power_meter.close()
+            except Exception:
+                pass
+        AnyVisa.ReleaseSystem()
+        self.power_meter = None
 
     def is_connected(self) -> bool:
         """

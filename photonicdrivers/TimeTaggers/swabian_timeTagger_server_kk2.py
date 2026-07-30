@@ -1,4 +1,4 @@
-import TimeTagger
+from Swabian import TimeTagger
 import time
 
 
@@ -16,7 +16,7 @@ tagger = TimeTagger.createTimeTagger(serialNumber)
 # The server keeps running until the command tagger.stopServer() is called or until the program is terminated
 print("Starts the server")
 tagger.startServer(access_mode = TimeTagger.AccessMode.Control,port=41101)
-
+tagger.disableLEDs(disabled=True)
 
 # Keep this process running
 run = True
@@ -37,4 +37,3 @@ TimeTagger.freeTimeTagger(tagger)
 
 
 print("Script completed")
-

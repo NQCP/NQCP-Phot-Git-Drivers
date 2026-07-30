@@ -1,0 +1,39 @@
+from Swabian import TimeTagger
+import time
+print(TimeTagger.getVersion())
+
+
+# Connecting to time tagger
+# serialNumber = "23010013V4" #  TTX01 (should be in KK2)
+serialNumber = "25240020FY" # TTX02 (should be in KK4)
+
+# Fk5 serialnumber:
+# serialNumber = "2208000ZBU"
+
+print("Connecting to timetagger with serial number " + serialNumber)
+tagger = TimeTagger.createTimeTagger(serialNumber)
+
+tagger.xtra_setClockOut(False)
+
+# Start the Server. TimeTagger.AccessMode sets the access rights for clients. Port defines the network port to be used
+# The server keeps running until the command tagger.stopServer() is called or until the program is terminated
+print("Starts the server")
+tagger.startServer(access_mode = TimeTagger.AccessMode.Control,port=41101)
+tagger.disableLEDs(disabled=False)
+
+# Keep this process running
+run = True
+print("Server is now running")
+while run == True:
+    user_input = input("Type 'close' in the terminal followed by ENTER to stop the server: ")
+    if user_input.lower() == 'close':
+        run = False
+    time.sleep(0.1)
+
+tagger.stopServer()
+print("Server stopped")
+
+print("Free up timetagger")
+TimeTagger.freeTimeTagger(tagger)
+
+print("Script completed")

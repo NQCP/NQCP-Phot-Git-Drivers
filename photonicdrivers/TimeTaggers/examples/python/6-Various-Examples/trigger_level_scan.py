@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from TimeTagger import scanTimeTagger, createTimeTagger, Countrate, getVersion, StartStop
+from Swabian.TimeTagger import scanTimeTagger, createTimeTagger, Countrate, getVersion, StartStop
 from scipy.optimize import curve_fit
 from time import sleep
 from datetime import datetime
