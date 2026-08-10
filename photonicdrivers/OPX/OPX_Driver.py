@@ -71,6 +71,12 @@ class OPX_Driver(Connectable):
             program_step["duration"] = duration
         self.sequence_stack.append(program_step)
 
+    def add_measure_step(self, readout=None):
+        program_step = {}
+        if readout is not None:
+            program_step["readout"] = readout
+        self.sequence_stack.append(program_step)
+
     def execute_program(self):
         with program() as sequence_program:
             for step in self.sequence_stack:
@@ -88,6 +94,8 @@ class OPX_Driver(Connectable):
                     play(element=step["element"])
                 elif "duration" in step:
                     play(duration=step["duration"])
+                elif "readout" in step:
+                    measure(readout=step["readout"])
 
         job = self.get_quantum_machine().execute(sequence_program)
         print(job.get_status())
