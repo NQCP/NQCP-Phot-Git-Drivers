@@ -10,11 +10,11 @@ real hardware. That still exercises the full ctypes binding, which is where wron
 argtypes would surface, so it is worth doing before touching a real device.
 '''
 
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Constants import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Constants import (
     HAS_HIRES,
     describe_features,
 )
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_USB_Driver import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_USB_Driver import (
     Vaunix_LDA_USB_Driver,
     set_test_mode,
 )

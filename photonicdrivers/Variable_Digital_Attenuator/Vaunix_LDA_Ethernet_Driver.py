@@ -32,7 +32,7 @@ Two consequences worth knowing before using this driver:
 
 Typical use:
 
-    from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Ethernet_Driver import Vaunix_LDA_Ethernet_Driver
+    from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Ethernet_Driver import Vaunix_LDA_Ethernet_Driver
 
     with Vaunix_LDA_Ethernet_Driver(ip_address="192.168.100.5") as attenuator:
         attenuator.set_frequency_MHz(6000)
@@ -51,7 +51,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from photonicdrivers.Abstract.Connectable import Connectable
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Constants import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Constants import (
     ETH_STATUS_NAMES,
     ETH_STATUS_OK,
     HAS_BIDIR_RAMPS,

@@ -10,11 +10,11 @@ the one the USB driver reports for the same physical box -- that is the stronges
 single confirmation that both ctypes bindings are correct.
 '''
 
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Constants import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Constants import (
     Vaunix_LDA_Transport_Error,
     describe_features,
 )
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Ethernet_Driver import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Ethernet_Driver import (
     Vaunix_LDA_Ethernet_Driver,
 )
 

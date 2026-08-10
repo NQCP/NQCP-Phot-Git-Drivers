@@ -25,7 +25,7 @@ export table of VNX_atten64.dll:
 
 Typical use:
 
-    from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_USB_Driver import Vaunix_LDA_USB_Driver
+    from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_USB_Driver import Vaunix_LDA_USB_Driver
 
     for info in Vaunix_LDA_USB_Driver.list_usb_devices():
         print(info.serial_number, info.model_name)
@@ -48,7 +48,7 @@ from dataclasses import dataclass
 from typing import Callable, Optional, Sequence
 
 from photonicdrivers.Abstract.Connectable import Connectable
-from photonicdrivers.Variable_Digital_Attenautor.Vaunix_LDA_Constants import (
+from photonicdrivers.Variable_Digital_Attenuator.Vaunix_LDA_Constants import (
     DEV_CONNECTED,
     DEV_OPENED,
     DEVICE_NOT_READY,
