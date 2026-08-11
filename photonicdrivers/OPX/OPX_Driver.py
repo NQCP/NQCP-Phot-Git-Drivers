@@ -88,6 +88,8 @@ class OPX_Driver(Connectable):
                     play(element=step["element"])
                 elif "duration" in step:
                     play(duration=step["duration"])
+                elif "readout" in step:
+                    measure(readout=step["readout"])
 
         job = self.get_quantum_machine().execute(sequence_program)
         print(job.get_status())

@@ -90,7 +90,10 @@ class RS_ZNL20_Driver(Connectable):
         return float(self.query(f"SENS:BAND:RES?"))
 
     def set_power(self, power_dBm: float) -> None:
-        self.write(f"SOUR:POW {power_dBm}dBm")
+        if power_dBm < -10 or power_dBm > 0:
+            self.write(f"SOUR:POW {power_dBm}dBm")
+        else:
+            raise ValueError("Power must be between -10 dBm and 0 dBm")
 
     def set_power_state(self, enable: bool) -> None:
         self.write(f"OUTP {boolean_str(enable)}")
