@@ -1,7 +1,7 @@
 # class to communicate with the iSMA_MAC36 controller that control the Ventek cooling system
 from photonicdrivers.Abstract.Connectable import Connectable
 
-from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodbus 
+from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodbus
 from pymodbus import pymodbus_apply_logging_config # to enable debug mode
 import struct
 
@@ -10,9 +10,9 @@ class ISMA_MAC36_Driver(Connectable):
         # _ip_address: IP of the Modbus TCP server
         # _port: port of the Modbus TCP server. Default is 502
         # _slave_ID: slave ID of the device
-        
+
         print('Inilialisting iSMA_MAC36 class')
-        
+
         if _debug == True:
             print('Enabling debugging mode')
             pymodbus_apply_logging_config("DEBUG")
@@ -21,13 +21,11 @@ class ISMA_MAC36_Driver(Connectable):
         self.port = _port
         self.slave_id = _slave_id
 
-        # Connect to the Modbus TCP server
-        self.client = ModbusTcpClient(self.ip_address, self.port)
-
         # Open the connection
-        self.client.connect()
+        self.connect()
 
     def connect(self):
+        # Connect to the Modbus TCP server
         self.client = ModbusTcpClient(self.ip_address, self.port)
 
         self.client.connect()
@@ -48,11 +46,21 @@ class ISMA_MAC36_Driver(Connectable):
         floatArray = self.__array_uint16_to_float32(uInt16Array)
         kk4Info = KK4Info(floatArray)
         return kk4Info
-        
+
+    def queryKK2Info(self):
+        # this function is hardcoded to return the registers relevant for the KK2 lab
+        output = self.queryInputRegisters(0,12)
+        uInt16Array = output.registers
+        floatArray = self.__array_uint16_to_float32(uInt16Array)
+        kk2Info = KK2Info(floatArray)
+        return kk2Info
+
 
     def queryInputRegisters(self, registerStart, length):
         # for 3xxxx registers
-        return self.client.read_input_registers(registerStart, length, self.slave_id)
+        temp = self.client.read_input_registers(registerStart, length, self.slave_id)
+        print(temp)
+        return temp
 
 
     def queryHoldingRegisters(self, registerStart, length):
@@ -83,10 +91,39 @@ class ISMA_MAC36_Driver(Connectable):
             float_rounded = float(float_string_rounded)
             float_array.append(float_rounded)
 
-        return float_array    
+        return float_array
 
 
 class KK4Info:
+    # a class to make it easy to identify which values correspond to which variables
+    def __init__(self, floatArray):
+        # print(floatArray)
+        # blank = floatArray[0]
+        self.IBI01_ACT_SP = floatArray[1]
+        self.IBI01_TT001 = floatArray[2]
+        self.IBI01_MK201 = floatArray[3]
+        self.IBI01_FC = floatArray[4]
+        self.IBI01_P = floatArray[5]
+        self.IBI01_I = floatArray[6]
+        self.IBI01_D = floatArray[7]
+
+        self.IBI02_ACT_SP = floatArray[8]
+        self.IBI02_TT001 = floatArray[9]
+        self.IBI02_MK201 = floatArray[10]
+        self.IBI02_FC = floatArray[11]
+        self.IBI02_P = floatArray[12]
+        self.IBI02_I = floatArray[13]
+        self.IBI02_D = floatArray[14]
+
+        self.IBI03_ACT_SP = floatArray[15]
+        self.IBI03_TT001 = floatArray[16]
+        self.IBI03_MK201 = floatArray[17]
+        self.IBI03_FC = floatArray[18]
+        self.IBI03_P = floatArray[19]
+        self.IBI03_I = floatArray[20]
+        self.IBI03_D = floatArray[21]
+
+class KK2Info:
     # a class to make it easy to identify which values correspond to which variables
     def __init__(self, floatArray):
         # print(floatArray)
