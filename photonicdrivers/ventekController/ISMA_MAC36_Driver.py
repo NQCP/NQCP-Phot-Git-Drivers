@@ -7,13 +7,18 @@ import struct
 
 class ISMA_MAC36_Driver(Connectable):
     def __init__(self, _ip_address, _port=502, _slave_id=1, _debug=False) -> None:
-        # _ip_address: IP of the Modbus TCP server
-        # _port: port of the Modbus TCP server. Default is 502
-        # _slave_ID: slave ID of the device
+        """
+        Class to communicate with the iSMA_MAC36 controller that controls the Ventek cooling system.
 
+        Arguments:
+            _ip_address: IP of the Modbus TCP server
+            _port: port of the Modbus TCP server. Default is 502
+            _slave_id: slave ID of the device
+            _debug: whether to enable debug mode
+        """
         print('Inilialisting iSMA_MAC36 class')
 
-        if _debug == True:
+        if _debug:
             print('Enabling debugging mode')
             pymodbus_apply_logging_config("DEBUG")
 
@@ -36,7 +41,8 @@ class ISMA_MAC36_Driver(Connectable):
     def is_connected(self):
         try:
             return self.queryKK4Info() is not None
-        except:
+        except Exception as e:
+            print(f"Error occurred while querying: {e}")
             return False
 
     def queryKK4Info(self):
@@ -49,8 +55,12 @@ class ISMA_MAC36_Driver(Connectable):
 
     def queryKK2Info(self):
         # this function is hardcoded to return the registers relevant for the KK2 lab
-        output = self.queryInputRegisters(0,12)
-        uInt16Array = output.registers
+        output = self.queryInputRegisters(0,26)
+        try:
+            uInt16Array = output.registers
+        except Exception as e:
+            print(f"Error occurred while querying KK2 info: {e}. Output: {output}.")
+            return None
         floatArray = self.__array_uint16_to_float32(uInt16Array)
         kk2Info = KK2Info(floatArray)
         return kk2Info
@@ -58,14 +68,12 @@ class ISMA_MAC36_Driver(Connectable):
 
     def queryInputRegisters(self, registerStart, length):
         # for 3xxxx registers
-        temp = self.client.read_input_registers(registerStart, length, self.slave_id)
-        print(temp)
-        return temp
+        return self.client.read_input_registers(address=registerStart, count=length, slave=self.slave_id)
 
 
     def queryHoldingRegisters(self, registerStart, length):
         # for 4xxxx registers
-        return self.client.read_holding_registers(registerStart, length, self.slave_id)
+        return self.client.read_holding_registers(address=registerStart, count=length, slave=self.slave_id)
 
     ##################### PRIVATE METHODS ###########################
 
@@ -128,26 +136,17 @@ class KK2Info:
     def __init__(self, floatArray):
         # print(floatArray)
         # blank = floatArray[0]
-        self.IBI01_ACT_SP = floatArray[1]
-        self.IBI01_TT001 = floatArray[2]
-        self.IBI01_MK201 = floatArray[3]
-        self.IBI01_FC = floatArray[4]
-        self.IBI01_P = floatArray[5]
-        self.IBI01_I = floatArray[6]
-        self.IBI01_D = floatArray[7]
+        self.IBI01_ACT_SP = floatArray[4]   # ACT_Temp_SP
+        self.IBI01_TT001 = floatArray[1]    # DisplayTemp
+        self.IBI01_MK201 = floatArray[2]    # CoolingValve
+        self.IBI01_FC = floatArray[3]       # FancoilSpeed
 
-        self.IBI02_ACT_SP = floatArray[8]
-        self.IBI02_TT001 = floatArray[9]
-        self.IBI02_MK201 = floatArray[10]
-        self.IBI02_FC = floatArray[11]
-        self.IBI02_P = floatArray[12]
-        self.IBI02_I = floatArray[13]
-        self.IBI02_D = floatArray[14]
+        self.IBI02_ACT_SP = floatArray[8]   # ACT_Temp_SP
+        self.IBI02_TT001 = floatArray[5]    # DisplayTemp
+        self.IBI02_MK201 = floatArray[6]   # CoolingValve
+        self.IBI02_FC = floatArray[7]       # FancoilSpeed
 
-        self.IBI03_ACT_SP = floatArray[15]
-        self.IBI03_TT001 = floatArray[16]
-        self.IBI03_MK201 = floatArray[17]
-        self.IBI03_FC = floatArray[18]
-        self.IBI03_P = floatArray[19]
-        self.IBI03_I = floatArray[20]
-        self.IBI03_D = floatArray[21]
+        self.IBI03_ACT_SP = floatArray[12]  # ACT_Temp_SP
+        self.IBI03_TT001 = floatArray[9]   # DisplayTemp
+        self.IBI03_MK201 = floatArray[10]   # CoolingValve
+        self.IBI03_FC = floatArray[11]      # FancoilSpeed
