@@ -134,18 +134,19 @@ class KK4Info:
 class KK2Info:
     # a class to make it easy to identify which values correspond to which variables
     def __init__(self, floatArray):
-        # print(floatArray)
-        # blank = floatArray[0]
+        # Lille rum (kælder) --> Kokebs lab
         self.IBI01_ACT_SP = floatArray[4]   # ACT_Temp_SP
         self.IBI01_TT001 = floatArray[1]    # DisplayTemp
         self.IBI01_MK201 = floatArray[2]    # CoolingValve
         self.IBI01_FC = floatArray[3]       # FancoilSpeed
 
+        # Stort rum (kælder) --> Main lab
         self.IBI02_ACT_SP = floatArray[8]   # ACT_Temp_SP
         self.IBI02_TT001 = floatArray[5]    # DisplayTemp
         self.IBI02_MK201 = floatArray[6]   # CoolingValve
         self.IBI02_FC = floatArray[7]       # FancoilSpeed
 
+        # Lille rum (stueplan) --> Compressors room
         self.IBI03_ACT_SP = floatArray[12]  # ACT_Temp_SP
         self.IBI03_TT001 = floatArray[9]   # DisplayTemp
         self.IBI03_MK201 = floatArray[10]   # CoolingValve
