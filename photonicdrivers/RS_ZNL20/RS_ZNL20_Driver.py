@@ -50,27 +50,6 @@ class RS_ZNL20_Driver(Connectable):
     def status(self) -> int:
         return int(self.query("*STB?"))
 
-    def clear_status(self) -> None:
-        """Clear the status registers and empty the SCPI error queue (``*CLS``).
-
-        Issue this immediately before a command whose acceptance you intend to check with
-        ``get_error()``, so the response can only describe that command.
-        """
-        self.write("*CLS")
-
-    def get_error(self) -> str:
-        """Pop the oldest entry from the SCPI error queue (``SYST:ERR?``).
-
-        Returns:
-            str: ``'0,"No error"'`` when the queue is empty, otherwise something like
-            ``'-113,"Undefined header;INP:FILT:YIG:STAT ON"'``.
-
-        A rejected command is not a transport error: the instrument records it here and
-        carries on, so ``write()`` raises nothing. This is the only way to find out whether
-        a command the instrument does not implement was silently discarded.
-        """
-        return self.query("SYST:ERR?")
-    
     def wait(self) -> None:
         """Issue SCPI ``*WAI`` to enforce instrument-side command ordering.
 
@@ -118,18 +97,6 @@ class RS_ZNL20_Driver(Connectable):
 
     def set_power_state(self, enable: bool) -> None:
         self.write(f"OUTP {boolean_str(enable)}")
-
-    def set_yig_preselector(self, enable: bool) -> None:
-        """Switch the input YIG preselector on or off.
-
-        The preselector rejects image frequencies. It is active only above 6 GHz -- below
-        that, switching it has no effect. Image rejection is available over a restricted
-        bandwidth only, so a wide span above 6 GHz trades image rejection against bandwidth.
-
-        Switched off above 6 GHz, image and spurious responses are displayed alongside the
-        real signal: extra bands that track the tone at fixed offsets.
-        """
-        self.write(f"INP:FILT:YIG:STAT {boolean_str(enable)}")
 
     def set_frequency_start(self, start: float) -> None:
         self.write(f"SENS:FREQ:STAR {start}")
