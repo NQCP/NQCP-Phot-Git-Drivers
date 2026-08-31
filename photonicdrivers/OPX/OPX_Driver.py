@@ -37,7 +37,7 @@ class OPX_Driver(Connectable):
             return False
     
     def open_quantum_machine(self, config):
-        return self.driver.open_qm(config=config)
+        return self.driver.open_qm(config=config, close_other_machines=True)
     
     def is_quantum_machine_open(self):
         if len(self.driver.list_open_qms()) > 0:
@@ -71,7 +71,7 @@ class OPX_Driver(Connectable):
             program_step["duration"] = duration
         self.sequence_stack.append(program_step)
 
-    def execute_program(self):
+    def execute_sequence(self):
         with program() as sequence_program:
             for step in self.sequence_stack:
                 if "pulse" in step and "element" in step and "duration" in step:
@@ -88,6 +88,8 @@ class OPX_Driver(Connectable):
                     play(element=step["element"])
                 elif "duration" in step:
                     play(duration=step["duration"])
+                elif "readout" in step:
+                    measure(readout=step["readout"])
 
         job = self.get_quantum_machine().execute(sequence_program)
         print(job.get_status())
@@ -103,4 +105,3 @@ class OPX_Driver(Connectable):
     
     def get_devices(self):
         return self.driver.get_devices()
-        

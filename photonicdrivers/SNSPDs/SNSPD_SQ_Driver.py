@@ -68,6 +68,24 @@ class SNSPD_SQ_Driver(Connectable):
         # in ms
         return self.websq.get_measurement_periode()
 
+    def run_iv_scan(self, state):
+        # runs the IV scan 
+        return self.websq.iv_scan_run(state)
+
+    def change_iv_scan_settings(self, start, stop, step):
+     '''
+     Sets up the settings for an IV scan to record the IV curves and the I vs Counts curves for current integration time.
+        start: starting bias current value for the IV curve in uA (-90.9 < I < 90.9)
+        stop: stopping bias current value for the IV curve in uA (-90.9 < I < 90.9)
+        step: bias current steps used for the IV scan
+     '''
+     return self.websq.iv_scan_setup(start, stop, step)
+
+    def get_ic_scan_history(self):
+        # returns the last IV scan measurement and returns a matrix where the first column contains the current and the rest the counts for each detector.
+        return self.websq.ic_scan_history()
+    
+
 
 
 

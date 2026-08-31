@@ -37,7 +37,6 @@ dependencies = [
     "rpyc",
     "loguru",
     "pylablib",
-    "timetagger",
     "zeroconf",
     "pulsestreamer",
     "pefile",
@@ -56,6 +55,7 @@ content-type = "text/markdown"
 
 
 [project.optional-dependencies]
+attocube = ["atto_device"]
 test = [
     "coverage[toml]>=6.0.0",
     "deepdiff>=5.0.2",
@@ -225,6 +225,9 @@ distance-dirty = "{next_version}.dev{distance}+{branch}.{vcs}{rev}.dirty"
 prerelease = "allow"
 required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]
 constraint-dependencies = ["pyqt5-qt5<5.15.18; sys_platform == 'win32' and platform_machine == 'AMD64'"]
+
+[tool.uv.sources]
+atto_device = { path = "N:/SCI-NBI-NQCP/Phot/manualsEtc/attocube/Software/attoDRY800_Software/api_atto-device-python_1.0.12/", editable = false }
 
 [tool.versioningit.vcs]
 method = "git"

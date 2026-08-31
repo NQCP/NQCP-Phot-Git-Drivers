@@ -158,3 +158,67 @@ class Pulse_Streamer_82_Driver(Connectable):
     
     def force_final(self):
         self.driver.forceFinal()
+
+    ##################### ANALOG OUTPUT ###########################
+    # The Pulse Streamer 8/2 has no built-in function generators - analog waveforms are built as
+    # (duration_ns, voltage_V) step lists and set on a Sequence with setAnalog(). See the
+    # Pulse_Streamer instrument wrapper for generators that produce those lists. The methods below
+    # only expose the vendor analog calls that were missing from this driver.
+
+    def create_output_state(self, digital_channels: list = None, A0: float = 0.0, A1: float = 0.0):
+        """Build an OutputState describing a static output of the Pulse Streamer 8/2.
+
+        Passthrough to PulseStreamer.createOutputState, which is itself just
+        OutputState(digi=..., A0=..., A1=...). Exposed here so callers can build one without
+        importing the vendor package.
+
+        Args:
+            digital_channels: Digital channels to drive HIGH. Must be a list of ints - OutputState
+                raises TypeError on anything else. None means no channels high.
+            A0: Analog channel 0 level in volts, within +/-1 V.
+            A1: Analog channel 1 level in volts, within +/-1 V.
+
+        Returns:
+            OutputState: Suitable for set_analog_constant().
+
+        Raises:
+            AssertionError: From OutputState if a voltage is outside +/-1 V or a digital channel is
+                outside 0..7.
+        """
+        if digital_channels is None:
+            digital_channels = []
+        return self.driver.createOutputState(digital_channels, A0, A1)
+
+    def set_analog_constant(self, output_state=None):
+        """Drive a static output state immediately, replacing any streamed sequence.
+
+        Passthrough to PulseStreamer.constant.
+
+        NOTE this is not "hold a DC level alongside the sequence": constant() clears the client's
+        sequence bookkeeping, so whatever was streaming stops and the uploaded sequence is
+        discarded. To put a DC level *inside* a sequence, use the Pulse_Streamer instrument's
+        set_analog_dc() instead.
+
+        Args:
+            output_state: OutputState to hold, as returned by create_output_state(). None means all
+                outputs at zero.
+        """
+        if output_state is None:
+            output_state = OutputState([])
+        return self.driver.constant(output_state)
+
+    def set_analog_calibration(self, dc_offset_a0: float = 0.0, dc_offset_a1: float = 0.0,
+                               slope_a0: float = 1.0, slope_a1: float = 1.0):
+        """Write the analog output calibration to the device.
+
+        Passthrough to PulseStreamer.setAnalogCalibration, the inverse of the existing
+        get_analog_calibration(). The vendor call does no validation and the values persist on the
+        device, so read the current values with get_analog_calibration() before changing them.
+
+        Args:
+            dc_offset_a0: DC offset correction for A0, in volts.
+            dc_offset_a1: DC offset correction for A1, in volts.
+            slope_a0: Gain correction for A0. 1.0 is uncorrected.
+            slope_a1: Gain correction for A1. 1.0 is uncorrected.
+        """
+        return self.driver.setAnalogCalibration(dc_offset_a0, dc_offset_a1, slope_a0, slope_a1)
