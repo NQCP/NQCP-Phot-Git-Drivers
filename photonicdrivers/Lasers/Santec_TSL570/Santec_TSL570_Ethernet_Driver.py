@@ -1,6 +1,71 @@
+"""
+Santec TSL-570 tunable laser driver, over ethernet.
+
+Section references in this module point to the TSL-570 operation manual
+(TSL-570-M-E-v1.5, chapter 6 = detailed operation, 7.4 = command reference), which
+lives at:
+    N:/SCI-NBI-NQCP/Phot/manualsEtc/SANTEC TSL570/USB stick contents/TSL-570/Product Manual/
+"""
+
 from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
 import logging
+
+SPEED_OF_LIGHT_M_PER_S = 299792458.0
+
+# Command sets, see ":SYSTem:COMMunicate:CODe" in manual chapter 7.4.
+# The unit of every value the laser sends and accepts depends on this setting:
+#   Legacy: wavelengths in nm, frequencies in THz
+#   SCPI:   wavelengths in m,  frequencies in Hz
+# This driver assumes the laser is in SCPI mode.
+COMMAND_SET_LEGACY = 0
+COMMAND_SET_SCPI = 1
+
+# Modulation sources, see ":AM:SOURce" in manual chapter 7.4.
+MODULATION_SOURCE_COHERENCE_CONTROL = 0
+MODULATION_SOURCE_INTENSITY_MODULATION = 1
+MODULATION_SOURCE_FREQUENCY_MODULATION = 3
+
+# Fine-tuning limits, see manual chapter 6.1.
+# The fine-tuning value is a unitless number that spans roughly 10 GHz in total
+# (about 80 pm around 1550 nm) with a resolution below 1 MHz. Increasing the value
+# shifts the output to a SHORTER wavelength, i.e. to a HIGHER optical frequency.
+FINE_TUNING_MIN = -100.00
+FINE_TUNING_MAX = 100.00
+FINE_TUNING_STEP = 0.01
+FINE_TUNING_RANGE_HZ = 10e9
+
+# Frequency modulation ("Frequency Mod." external modulation) specifications, see
+# manual chapter 6.3.2. The signal is applied to the "ANALOG INPUT" BNC connector on
+# the rear panel. Exceeding the input voltage range may damage the laser.
+FREQUENCY_MODULATION_INPUT_MIN_V = -1.2
+FREQUENCY_MODULATION_INPUT_MAX_V = 1.2
+FREQUENCY_MODULATION_DEPTH_HZ_PER_V = 5e9
+FREQUENCY_MODULATION_BANDWIDTH_HZ = 100.0
+FREQUENCY_MODULATION_INPUT_IMPEDANCE_OHM = 4700.0
+
+# Intensity modulation specifications, see manual chapter 6.3.1.
+INTENSITY_MODULATION_INPUT_MIN_V = -2.0
+INTENSITY_MODULATION_INPUT_MAX_V = 0.0
+INTENSITY_MODULATION_BANDWIDTH_HZ = 400e3
+INTENSITY_MODULATION_INPUT_IMPEDANCE_OHM = 100.0
+
+# Smallest step of the ":WAVelength:FREQuency" command, see manual chapter 7.4.
+FREQUENCY_SET_STEP_HZ = 10e6
+
+
+def wavelength_nm_to_frequency_Hz(wavelength_nm: float) -> float:
+    """
+    Converts a vacuum wavelength [nm] to an optical frequency [Hz].
+    """
+    return SPEED_OF_LIGHT_M_PER_S / (wavelength_nm * 1e-9)
+
+
+def frequency_Hz_to_wavelength_nm(frequency_Hz: float) -> float:
+    """
+    Converts an optical frequency [Hz] to a vacuum wavelength [nm].
+    """
+    return SPEED_OF_LIGHT_M_PER_S / frequency_Hz * 1e9
 
 
 class Santec_TSL570_driver(Connectable):
@@ -85,7 +150,133 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         wavelength_in_nm = float(return_msg) * 1e9
         return wavelength_in_nm
-    
+
+    def get_wavelength_nm(self) -> float:
+        """
+        Gets and returns the current set wavelength [nm].
+
+        Unit-explicit alias of get_wavelength(), which also returns nm. Prefer this
+        one: the matching setter set_wavelength() takes metres, not nm.
+
+        Args:
+            None
+        Returns:
+            float: wavelength in nm
+        """
+        return self.get_wavelength()
+
+    def set_wavelength_nm(self, wavelength_nm: float) -> None:
+        """
+        Set wavelength [nm] of the laser.
+
+        Unit-explicit wrapper around set_wavelength(), which takes metres.
+
+        Args:
+            wavelength_nm (float): wavelength in nm
+        Returns:
+            None
+        """
+        self.set_wavelength(wavelength_nm * 1e-9)
+
+    def get_frequency_Hz(self) -> float:
+        """
+        Gets and returns the current set optical frequency [Hz].
+
+        Uses the laser's native ":FREQuency?" command rather than converting the
+        wavelength by hand, so the value matches what the laser computes internally.
+        In SCPI command set mode the laser answers in Hz.
+
+        Args:
+            None
+        Returns:
+            float: optical frequency in Hz
+        """
+        msg = ":FREQ?"
+        return_msg = self.laser.query(msg)
+        frequency_in_Hz = float(return_msg)
+        return frequency_in_Hz
+
+    def get_frequency_MHz(self) -> float:
+        """
+        Gets and returns the current set optical frequency [MHz].
+
+        Args:
+            None
+        Returns:
+            float: optical frequency in MHz
+        """
+        return self.get_frequency_Hz() * 1e-6
+
+    def get_frequency_GHz(self) -> float:
+        """
+        Gets and returns the current set optical frequency [GHz].
+
+        Args:
+            None
+        Returns:
+            float: optical frequency in GHz
+        """
+        return self.get_frequency_Hz() * 1e-9
+
+    def get_frequency_THz(self) -> float:
+        """
+        Gets and returns the current set optical frequency [THz].
+
+        Args:
+            None
+        Returns:
+            float: optical frequency in THz
+        """
+        return self.get_frequency_Hz() * 1e-12
+
+    def set_frequency_Hz(self, frequency_Hz: float) -> None:
+        """
+        Set the optical frequency [Hz] of the laser.
+
+        The laser tunes in steps of 10 MHz (see ":FREQuency" in the manual). Use
+        fine-tuning or external frequency modulation for finer steps.
+
+        Args:
+            frequency_Hz (float): optical frequency in Hz
+        Returns:
+            None
+        """
+        msg = ":FREQuency " + "{:.12g}".format(frequency_Hz)
+        self.laser.write(msg)
+
+    def set_frequency_MHz(self, frequency_MHz: float) -> None:
+        """
+        Set the optical frequency [MHz] of the laser.
+
+        Args:
+            frequency_MHz (float): optical frequency in MHz
+        Returns:
+            None
+        """
+        self.set_frequency_Hz(frequency_MHz * 1e6)
+
+    def set_frequency_GHz(self, frequency_GHz: float) -> None:
+        """
+        Set the optical frequency [GHz] of the laser.
+
+        Args:
+            frequency_GHz (float): optical frequency in GHz
+        Returns:
+            None
+        """
+        self.set_frequency_Hz(frequency_GHz * 1e9)
+
+    def set_frequency_THz(self, frequency_THz: float) -> None:
+        """
+        Set the optical frequency [THz] of the laser.
+
+        Args:
+            frequency_THz (float): optical frequency in THz
+        Returns:
+            None
+        """
+        self.set_frequency_Hz(frequency_THz * 1e12)
+
     def get_wavelength_unit(self) -> str:
         
         """
@@ -195,18 +386,239 @@ class Santec_TSL570_driver(Connectable):
         self.laser.write(msg)
 
     def set_wavelength_unit(self, unit: str):
-        
-        # OBS: This code has not been tested!
+        """
+        Set the unit the laser shows on its own display: 'nm' or 'THz'.
 
+        This only changes the front panel display. It does not change the unit used
+        over the communication interface, which is fixed by the command set (see
+        ":SYSTem:COMMunicate:CODe").
+
+        Args:
+            unit (str): Desired display unit, either 'nm' or 'THz'
+        Returns:
+            None
+        """
         unit = unit.strip().lower()
         if unit == "nm":
-            cmd = ":WAV:UNIT NM"
-        elif unit == "um":
-            cmd = ":WAV:UNIT UM"
+            unit_int = 0
+        elif unit == "thz":
+            unit_int = 1
         else:
-            raise ValueError("Invalid unit. Must be 'nm' or 'um'.")
+            raise ValueError("Invalid unit. Must be 'nm' or 'THz'.")
 
+        cmd = ":WAV:UNIT " + str(unit_int)
         self.laser.write(cmd)
+
+    def get_command_set(self) -> int:
+        """
+        Get the command set the laser is using.
+
+        The command set decides which units the laser uses on the communication
+        interface. This driver assumes SCPI mode (wavelengths in m, frequencies in Hz).
+
+        Args:
+            None
+        Returns:
+            int: 0 for Legacy, 1 for SCPI
+        """
+        msg = ":SYST:COMM:COD?"
+        return_msg = self.laser.query(msg)
+        return int(return_msg)
+
+    def set_command_set(self, command_set: int) -> None:
+        """
+        Set the command set of the laser.
+
+        Args:
+            command_set (int): 0 for Legacy, 1 for SCPI
+        Returns:
+            None
+        """
+        if command_set not in [COMMAND_SET_LEGACY, COMMAND_SET_SCPI]:
+            raise ValueError("Invalid command set. Must be 0 (Legacy) or 1 (SCPI).")
+        msg = ":SYST:COMM:COD " + str(command_set)
+        self.laser.write(msg)
+
+    ####################### FINE-TUNING (manual chapter 6.1) #######################
+
+    def get_fine_tuning(self) -> float:
+        """
+        Get the current fine-tuning value.
+
+        The value is unitless and spans about 10 GHz in total (roughly 80 pm around
+        1550 nm) over its -100 to +100 range, with a resolution below 1 MHz.
+
+        Args:
+            None
+        Returns:
+            float: fine-tuning value in the range -100.00 to +100.00
+        """
+        msg = ":WAV:FIN?"
+        return_msg = self.laser.query(msg)
+        return float(return_msg)
+
+    def set_fine_tuning(self, fine_tuning_value: float) -> None:
+        """
+        Set the fine-tuning value, which puts the laser into fine-tuning mode.
+
+        Increasing the value shifts the output to a SHORTER wavelength, i.e. to a
+        HIGHER optical frequency.
+
+        While fine-tuning is active the closed-loop wavelength control of the laser is
+        stopped, so the output may drift with the environment. Call
+        disable_fine_tuning() or set the wavelength again to restart closed-loop
+        control.
+
+        Args:
+            fine_tuning_value (float): fine-tuning value, -100.00 to +100.00, step 0.01
+        Returns:
+            None
+        """
+        if not FINE_TUNING_MIN <= fine_tuning_value <= FINE_TUNING_MAX:
+            raise ValueError(
+                f"Invalid fine-tuning value. Must be between {FINE_TUNING_MIN} and {FINE_TUNING_MAX}."
+            )
+        msg = ":WAV:FIN " + "{:.2f}".format(fine_tuning_value)
+        self.laser.write(msg)
+
+    def disable_fine_tuning(self) -> None:
+        """
+        Terminate fine-tuning operation and restart closed-loop wavelength control.
+
+        Args:
+            None
+        Returns:
+            None
+        """
+        msg = ":WAV:FIN:DIS"
+        self.laser.write(msg)
+
+    ####################### MODULATION (manual chapter 6.2 and 6.3) #######################
+
+    def get_modulation_source(self) -> int:
+        """
+        Get the selected modulation source.
+
+        Args:
+            None
+        Returns:
+            int: 0 for coherence control, 1 for intensity modulation,
+                 3 for frequency modulation
+        """
+        msg = ":AM:SOUR?"
+        return_msg = self.laser.query(msg)
+        return int(return_msg)
+
+    def set_modulation_source(self, source: int) -> None:
+        """
+        Select the modulation source.
+
+        Intensity modulation and frequency modulation are both driven by an external
+        analog signal on the rear panel "ANALOG INPUT" BNC connector. Frequency
+        modulation is the one that fine tunes the wavelength; see chapter 6.3.2 of the
+        manual for the input voltage range and the modulation depth.
+
+        The source only takes effect once modulation is enabled with
+        set_modulation_state(True).
+
+        Args:
+            source (int): 0 for coherence control, 1 for intensity modulation,
+                          3 for frequency modulation
+        Returns:
+            None
+        """
+        valid_sources = [
+            MODULATION_SOURCE_COHERENCE_CONTROL,
+            MODULATION_SOURCE_INTENSITY_MODULATION,
+            MODULATION_SOURCE_FREQUENCY_MODULATION,
+        ]
+        if source not in valid_sources:
+            raise ValueError(
+                "Invalid modulation source. Must be 0 (coherence control), "
+                "1 (intensity modulation) or 3 (frequency modulation)."
+            )
+        msg = ":AM:SOUR " + str(source)
+        self.laser.write(msg)
+
+    def get_modulation_state(self) -> bool:
+        """
+        Get whether the modulation function of the laser output is enabled.
+
+        Args:
+            None
+        Returns:
+            bool: True if modulation is enabled, False otherwise
+        """
+        msg = ":AM:STAT?"
+        return_msg = self.laser.query(msg)
+        return bool(int(return_msg))
+
+    def set_modulation_state(self, enabled: bool) -> None:
+        """
+        Enable or disable the modulation function of the laser output.
+
+        With frequency modulation selected, enabling modulation stops the closed-loop
+        wavelength control, so the output frequency may drift with the environment.
+        This is why external fine tuning is normally used together with a wavemeter.
+
+        Args:
+            enabled (bool): True to enable modulation, False to disable it
+        Returns:
+            None
+        """
+        msg = ":AM:STAT " + str(int(bool(enabled)))
+        self.laser.write(msg)
+
+    def set_frequency_modulation_enabled(self, enabled: bool) -> None:
+        """
+        Put the laser into (or out of) external frequency modulation mode.
+
+        This is the mode used to fine tune the optical frequency with an external
+        analog voltage on the rear panel "ANALOG INPUT" connector, at about
+        5 GHz/V over a -1.2 V to +1.2 V input range (manual chapter 6.3.2).
+
+        Never apply a voltage outside that range: it may damage the laser.
+
+        Args:
+            enabled (bool): True to select frequency modulation and enable modulation,
+                            False to disable modulation
+        Returns:
+            None
+        """
+        if enabled:
+            self.set_modulation_source(MODULATION_SOURCE_FREQUENCY_MODULATION)
+            self.set_modulation_state(True)
+        else:
+            self.set_modulation_state(False)
+
+    def get_coherence_control(self) -> bool:
+        """
+        Get the coherence control status.
+
+        Coherence control broadens the spectral linewidth of the output, which
+        suppresses power fluctuations caused by interference. It must be off for
+        narrow-linewidth fine tuning.
+
+        Args:
+            None
+        Returns:
+            bool: True if coherence control is on, False otherwise
+        """
+        msg = ":COHC?"
+        return_msg = self.laser.query(msg)
+        return bool(int(return_msg))
+
+    def set_coherence_control(self, enabled: bool) -> None:
+        """
+        Set the coherence control status.
+
+        Args:
+            enabled (bool): True to turn coherence control on, False to turn it off
+        Returns:
+            None
+        """
+        msg = ":COHC " + str(int(bool(enabled)))
+        self.laser.write(msg)
 
     def set_power(self, power_dBm: float):
         """
@@ -347,6 +759,97 @@ class Santec_TSL570_driver(Connectable):
         return_msg = self.laser.query(msg)
         stop_wavelength_nm = float(return_msg) * 1e9
         return stop_wavelength_nm
+
+    def set_sweep_start_frequency_Hz(self, start_frequency_Hz: float):
+        """
+        Set the start frequency of the sweep in Hz
+
+        Note that the start frequency corresponds to the stop wavelength, since
+        frequency and wavelength run in opposite directions.
+
+        Args:
+            start_frequency_Hz (float): Start frequency in Hz
+        Returns:
+            None
+        """
+        msg = ":FREQ:SWE:STAR " + "{:.12g}".format(start_frequency_Hz)
+        self.laser.write(msg)
+
+    def get_sweep_start_frequency_Hz(self) -> float:
+        """
+        Get the start frequency of the sweep in Hz
+
+        Args:
+            None
+        Returns:
+            float: Start frequency in Hz
+        """
+        msg = ":FREQ:SWE:STAR?"
+        return_msg = self.laser.query(msg)
+        return float(return_msg)
+
+    def set_sweep_stop_frequency_Hz(self, stop_frequency_Hz: float):
+        """
+        Set the stop frequency of the sweep in Hz
+
+        Args:
+            stop_frequency_Hz (float): Stop frequency in Hz
+        Returns:
+            None
+        """
+        msg = ":FREQ:SWE:STOP " + "{:.12g}".format(stop_frequency_Hz)
+        self.laser.write(msg)
+
+    def get_sweep_stop_frequency_Hz(self) -> float:
+        """
+        Get the stop frequency of the sweep in Hz
+
+        Args:
+            None
+        Returns:
+            float: Stop frequency in Hz
+        """
+        msg = ":FREQ:SWE:STOP?"
+        return_msg = self.laser.query(msg)
+        return float(return_msg)
+
+    def set_sweep_step_frequency_Hz(self, step_frequency_Hz: float):
+        """
+        Set the step of the step sweep mode in Hz
+
+        Args:
+            step_frequency_Hz (float): Step size in Hz
+        Returns:
+            None
+        """
+        msg = ":FREQ:SWE:STEP " + "{:.12g}".format(step_frequency_Hz)
+        self.laser.write(msg)
+
+    def get_sweep_step_frequency_Hz(self) -> float:
+        """
+        Get the step of the step sweep mode in Hz
+
+        Args:
+            None
+        Returns:
+            float: Step size in Hz
+        """
+        msg = ":FREQ:SWE:STEP?"
+        return_msg = self.laser.query(msg)
+        return float(return_msg)
+
+    def get_sweep_frequency_range_Hz(self) -> tuple[float, float]:
+        """
+        Get the minimum and maximum configurable sweep frequency in Hz
+
+        Args:
+            None
+        Returns:
+            tuple[float, float]: (minimum frequency, maximum frequency) in Hz
+        """
+        minimum_frequency_Hz = float(self.laser.query(":FREQ:SWE:RANG:MIN?"))
+        maximum_frequency_Hz = float(self.laser.query(":FREQ:SWE:RANG:MAX?"))
+        return minimum_frequency_Hz, maximum_frequency_Hz
 
     def set_sweep_speed(self, speed_nm_per_s: float):
         """
