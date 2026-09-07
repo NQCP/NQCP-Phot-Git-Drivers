@@ -83,11 +83,14 @@ class Santec_TSL570_driver(Connectable):
             self.resource_manager = pyvisa.ResourceManager()
         self.ip_address = ip_address
         self.port_number = port_number
+        self.laser = None
 
     def connect(self):
         """
-        Connects to laser
+        Connects to laser. The TSL-570 accepts one LAN session at a time, so any
+        session already held is released first.
         """
+        self.disconnect()
         try:
             self.laser = self.resource_manager.open_resource(
                 f"TCPIP0::{self.ip_address}::{self.port_number}::SOCKET",
@@ -97,6 +100,7 @@ class Santec_TSL570_driver(Connectable):
             if self.prints_enabled:
                 logging.info("Succesfully connected to laser.")
         except Exception as e:
+            self.laser = None
             if self.prints_enabled:
                 logging.error(f"Couldn't connect to the laser due to the error: {e}")
             else:
@@ -104,9 +108,12 @@ class Santec_TSL570_driver(Connectable):
 
     def disconnect(self):
         """
-        Closes the connections to laser
+        Closes the connections to laser. Safe to call when not connected.
         """
+        if self.laser is None:
+            return
         self.laser.close()
+        self.laser = None
         if self.prints_enabled:
             print("Connection to laser closed.")
 
@@ -182,19 +189,16 @@ class Santec_TSL570_driver(Connectable):
         """
         Gets and returns the current set optical frequency [Hz].
 
-        Uses the laser's native ":FREQuency?" command rather than converting the
-        wavelength by hand, so the value matches what the laser computes internally.
-        In SCPI command set mode the laser answers in Hz.
+        Derived from ":WAV?" via c/lambda. Not an approximation: the TSL-570 is
+        specified in vacuum wavelength, so this is the same relation the laser applies
+        internally. ":FREQ?" is not used because it is not answered by every unit.
 
         Args:
             None
         Returns:
             float: optical frequency in Hz
         """
-        msg = ":FREQ?"
-        return_msg = self.laser.query(msg)
-        frequency_in_Hz = float(return_msg)
-        return frequency_in_Hz
+        return wavelength_nm_to_frequency_Hz(self.get_wavelength_nm())
 
     def get_frequency_MHz(self) -> float:
         """
@@ -233,16 +237,17 @@ class Santec_TSL570_driver(Connectable):
         """
         Set the optical frequency [Hz] of the laser.
 
-        The laser tunes in steps of 10 MHz (see ":FREQuency" in the manual). Use
-        fine-tuning or external frequency modulation for finer steps.
+        Goes through ":WAVelength" via c/lambda, matching the getter. Resolution is
+        comparable either way: the wavelength step is 0.1 pm (about 12.5 MHz at
+        1550 nm) against the 10 MHz step of ":FREQuency". Use fine-tuning or external
+        frequency modulation for finer steps.
 
         Args:
             frequency_Hz (float): optical frequency in Hz
         Returns:
             None
         """
-        msg = ":FREQuency " + "{:.12g}".format(frequency_Hz)
-        self.laser.write(msg)
+        self.set_wavelength_nm(frequency_Hz_to_wavelength_nm(frequency_Hz))
 
     def set_frequency_MHz(self, frequency_MHz: float) -> None:
         """
@@ -415,6 +420,10 @@ class Santec_TSL570_driver(Connectable):
 
         The command set decides which units the laser uses on the communication
         interface. This driver assumes SCPI mode (wavelengths in m, frequencies in Hz).
+
+        WARNING: observed to time out (VI_ERROR_TMO) on at least one TSL-570 unit,
+        which does not answer this query even though the manual documents it. Do not
+        call it on a connection path.
 
         Args:
             None
