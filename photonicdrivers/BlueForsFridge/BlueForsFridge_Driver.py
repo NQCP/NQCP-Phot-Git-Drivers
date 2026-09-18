@@ -275,15 +275,11 @@ class BlueForsFridge_Driver(Connectable):
 
         return f"v{valve_number}"
 
-    def configure_pid_loop(self, setpoint: float) -> dict[str, Any]:
-        """Configure PID control parameters for the FSE heater via the TC API based on a lookup table."""
-        return self.configure_fse_temperature_pid_loop(setpoint)
-
-    def configure_fse_temperature_pid_loop(
+    def configure_pid_loop(
         self,
         setpoint: float,
     ) -> dict[str, Any]:
-        """Configure PID control parameters from the lookup table based on setpoint."""
+        """Configure PID control parameters for the FSE heater from the lookup table based on setpoint."""
         import json
         import os
         
@@ -347,10 +343,6 @@ class BlueForsFridge_Driver(Connectable):
 
     def enable_pid_loop(self) -> dict[str, Any]:
         """Enable PID mode on the FSE heater."""
-        return self.enable_fse_temperature_pid_loop()
-
-    def enable_fse_temperature_pid_loop(self) -> dict[str, Any]:
-        """Enable PID mode on the FSE heater."""
         return self._tc_post("heater/update", {
             "heater_nr": self._FSE_HEATER_NR,
             "pid_mode": 1,
@@ -358,10 +350,6 @@ class BlueForsFridge_Driver(Connectable):
         })
 
     def disable_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
-        """Disable PID mode for the FSE heater."""
-        return self.disable_fse_temperature_pid_loop(keep_heater_active)
-
-    def disable_fse_temperature_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
         """Disable PID mode for the FSE heater."""
         return self._tc_post("heater/update", {
             "heater_nr": self._FSE_HEATER_NR,
