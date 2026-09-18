@@ -7,6 +7,10 @@ from enum import Enum
 LAN_PORT = 49099
 TC_PORT = 5001
 
+# The sample holder sensor is not part of mapper.bf.temperatures and must be read
+# from the temperature controller's value tree branch directly.
+SAMPLE_TEMPERATURE_PATH = "driver.bftc2.data.channels.channel_5.temperature"
+
 class OnOffError(Enum):
     Off = 0
     On = 1
@@ -45,6 +49,32 @@ def convert_to_python_type(value: str, typ: str):
 
 def strip_prefix(s: str):
     return s.split('.')[-1]
+
+
+def extract_value_node(data: dict, path: str) -> dict | None:
+    """Return the single value node addressed by path from a /values GET response.
+
+    The API returns a single node either keyed by its full dotted path (flat style,
+    which flatten_value_nodes relies on) or as the bare node itself. Both shapes are
+    accepted here. Returns None if no value node is found.
+    """
+    node = data.get(path)
+    if isinstance(node, dict) and "content" in node and "type" in node:
+        return node
+    if "content" in data and "type" in data:
+        return data
+    return None
+
+
+def value_from_node(node: dict):
+    """Convert the latest sample of a single value node to its python type.
+
+    Returns None if the node currently holds no value.
+    """
+    latest_value = node["content"]["latest_value"]
+    if latest_value is None or latest_value["value"] is None or latest_value["value"] == "":
+        return None
+    return convert_to_python_type(latest_value["value"], node["type"])
 
 
 def filter_type(data: dict, filter_types: list[type] | None = None):
@@ -113,10 +143,31 @@ class BlueForsFridge_Driver(Connectable):
         return flatten_value_nodes(data) if flatten else data
 
     ### Convenience methods that return normalized data ###
+    def _get_sample_temperature(self) -> float | None:
+        """Return the sample holder temperature in K, or None if it is unavailable.
+
+        The sample holder is not exposed through mapper.bf.temperatures, so it needs
+        its own read of the temperature controller node.
+        """
+        data = self.get_from_root(f"values/{SAMPLE_TEMPERATURE_PATH}")["data"]
+        node = extract_value_node(data, SAMPLE_TEMPERATURE_PATH)
+        return None if node is None else value_from_node(node)
+
     def get_temperatures(self) -> dict[str, float]:
         node_values = self.get_values("temperatures")
-        return filter_type(node_values, [float])
-    
+        temperatures = filter_type(node_values, [float])
+
+        try:
+            sample_temperature = self._get_sample_temperature()
+        except Exception:
+            # The mapper temperatures are what the condensing and stabilisation logic
+            # depends on, so the extra read must never break them.
+            sample_temperature = None
+        if isinstance(sample_temperature, float):
+            temperatures["tsample"] = sample_temperature
+
+        return temperatures
+
     def get_pressures(self) -> dict[str, float]:
         node_values = self.get_values("pressures")
         return filter_type(node_values, [float])
