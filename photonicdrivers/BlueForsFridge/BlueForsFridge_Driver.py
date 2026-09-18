@@ -80,6 +80,11 @@ def value_from_node(node: dict):
 def filter_type(data: dict, filter_types: list[type] | None = None):
     return {k: v for k, v in data.items() if filter_types is None or type(v) in filter_types}
 
+
+def names_of_enums(data: dict):
+    """Replace OnOffError members with their names so the dict can be serialized."""
+    return {k: v.name if isinstance(v, OnOffError) else v for k, v in data.items()}
+
 class BlueForsFridge_Driver(Connectable):
     """Driver for interacting with the BlueFors Control Software application programmatically"""
     _FORBIDDEN_VALVES = {"v15", "v17", "v18"}
@@ -203,7 +208,24 @@ class BlueForsFridge_Driver(Connectable):
     def get_pid_settings(self) -> dict[str, Any]:
         """Return PID-related settings for the FSE heater from the TC API."""
         return self._tc_post("heater", {"heater_nr": self._FSE_HEATER_NR})
-    
+
+    def get_settings(self) -> dict[str, Any]:
+        """Return the state of the fridge as a JSON serializable dictionary.
+
+        The PID settings come from the temperature controller API, which is only
+        available if the driver was constructed with a tc_host. They are None if it
+        was not.
+        """
+        return {
+            "pid": self.get_pid_settings() if self.tc_session is not None else None,
+            "valves": names_of_enums(self.get_valves()),
+            "temperatures": self.get_temperatures(),
+            "pressures": self.get_pressures(),
+            "heaters": names_of_enums(self.get_heaters()),
+            "pumps": names_of_enums(self.get_pumps())
+        }
+
+
     def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
         payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
         response = self._post_values(payload)
@@ -252,6 +274,10 @@ class BlueForsFridge_Driver(Connectable):
             raise ValueError(f"Valve number must be in [1, 23], got {valve_number}")
 
         return f"v{valve_number}"
+
+    def configure_pid_loop(self, setpoint: float) -> dict[str, Any]:
+        """Configure PID control parameters for the FSE heater via the TC API based on a lookup table."""
+        return self.configure_fse_temperature_pid_loop(setpoint)
 
     def configure_fse_temperature_pid_loop(
         self,
@@ -319,6 +345,10 @@ class BlueForsFridge_Driver(Connectable):
 
         return self._tc_post("heater/update", payload)
 
+    def enable_pid_loop(self) -> dict[str, Any]:
+        """Enable PID mode on the FSE heater."""
+        return self.enable_fse_temperature_pid_loop()
+
     def enable_fse_temperature_pid_loop(self) -> dict[str, Any]:
         """Enable PID mode on the FSE heater."""
         return self._tc_post("heater/update", {
@@ -326,6 +356,10 @@ class BlueForsFridge_Driver(Connectable):
             "pid_mode": 1,
             "active": True,
         })
+
+    def disable_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
+        """Disable PID mode for the FSE heater."""
+        return self.disable_fse_temperature_pid_loop(keep_heater_active)
 
     def disable_fse_temperature_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
         """Disable PID mode for the FSE heater."""
