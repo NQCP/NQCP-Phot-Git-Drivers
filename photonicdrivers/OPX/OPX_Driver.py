@@ -16,15 +16,20 @@ HIGH = 1
 LOW = 0
 
 class OPX_Driver(Connectable):
-    def __init__(self, ip_address='10.209.64.242', cluster_name="Cluster_1", qop_port=None):
+    def __init__(self, ip_address='10.209.64.242', cluster_name="Cluster_1", qop_port=None,
+                 timeout=None):
         self.ip_address = ip_address
         self.cluster_name = cluster_name
         self.qop_port = qop_port
+        # Seconds the gateway calls may take - including adding a program to the queue, which
+        # compiles it. None: qm's default (60 s); a large unrolled program needs longer.
+        self.timeout = timeout
         self.sequence_stack = []
 
     def connect(self) -> None:
         ### Create a QuantumMachinesManager instance for the OPX and set it as the driver
-        self.driver = QuantumMachinesManager(host=self.ip_address, port=self.qop_port, cluster_name=self.cluster_name)
+        self.driver = QuantumMachinesManager(host=self.ip_address, port=self.qop_port,
+                                             cluster_name=self.cluster_name, timeout=self.timeout)
     
     def disconnect(self) -> None:
         self.driver = None
