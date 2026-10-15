@@ -50,6 +50,29 @@ class SNSPD_SQ_Driver(Connectable):
         data = self.websq.acquire_cnts(numberOfMeasurements)
         print(data)
         return data
+
+    def _counts_thread(self):
+        if not getattr(self.websq, "connected", False) or getattr(self.websq, "cnts", None) is None:
+            raise RuntimeError("SNSPD_SQ_Driver is not connected (call connect() first).")
+        return self.websq.cnts
+
+    def get_latest_counts(self, number_of_measurements: int = 1) -> list:
+        """The newest number_of_measurements count rows already received, oldest first, each
+        [timestamp, counts channel 1, ..., counts channel N] (counts per measurement period) -
+        WITHOUT waiting: unlike getCounts it never blocks (getCounts waits for new samples with no
+        timeout and hangs if the counts stream stops). Read only; fewer rows if fewer arrived (the
+        manufacturer keeps the last 100). Copies, so the caller may modify them."""
+        thread = self._counts_thread()
+        with thread.lock:
+            rows = thread.cnts[-int(number_of_measurements):] if number_of_measurements > 0 else []
+            return [list(row) for row in rows]
+
+    def get_counts_sample_number(self) -> int:
+        """How many count rows have been received since connect() - if it stops growing between
+        two calls one measurement period apart, the counts stream has stopped. Read only."""
+        thread = self._counts_thread()
+        with thread.lock:
+            return int(thread.n)
     
     def set_measurement_period(self, integrationtime_ms:int) -> None:
         self.websq.set_measurement_periode(integrationtime_ms)
