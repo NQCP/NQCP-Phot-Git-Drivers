@@ -75,6 +75,17 @@ class Swabian_TimeTagger_Driver(Connectable):
     def initialise_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
         return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, binwidth = bin_width_ps, n_bins=num_bins)
 
+    def initialise_readout_pair_map(self, trigger_channel: int, click_channel: int, window_lo_ps, window_hi_ps,
+                                    window_block, window_u, n_blocks: int, n_u: int, expected_period_ps: float,
+                                    period_tolerance: float = 0.01):
+        """Every click pair between readout time bins of the same block (same period and the next one) -
+        Readout_Pair_Map.py. Runs here, next to the tagger. Pass the window table as tuples (by value
+        over rpyc); getData() returns plain values."""
+        from photonicdrivers.TimeTaggers.Readout_Pair_Map import Readout_Pair_Map
+        return Readout_Pair_Map(self.connection, trigger_channel, click_channel, tuple(window_lo_ps),
+                                tuple(window_hi_ps), tuple(window_block), tuple(window_u), n_blocks, n_u,
+                                expected_period_ps, period_tolerance)
+
     def initialise_frequency_stability(self, channel: int, steps: list[int], average: int = 1000, trace_len: int = 1000):
         return TimeTagger.FrequencyStability(tagger=self.connection, channel=channel, steps=steps, average=average, trace_len=trace_len)
 
