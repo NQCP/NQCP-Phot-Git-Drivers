@@ -1,6 +1,7 @@
 from photonicdrivers.Abstract.Connectable import Connectable
 import pyvisa
 import logging
+from typing import Optional
 
 
 class Santec_TSL570_driver(Connectable):
@@ -181,6 +182,24 @@ class Santec_TSL570_driver(Connectable):
         operation_status = int(return_msg)
         return operation_status
 
+    def wait_for_operation_complete(
+        self, poll_interval_s: float = 0.1, timeout_s: Optional[float] = None
+    ) -> bool:
+        """
+        Wait until the instrument reports operation complete.
+
+        Returns:
+            bool: True when complete, False if timeout is reached.
+        """
+        from time import sleep, time
+
+        start_time = time()
+        while self.get_operation_status() == 0:
+            if timeout_s is not None and (time() - start_time) > timeout_s:
+                return False
+            sleep(poll_interval_s)
+        return True
+
     def set_wavelength(self, wavelength_nm: float) -> None:
         """
         Set wavelength [nm] of the laser
@@ -193,6 +212,66 @@ class Santec_TSL570_driver(Connectable):
 
         msg = ":WAVelength  " + str(wavelength_nm) # + "e-9"
         self.laser.write(msg)
+
+    def clear_status(self) -> None:
+        """Clear instrument status registers."""
+        self.laser.write("*CLS")
+
+    def reset(self) -> None:
+        """Reset instrument to default state."""
+        self.laser.write("*RST")
+
+    def set_legacy_command_set(self, enabled: bool) -> None:
+        """Select legacy (True) or modern (False) command set."""
+        self.laser.write(f"SYST:COMM:COD {0 if enabled else 1}")
+
+    def set_gpib_delimiter(self, delimiter: int) -> None:
+        """Set GPIB command delimiter."""
+        self.laser.write(f"SYST:COMM:GPIB:DEL {delimiter}")
+
+    def set_auto_power_attenuation(self, enabled: bool) -> None:
+        """Enable or disable automatic power attenuation mode."""
+        self.laser.write(f"POW:ATT:AUT {1 if enabled else 0}")
+
+    def set_coherence_control(self, enabled: bool) -> None:
+        """Enable or disable coherence control."""
+        self.laser.write(f"COHCtrl {1 if enabled else 0}")
+
+    def set_shutter_open(self, is_open: bool) -> None:
+        """Open or close the internal shutter."""
+        self.laser.write(f"POW:SHUT {0 if is_open else 1}")
+
+    def set_sweep_start_wavelength(self, wavelength_nm: float) -> None:
+        """Set wavelength sweep start in nm."""
+        self.laser.write(f":WAV:SWE:STAR {wavelength_nm}")
+
+    def set_sweep_stop_wavelength(self, wavelength_nm: float) -> None:
+        """Set wavelength sweep stop in nm."""
+        self.laser.write(f":WAV:SWE:STOP {wavelength_nm}")
+
+    def set_sweep_speed(self, speed_nm_per_s: float) -> None:
+        """Set wavelength sweep speed in nm/s."""
+        self.laser.write(f":WAV:SWE:SPE {speed_nm_per_s}")
+
+    def get_sweep_speed(self) -> float:
+        """Get configured wavelength sweep speed in nm/s."""
+        return float(self.laser.query(":WAV:SWE:SPE?").strip())
+
+    def set_trigger_output_step(self, step_wavelength_nm: float) -> None:
+        """Set trigger output step size in nm."""
+        self.laser.write(f":TRIG:OUTP:STEP {step_wavelength_nm}")
+
+    def set_sweep_cycles(self, cycles: int) -> None:
+        """Set number of sweep cycles."""
+        self.laser.write(f":WAV:SWE:CYCL {cycles}")
+
+    def start_sweep(self) -> None:
+        """Start wavelength sweep."""
+        self.laser.write(":WAV:SWE 1")
+
+    def get_sweep_status(self) -> int:
+        """Get sweep status; 0 indicates finished."""
+        return int(self.laser.query(":WAV:SWE?").strip())
 
     def set_wavelength_unit(self, unit: str):
         
