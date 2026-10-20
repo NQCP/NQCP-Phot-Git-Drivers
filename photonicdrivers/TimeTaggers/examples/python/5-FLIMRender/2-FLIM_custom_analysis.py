@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from intensity_renderer import IntensityRenderer
-from TimeTagger import createTimeTaggerVirtual, TimeTagStream, CountBetweenMarkers
+from Swabian.TimeTagger import createTimeTaggerVirtual, TimeTagStream, CountBetweenMarkers
 
 show_timing_information = True
 

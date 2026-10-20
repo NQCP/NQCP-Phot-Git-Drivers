@@ -8,7 +8,7 @@ Histogram2D window.
 """
 
 import matplotlib.pyplot as plt
-import TimeTagger
+from Swabian import TimeTagger
 
 tagger = TimeTagger.createTimeTagger()
 

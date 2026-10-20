@@ -4,7 +4,7 @@ We use the built-in test signal within the Time Tagger.
 The applied signal is the very same but has a fixed temporal shift depending on the channel used.
 We will compensate for this delay and repeat the measurement to verify the compensation."""
 
-import TimeTagger
+from Swabian import TimeTagger
 import numpy as np
 
 

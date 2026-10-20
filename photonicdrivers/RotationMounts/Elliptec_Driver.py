@@ -12,10 +12,10 @@ class Elliptec_Driver(Connectable):
 
         Args:
             port (str): The connection port for the rotation stage.
-            address (str): The address of the rotation stage (default is 'all'). Must be between 0 and 15. Addresses above 10 represent letters (A, B, C, D, E, F) but cannot be used.
+            address (str | list): The address of the rotation stage (default is 'all'). Must be between 0 and 15. Addresses above 10 represent letters (A, B, C, D, E, F) but cannot be used.
         """
         self.port = port
-        self.addresses = addresses
+        self.addresses: str | list = addresses
         self.driver: ElliptecMotor = None
         self.latest_command_time: float | None = None
 
@@ -27,6 +27,7 @@ class Elliptec_Driver(Connectable):
         Establishes a connection to the ELL6 rotation stage.
         """
         self.driver = ElliptecMotor(conn=self.port, addrs=self.addresses)
+        self.serial_number: str = self.driver.get_device_info()[0]
 
     def disconnect(self) -> None:
         """
@@ -61,7 +62,6 @@ class Elliptec_Driver(Connectable):
         """
         self.update_command_time()
         return self.driver.get_connected_addrs()
-    
 
     def get_position(self, address) -> float:
         self.update_command_time()

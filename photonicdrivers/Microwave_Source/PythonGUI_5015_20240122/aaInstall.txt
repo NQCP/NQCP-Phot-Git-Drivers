@@ -1,0 +1,79 @@
+The files in this directory demonstrate a simple Python/Tk GUI interface for the Valon 5015 synthesizer.
+
+Preparing your Computer.
+========================
+
+1. Install Python2.7.
+---------------------
+
+To run the V5015 Configuration Manager, you will need Python2.7 
+and the Python library "pyserial", including its "tools" directory.
+
+    To use Python3, at a minimum, you will need to modify the serial port module to 
+    convert back and forth between unicode and 8-bit characters.  
+    Python3 also contains incompatible changes in the Tkinter module.  
+    I don't know what else.
+
+On a Linux system terminal, enter
+    sudo apt install python2.7
+        and
+    sudo apt install python-pip    
+        and then
+    sudo pip install pyserial==2.7
+
+When you run python, you may see a message about a missing tools directory.  Try:
+   	sudo pip install --upgrade pyserial
+    
+On Microsoft Windows
+    Navigate your web browser to www.python.org/downloads/windows, 
+    and select a file for installing Python2.7 that is appropriate for your hardware (32 or 64 bit).
+    You can get PySerial at https://sourceforge.net/projects/pyserial/files/pyserial/2.7/
+
+2.  Gain Access to USB ports.
+-----------------------------
+    On Linux systems, by default, users are blocked from opening USB ports.
+    This causes early termination of the Configuration Manager.
+    At a shell prompt, add your user name to the "dialout" group.
+        sudo adduser <Your User Name> dialout
+ 
+3.  Copy the V5015CM files to your bin directory.
+-------------------------------------------------
+    
+You can (maybe temporarily) create and use a bin directory in your existing user directory.
+In /home/<your user name>
+    mkdir bin 
+    cd bin
+    mkdir V5015CM
+Or if you have multiple users, you could use /usr/local/bin/V5015CM
+
+Unzip V5015cm.zip into your new V5015CM directory.
+
+Running the V5015 Configuration Manager.
+========================================
+
+V5015CM.py contains the program's 'main' entry point.  
+At a shell prompt, type 
+
+	python V5015CM.py
+
+If the above command runs Python3 instead of Python2, terminate python,
+and try running the program with:
+
+    python2 V5015CM.py
+    or
+    python2.7 V5015CM.py
+    
+Or run Idle, and load V5015CM.py, and then press F5 to start execution.
+Again, if Python3 is installed, you may need to run "Idle2" or "Idle2.7"
+
+V5009CM has been tested with python2.7 on:
+o   A PC running Windows 7.
+o   Laptops running Mint 18 and lubuntu 18.4.
+o   A Raspberry Pi B+ running Raspbian.
+
+You are free to use and modify these files, and share them.
+
+There is very little error handling code here.  
+For use in a production environment, you will want to add some.
+
+Peter McKone

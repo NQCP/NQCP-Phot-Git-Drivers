@@ -6,7 +6,7 @@ import sys
 from time import sleep
 import numpy as np
 from matplotlib import pyplot as plt
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

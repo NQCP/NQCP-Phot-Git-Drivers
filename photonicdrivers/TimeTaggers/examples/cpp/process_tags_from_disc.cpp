@@ -4,7 +4,7 @@ C++. For post-processing, a start-stop measurement is implemented for the
 channels 1-2. An example file with 16M events can be generated with this python
 code:
 
-  from TimeTagger import *
+  from Swabian.TimeTagger import *
   from time import sleep
   tt = createTimeTagger()
   tt.setTestSignal([1,2], True)

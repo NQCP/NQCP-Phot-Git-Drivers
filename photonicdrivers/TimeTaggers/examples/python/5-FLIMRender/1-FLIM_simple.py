@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from TimeTagger import TimeTagStream, Flim, CountBetweenMarkers, createTimeTaggerVirtual
+from Swabian.TimeTagger import TimeTagStream, Flim, CountBetweenMarkers, createTimeTaggerVirtual
 
 show_timing_information = True
 

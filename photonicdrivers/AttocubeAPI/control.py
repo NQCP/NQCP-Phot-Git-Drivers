@@ -1,11 +1,11 @@
-    
+
 class Control():
 
     def __init__(self, device):
         self.device = device
         self.interface_name = "com.attocube.amc.control"
-            
-    def MultiAxisPositioning(self, set1, set2, set3, target1, target2, target3):
+
+    def  MultiAxisPositioning(self, set1, set2, set3, target1, target2, target3):
         """
         Simultaneously set 3 axes positions
             and get positions to minimize network latency
@@ -442,7 +442,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "searchReferencePosition", [axis])
         self.device.handleError(response)
-        return 
+        return
 
     def setActorParametersByName(self, axis, actorname):
         """
@@ -458,7 +458,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setActorParametersByName", [axis, actorname])
         self.device.handleError(response)
-        return 
+        return
 
     def setActorParametersJson(self, axis, json_dict):
         """
@@ -474,7 +474,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setActorParametersJson", [axis, json_dict])
         self.device.handleError(response)
-        return 
+        return
 
     def setActorSensitivity(self, axis, sensitivity):
         """
@@ -483,14 +483,14 @@ class Control():
         Parameters
         ----------
         axis:  [0|1|2]
-        sensitivity: 
+        sensitivity:
 
         Returns
         -------
         """
         response = self.device.request(self.interface_name + "." + "setActorSensitivity", [axis, sensitivity])
         self.device.handleError(response)
-        return 
+        return
 
     def setAutoMeasure(self, axis, enable):
         """
@@ -506,7 +506,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setAutoMeasure", [axis, enable])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlAmplitude(self, axis, amplitude):
         """
@@ -522,7 +522,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlAmplitude", [axis, amplitude])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlAutoReset(self, axis, enable):
         """
@@ -538,7 +538,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlAutoReset", [axis, enable])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlFixOutputVoltage(self, axis, amplitude_mv):
         """
@@ -554,7 +554,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlFixOutputVoltage", [axis, amplitude_mv])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlFrequency(self, axis, frequency):
         """
@@ -571,7 +571,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlFrequency", [axis, frequency])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlMove(self, axis, enable):
         """
@@ -587,7 +587,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlMove", [axis, enable])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlOutput(self, axis, enable):
         """
@@ -605,7 +605,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlOutput", [axis, enable])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlReferenceAutoUpdate(self, axis, enable):
         """
@@ -622,7 +622,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlReferenceAutoUpdate", [axis, enable])
         self.device.handleError(response)
-        return 
+        return
 
     def setControlTargetRange(self, axis, range):
         """
@@ -638,7 +638,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setControlTargetRange", [axis, range])
         self.device.handleError(response)
-        return 
+        return
 
     def setCrosstalkThreshold(self, axis, threshold, slipphasetime):
         """
@@ -655,7 +655,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setCrosstalkThreshold", [axis, threshold, slipphasetime])
         self.device.handleError(response)
-        return 
+        return
 
     def setExternalSensor(self, axis, enabled, ignoreFunctionError=True):
         """
@@ -665,7 +665,7 @@ class Control():
         Parameters
         ----------
         axis:  [0|1|2]
-        enabled: 
+        enabled:
         ignoreFunctionError : boolean (default: True)
             True = Do not raise an AttoException if a warning code is returned.
 
@@ -691,7 +691,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setFinePositioningRange", [axis, range])
         self.device.handleError(response)
-        return 
+        return
 
     def setFinePositioningSlewRate(self, axis, slewrate):
         """
@@ -707,7 +707,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setFinePositioningSlewRate", [axis, slewrate])
         self.device.handleError(response)
-        return 
+        return
 
     def setMotionControlThreshold(self, axis, threshold):
         """
@@ -723,7 +723,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setMotionControlThreshold", [axis, threshold])
         self.device.handleError(response)
-        return 
+        return
 
     def setReset(self, axis):
         """
@@ -740,7 +740,7 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setReset", [axis])
         self.device.handleError(response)
-        return 
+        return
 
     def setSensorDirection(self, axis, inverted):
         """
@@ -750,14 +750,14 @@ class Control():
         Parameters
         ----------
         axis:  [0|1|2]
-        inverted: 
+        inverted:
 
         Returns
         -------
         """
         response = self.device.request(self.interface_name + "." + "setSensorDirection", [axis, inverted])
         self.device.handleError(response)
-        return 
+        return
 
     def setSensorEnabled(self, axis, value):
         """
@@ -774,5 +774,4 @@ class Control():
         """
         response = self.device.request(self.interface_name + "." + "setSensorEnabled", [axis, value])
         self.device.handleError(response)
-        return 
-
+        return

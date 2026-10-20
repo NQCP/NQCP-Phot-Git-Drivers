@@ -12,7 +12,7 @@ the test oscillator."""
 
 from matplotlib import pyplot as plt
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 
 
 def measure_frequency_stability(tagger, channel, figure_name):

@@ -1,0 +1,92 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "MeasurementExamples/1.0.0": {
+        "dependencies": {
+          "OxyPlot.Wpf": "2.1.2",
+          "SwabianInstruments.TimeTagger": "2.17.4.0"
+        },
+        "runtime": {
+          "MeasurementExamples.dll": {}
+        }
+      },
+      "OxyPlot.Core/2.1.2": {
+        "runtime": {
+          "lib/netstandard2.0/OxyPlot.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "OxyPlot.Wpf/2.1.2": {
+        "dependencies": {
+          "OxyPlot.Core": "2.1.2",
+          "OxyPlot.Wpf.Shared": "2.1.2"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OxyPlot.Wpf.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "OxyPlot.Wpf.Shared/2.1.2": {
+        "dependencies": {
+          "OxyPlot.Core": "2.1.2"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OxyPlot.Wpf.Shared.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.0"
+          }
+        }
+      },
+      "SwabianInstruments.TimeTagger/2.17.4.0": {
+        "runtime": {
+          "SwabianInstruments.TimeTagger.dll": {
+            "assemblyVersion": "2.17.4.0",
+            "fileVersion": "2.17.4.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MeasurementExamples/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OxyPlot.Core/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/BuPL1Wa7ZhpKA2DBe72md+S8PgIHF+UP/NsKfO9BiheXnbns1/tqS7s2MWIR1xFy5i+PWVC67KziGPY48mNgA==",
+      "path": "oxyplot.core/2.1.2",
+      "hashPath": "oxyplot.core.2.1.2.nupkg.sha512"
+    },
+    "OxyPlot.Wpf/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-udX9T1YC5BnnTZkVSNgJqvzXLaBcZDYG32YHWlDELk1UDWQeJi0Z2jBLoIiv4hcW16N4ptYO5cGC3e8m5/z0hw==",
+      "path": "oxyplot.wpf/2.1.2",
+      "hashPath": "oxyplot.wpf.2.1.2.nupkg.sha512"
+    },
+    "OxyPlot.Wpf.Shared/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6Cj7UET7AS5gVf77+avKG+PzaKQhTdqRYbyBTCPWW9JEbAsojpNdLICjVXO+5o/HP+DjshZJ6oCFw8eyRnHtCA==",
+      "path": "oxyplot.wpf.shared/2.1.2",
+      "hashPath": "oxyplot.wpf.shared.2.1.2.nupkg.sha512"
+    },
+    "SwabianInstruments.TimeTagger/2.17.4.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

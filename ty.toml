@@ -1,0 +1,7 @@
+[environment]
+extra-paths = [
+    "../NQCP-Phot-Git-Drivers",
+    "../NQCP-Phot-Git-Instruments",
+    "../NQCP-Phot-Git-LabServer",
+    "../NQCP-Phot-Git-Controllers"
+]

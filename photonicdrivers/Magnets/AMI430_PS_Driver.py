@@ -1,6 +1,5 @@
 import socket
 import time
-
 from photonicdrivers.Abstract.Connectable import Connectable
 
 
@@ -18,19 +17,34 @@ class AMI430_PS_Driver(Connectable):
         self.port = port
         self.timeout = 10
         self.termination_char = "\n"
+        self._buffer = ""  # Buffer to store incomplete responses
 
     def connect(self) -> None:
+        self._buffer = ""  # Reset buffer on connect
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.settimeout(self.timeout)
         self.connection.connect((self.ip_address, self.port))
 
-        # Read and discard the "Hello" message
-        hello_msg = self.connection.recv(1024).decode("utf-8")
+        # Read and discard the "Hello" message using proper line reading
+        # The AMI430 sends a welcome message upon connection
+        hello_msg = self.__read_line()
         print(f"Connected: {hello_msg.strip()}")
+        
+        # Clear any additional data that might be in the buffer
+        self.__clear_buffer()
 
-        self.unit = self.get_unit()
+        self.field_unit = self.get_field_unit()
+        self.__set_field_unit("T")
+        self.field_unit = self.get_field_unit()
+
+        self.time_unit = self.get_time_unit()
+        self.__set_time_unit("sec")
+        self.time_unit = self.get_time_unit()
+
+        
 
     def disconnect(self) -> None:
+        self._buffer = ""  # Clear buffer on disconnect
         self.connection.close()
 
     def is_connected(self) -> bool:
@@ -49,16 +63,24 @@ class AMI430_PS_Driver(Connectable):
     def set_control_local(self) -> str:
         return self.__query("SYSTem:LOCal")
 
-    def get_unit(self) -> str:
+    def get_field_unit(self) -> str:
         """
         Returns "kG" for kilogauss or "T" for tesla
         """
         response = self.__query("FIELD:UNITS?")
-        return "T" if response == "1" else "kG"
 
-    def set_unit(self, unit: str) -> str:
+        if response == "0":
+            return "kG"
+        elif response == "1":
+            return "T"
+        else:
+            warning_str = f"get_field_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_field_unit(self, unit: str) -> str:
         """
-        Unit options are kG or T.
+        Unit options are "kG" or "T".  CONFigure:RAMP:RATE:UNITS
         """
         if unit == "kG":
             response = self.__query("CONFigure:FIELD:UNITS 0")
@@ -69,7 +91,38 @@ class AMI430_PS_Driver(Connectable):
             print(warning_str)
             return warning_str
 
-        self.unit = self.get_unit()
+        self.field_unit = self.get_field_unit()
+        return response
+    
+    def get_time_unit(self) -> str:
+        """
+        Returns "sec" for seconds or "min" for minutes
+        """
+        response = self.__query("RAMP:RATE:UNITS?")
+
+        if response == "0":
+            return "sec"
+        elif response == "1":
+            return "min"
+        else:
+            warning_str = f"get_time_unit query did not return 0 or 1. Result cannot be interpreted"
+            print(warning_str)
+            return warning_str
+
+    def __set_time_unit(self, unit: str) -> str:
+        """
+        Unit options are "sec" for seconds or "min" for minutes.
+        """
+        if unit == "sec":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 0")
+        elif unit == "min":
+            response = self.__query("CONFigure:RAMP:RATE:UNITS 1")
+        else:
+            warning_str = f"Unit must be sec or min, not {unit}"
+            print(warning_str)
+            return warning_str
+
+        self.field_unit = self.get_time_unit()
         return response
 
     def get_limit(self) -> str:
@@ -89,7 +142,7 @@ class AMI430_PS_Driver(Connectable):
             return warning_str
         return self.__query(f"CONFigure:CURRent:LIMit {limit}")
 
-    def ramp_up(self, wait_while_ramping: bool = True) -> str:
+    def ramp(self, wait_while_ramping: bool = True) -> str:
         """
         Ramps to the target setpoint
         """
@@ -98,14 +151,6 @@ class AMI430_PS_Driver(Connectable):
             self.__wait_for_state([2, 8])  # HOLDING or AT ZERO
         return response
 
-    def ramp_down(self, wait_while_ramping: bool = True) -> str:
-        """
-        Manually ramps down
-        """
-        response = self.__query("DECR")
-        if wait_while_ramping:
-            print("Manual ramp down - will continue until limit or stopped")
-        return response
 
     def ramp_to_zero(self, wait_while_ramping: bool = True) -> str:
         """
@@ -145,7 +190,7 @@ class AMI430_PS_Driver(Connectable):
         }
         return state_map.get(state_code, f"Unknown state: {state_code}"), state_code
 
-    def __wait_for_state(self, target_states: list, timeout: float = 600):
+    def __wait_for_state(self, target_states: list, timeout: float = 1800):
         """
         Wait for the magnet to reach one of the target states
         """
@@ -156,12 +201,15 @@ class AMI430_PS_Driver(Connectable):
                 break
 
             state = self.__query("STATE?")
-            print(f"Current state: {self.get_sweep_mode()}\r", end="")
+            print(f"\rCurrent state: {self.get_sweep_mode()} | Current field: {self.get_field()} T", end="", flush=True)
 
-            if int(state) in target_states:
-                break
+            try:
+                if int(state) in target_states:
+                    break
+            except ValueError:
+                print(f"Invalid state received: {state}")
 
-            time.sleep(0.5)
+            time.sleep(1)
 
     def get_current(self) -> float:
         """
@@ -310,7 +358,7 @@ class AMI430_PS_Driver(Connectable):
     def get_all_settings(self) -> dict:
         settings = {
             "ID": self.get_id(),
-            "Unit": self.get_unit(),
+            "Unit": self.get_field_unit(),
             "Limit": self.get_limit(),
             "Current": self.get_current(),
             "Current_Target": self.get_current_target(),
@@ -329,17 +377,85 @@ class AMI430_PS_Driver(Connectable):
 
     ################################ PRIVATE METHODS ################################
 
+    def __read_line(self) -> str:
+        """
+        Read a single line from the socket, properly handling the termination character.
+        This prevents reading multiple responses at once and ensures proper parsing.
+        
+        Returns:
+            str: A single line response with termination characters stripped.
+        """
+        while True:
+            # Check if we already have a complete line in the buffer
+            if "\r\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\r\n", 1)
+                return line.strip()
+            elif "\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\n", 1)
+                return line.strip()
+            
+            # Need to read more data from socket
+            try:
+                chunk = self.connection.recv(1024).decode("utf-8")
+                if not chunk:
+                    # Connection closed
+                    if self._buffer:
+                        line = self._buffer.strip()
+                        self._buffer = ""
+                        return line
+                    return ""
+                self._buffer += chunk
+            except socket.timeout:
+                # Timeout - return whatever we have
+                if self._buffer:
+                    line = self._buffer.strip()
+                    self._buffer = ""
+                    return line
+                raise
+
+    def __clear_buffer(self) -> None:
+        """
+        Clear any pending data in the receive buffer.
+        Useful after connect or when recovering from errors.
+        """
+        self.connection.setblocking(False)
+        try:
+            while True:
+                data = self.connection.recv(1024)
+                if not data:
+                    break
+        except BlockingIOError:
+            pass  # No more data available
+        finally:
+            self.connection.setblocking(True)
+            self.connection.settimeout(self.timeout)
+        self._buffer = ""
+
     def __query(self, command_str: str) -> str:
+        """
+        Send a command and optionally read the response.
+        
+        For commands ending with '?', reads and returns the response.
+        For other commands, returns 0 after sending.
+        
+        Args:
+            command_str: The command to send (with or without '?')
+            
+        Returns:
+            str: The response for queries, or 0 for commands.
+        """
+        # Clear any stale data before sending a new command
+        self.__clear_buffer()
+        
         command = f"{command_str}{self.termination_char}"
         self.connection.sendall(command.encode("utf-8"))
 
         if not command_str.endswith("?"):
+            # Small delay to allow command processing
+            time.sleep(0.05)
             return 0
 
-        # Wait for response
-        time.sleep(0.1)
-
-        response_raw = self.connection.recv(4096)
-        response = response_raw.decode("utf-8").strip()
-
+        # Read exactly one response line
+        response = self.__read_line()
+        
         return response

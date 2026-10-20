@@ -1,7 +1,7 @@
 """In this example, we measure the jitter/resolution of the Time Tagger channels with the built-in test signals
 and compare the results to the specifications of the Time Tagger, which is connected.
 """
-import TimeTagger
+from Swabian import TimeTagger
 import numpy as np
 import matplotlib.pyplot as plt
 import time

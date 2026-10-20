@@ -72,7 +72,8 @@ class NewFocus_8742_Driver(Connectable):
 
         @param axis_number_str: {0,1,2,3}
         """
-        self._write_command(str(axis_number_str) + 'PA')
+        raise NotImplementedError("Use move_relative_position instead")
+        # self._write_command(str(axis_number_str) + 'PA')
 
     def move_relative_position(self, axis_number_str, distance_str):
         """
@@ -203,7 +204,7 @@ class NewFocus_8742_Driver(Connectable):
 
             # remove the newline characters if present
             if b"\r\n" in response:
-                response, dummy = response.split(b'\r\n')
+                response = response.split(b'\r\n')[0]
 
             # convert from byte string to string
             response = response.decode('utf-8')
@@ -223,52 +224,3 @@ class NewFocus_8742_Driver(Connectable):
         # print(MAC_joinedStr)
 
         return MAC_joinedStr
-
-# This is clearly an instrument
-class PicoMotor_Driver:
-
-    def __init__(self, driver: NewFocus_8742_Driver, axis_number: int):
-        self.driver = driver
-        self.axis_number = axis_number
-
-    def move_target_position(self):
-        """
-        Moves a given axis of the Picomotor to a specified target position.
-
-        @param axis_number_str: {1,2,3,4}
-        """
-
-        try:
-            self.driver.move_target_position(self.axis_number)
-        except Exception as exception:
-            print(exception)
-
-    def move_relative_position(self, distance: int):
-        """
-        Moves a given axis of the Picomotor a relative position given by the distance parameter.
-
-        @param axis_number: Parameter to identify the axis to be moved: {1,2,3,4}
-        @param distance: The distance to moved: int32
-        @return: None
-        """
-        try:
-            self.driver.move_relative_position(self.axis_number, distance)
-        except Exception as exception:
-            print(exception)
-
-
-if __name__ == "__main__":
-    # Create JoystickHandler instance
-
-    pico_motor_controller = NewFocus_8742_Driver()
-    pico_motor_controller.connect()
-    pico_motor_x = PicoMotor_Driver(pico_motor_controller, 1)
-    pico_motor_y = PicoMotor_Driver(pico_motor_controller, 2)
-
-    while True:
-        plt.pause(0.01)
-        pico_motor_x.move_relative_position(1)
-        plt.pause(0.01)
-        pico_motor_y.move_relative_position(1)
-
-

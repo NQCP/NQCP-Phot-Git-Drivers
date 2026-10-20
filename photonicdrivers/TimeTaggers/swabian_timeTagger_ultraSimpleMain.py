@@ -1,5 +1,5 @@
 # from photonicdrivers.SNSPDs.FilesFromManufacturer.WebSQControl import WebSQControl
-import TimeTagger
+from Swabian import TimeTagger
 from matplotlib import pyplot as plt
 from time import sleep
 

@@ -58,7 +58,7 @@ def no_input_state() -> PSControllerState:
         DpadRight=False)
 
 def deadzoned(value: float, deadzone: float):
-    return (abs(value) - deadzone) / (1 - deadzone) * np.sign(value)
+    return 0 if abs(value) <= deadzone else (abs(value) - deadzone) / (1 - deadzone) * np.sign(value)
 
 class Joystick_Driver(Connectable):
     def __init__(self):

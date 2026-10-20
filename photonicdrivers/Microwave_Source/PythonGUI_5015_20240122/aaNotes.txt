@@ -1,0 +1,24 @@
+serial.tools.list_ports.comports() 
+----------------------------------
+This procedure reports different results on diffierent platforms.
+To see what it returns on your system:
+    run python -m serial.tools.list_ports -v
+
+1.  On Linux Mint, it reports:
+
+/dev/ttyUSB0        
+    desc: FT232R USB UART
+    hwid: USB VID:PID=0403:6001 SER=A49QLB6G LOCATION=4-1
+
+2.  On a Raspberry Pi running Raspbian (modified Debian), it reports:
+
+/dev/ttyUSB0
+    desc: Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
+    hwid: USB VID:PID=0403:6001: SNR=A49QLB6G
+    
+3.  On a PC running Windows 7, it reports:
+
+COM13
+    desc: USB Serial Port (COM13)
+    hwid: FTDIBUS\VID_0403+PID_6001+A49QLB6GA\0000
+

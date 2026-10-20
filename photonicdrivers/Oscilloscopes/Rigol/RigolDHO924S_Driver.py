@@ -1,7 +1,7 @@
 import pyvisa
 
 
-class RigolDHO924SDriver:
+class RigolDHO924S_Driver:
     """Driver for the Rigol DHO924S Oscilloscope over TCP/IP using PyVISA"""
     def __init__(self, ip_address: str) -> None:
         self.ip_address = ip_address
@@ -90,3 +90,15 @@ class RigolDHO924SDriver:
         Sets the oscilloscope to single acquisition mode.
         """
         self.write(":SINGle")
+
+    def set_source(self, channel):
+        self.write(f":WAV:SOUR CHAN{channel}")
+        
+    def set_saving_to_ascii(self):
+        self.write(":WAV:MODE NORM")
+        self.write(":WAV:FORM ASCii")
+    
+    def get_source(self):
+        return self.query(f":WAV:SOUR CHAN?")
+    
+    

@@ -9,7 +9,7 @@ It yields a high input rate, decreasing toward higher-order coincidences.
 
 import itertools
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 
 
 # Define a useful function that will be used to measure and print the count rates

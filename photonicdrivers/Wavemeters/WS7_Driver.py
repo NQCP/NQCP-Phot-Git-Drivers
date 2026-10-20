@@ -22,7 +22,7 @@ class WS7_Driver(Connectable):
     """
     WS7 Wavelength Meter Driver. Channels are 1-indexed
     """
-    def __init__(self, dll_path: str="C:\Windows\System32\wlmData.dll"):
+    def __init__(self, dll_path: str=r"C:\Windows\System32\wlmData.dll"):
         self._dll = ctypes.WinDLL(dll_path)
         self._bind_functions()
         self.exposure_limits = None
@@ -54,6 +54,44 @@ class WS7_Driver(Connectable):
 
     def get_wavelength_nm(self, channel: int) -> float:
         return error_checked(self._GetWavelengthNum(channel, 0.0)) if self.is_measuring() else None
+
+    def get_frequency_THz(self, channel: int) -> float:
+        """
+        Optical frequency [THz] of the given channel, as computed by the wavemeter itself.
+
+        Preferred over converting get_wavelength_nm() by hand: the DLL applies the same
+        air/vacuum refractive index correction it uses for the wavelength reading.
+
+        @return: frequency [THz], or None if the wavemeter is not measuring
+        """
+        return error_checked(self._GetFrequencyNum(channel, 0.0)) if self.is_measuring() else None
+
+    def get_frequency_GHz(self, channel: int) -> float:
+        """
+        Optical frequency [GHz] of the given channel.
+
+        @return: frequency [GHz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e3 if frequency_THz is not None else None
+
+    def get_frequency_MHz(self, channel: int) -> float:
+        """
+        Optical frequency [MHz] of the given channel.
+
+        @return: frequency [MHz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e6 if frequency_THz is not None else None
+
+    def get_frequency_Hz(self, channel: int) -> float:
+        """
+        Optical frequency [Hz] of the given channel.
+
+        @return: frequency [Hz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e12 if frequency_THz is not None else None
 
     def set_exposure(self, channel: int, exposure_ms: int, arrays: tuple[int, ...] = (1, 2)):
         """
@@ -112,6 +150,10 @@ class WS7_Driver(Connectable):
         self._GetWavelengthNum = self._dll.GetWavelengthNum
         self._GetWavelengthNum.argtypes = [c_int32, c_double]
         self._GetWavelengthNum.restype  = c_double
+
+        self._GetFrequencyNum = self._dll.GetFrequencyNum
+        self._GetFrequencyNum.argtypes = [c_int32, c_double]
+        self._GetFrequencyNum.restype  = c_double
 
         self._SetExposureModeNum = self._dll.SetExposureModeNum
         self._SetExposureModeNum.argtypes = [c_int32, c_bool]

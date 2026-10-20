@@ -22,25 +22,28 @@ classifiers = [
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
-    "numpy", 
-    "qcodes", 
-    "versioningit>=2.2.1", 
-    "pythonnet", 
-    "pyvisa", 
-    "toptica-lasersdk", 
-    "future", 
-    "wraps", 
-    "pyserial", 
-    "lakeshore", 
-    "pygame>=2.0", 
-    "pymodbus==3.6.9", 
-    "rpyc", 
-    "loguru", 
-    "pylablib", 
-    "timetagger",
+    "numpy",
+    "qcodes",
+    "versioningit>=2.2.1",
+    "pythonnet",
+    "pyvisa",
+    "toptica-lasersdk",
+    "future",
+    "wraps",
+    "pyserial",
+    "lakeshore",
+    "pygame>=2.0",
+    "pymodbus==3.6.9",
+    "rpyc",
+    "loguru",
+    "pylablib",
     "zeroconf",
     "pulsestreamer",
-    "pefile"]
+    "pefile",
+    "qm-octave",
+    "qm-qua",
+    "qualang-tools",
+]
 
 dynamic = ["version"]
 
@@ -52,6 +55,7 @@ content-type = "text/markdown"
 
 
 [project.optional-dependencies]
+attocube = ["atto_device"]
 test = [
     "coverage[toml]>=6.0.0",
     "deepdiff>=5.0.2",
@@ -216,6 +220,15 @@ distance = "{next_version}.dev{distance}+{branch}.{vcs}{rev}"
 dirty = "{next_version}.dev{distance}+{branch}.{vcs}{rev}.dirty"
 distance-dirty = "{next_version}.dev{distance}+{branch}.{vcs}{rev}.dirty"
 
+[tool.uv]
+# Ensure lock resolution always includes Windows compatibility.
+prerelease = "allow"
+required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]
+constraint-dependencies = ["pyqt5-qt5<5.15.18; sys_platform == 'win32' and platform_machine == 'AMD64'"]
+
+[tool.uv.sources]
+atto_device = { path = "N:/SCI-NBI-NQCP/Phot/manualsEtc/attocube/Software/attoDRY800_Software/api_atto-device-python_1.0.12/", editable = false }
+
 [tool.versioningit.vcs]
 method = "git"
 match = ["v*"]
@@ -224,5 +237,5 @@ match = ["v*"]
 source-file = "photonicdrivers/_version.py"
 build-file = "photonicdrivers/_version.py"
 
-[tools.setuptools]
-py-modules=[]
+[tool.setuptools]
+packages = ["photonicdrivers"]

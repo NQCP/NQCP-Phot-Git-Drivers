@@ -1,6 +1,6 @@
 from ctypes import *
 import ctypes.util
-from pyAndorSDK2 import atmcd_errors
+from . import atmcd_errors
 import platform
 import os
 import sys

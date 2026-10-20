@@ -2,7 +2,7 @@
 Track phase of multiple signals and write it to a CSV file
 """
 
-import TimeTagger
+from Swabian import TimeTagger
 from pathlib import Path
 from datetime import datetime
 import numpy

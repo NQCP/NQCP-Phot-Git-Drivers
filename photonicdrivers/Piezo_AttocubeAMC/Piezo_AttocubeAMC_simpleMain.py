@@ -1,7 +1,7 @@
 from photonicdrivers.Piezo_AttocubeAMC.Piezo_AttocubeAMC_Driver import Piezo_AttocubeAMC_Driver
 
 # has to run on the attocube PC
-ip = "192.168.1.1"
+ip = "10.209.68.152"
 
 # (2046444.326, 2170676.425, 3159894.639)
 

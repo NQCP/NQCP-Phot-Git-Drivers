@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import TimeTagger
+from Swabian import TimeTagger
 import numpy as np
 import numba
 

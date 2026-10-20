@@ -5,7 +5,7 @@ the DLS measurement. The bursts are simulated as time ranges of high homogeneous
 The bursts are detected based on the total count rate.
 """
 
-import TimeTagger
+from Swabian import TimeTagger
 from matplotlib import pyplot as plt
 
 TOC_WINDOW = 100_000_000

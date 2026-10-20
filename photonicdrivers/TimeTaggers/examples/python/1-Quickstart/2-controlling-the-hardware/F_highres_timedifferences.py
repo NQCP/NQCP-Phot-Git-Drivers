@@ -6,7 +6,7 @@ Under some conditions, heating effects of the hardware may be observed."""
 
 from matplotlib import pyplot as plt
 import numpy as np
-import TimeTagger
+from Swabian import TimeTagger
 
 
 def get_delay_and_jitter(x, y):

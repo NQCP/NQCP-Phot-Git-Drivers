@@ -8,7 +8,7 @@ second part, we use the FileReader to load the time tags from the ttbin file."""
 import tempfile
 from time import sleep
 import os
-import TimeTagger
+from Swabian import TimeTagger
 
 # Create a TimeTagger instance to control your hardware
 tagger = TimeTagger.createTimeTagger()

@@ -1,6 +1,6 @@
 """In this example, we look at methods that provide information on the Time Tagger(s) in your lab."""
 
-import TimeTagger
+from Swabian import TimeTagger
 import pprint
 
 available_taggers = TimeTagger.scanTimeTagger()

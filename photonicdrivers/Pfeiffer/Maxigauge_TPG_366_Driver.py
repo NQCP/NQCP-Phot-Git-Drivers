@@ -25,8 +25,8 @@ class Maxigauge_TPG_366_Driver(Connectable):
         try:
             self.get_id()
             return True
-        except:
-            False
+        except Exception:
+            return False
 
     def get_id(self) -> str:
         response_raw, command_acknowledged = self._query("AYT")

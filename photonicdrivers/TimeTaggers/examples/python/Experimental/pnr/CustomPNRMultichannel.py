@@ -1,4 +1,4 @@
-import TimeTagger
+from Swabian import TimeTagger
 from custom_pnr_constants import FRONT_EDGE, REAR_EDGE, LASER_CHANNEL, FOLDER, FILENAME, CALIBRATION_FILES
 from json import load
 import numba
