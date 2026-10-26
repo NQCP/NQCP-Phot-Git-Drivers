@@ -2,8 +2,7 @@ from Swabian import TimeTagger
 from Swabian.TimeTagger import TimeTagStreamBuffer
 import time
 from photonicdrivers.Abstract.Connectable import Connectable
-from FastFeedbackCoincidences import FastFeedbackCoincidences
-
+from photonicdrivers.TimeTaggers.FastForward.FastFeedbackCoincidences import FastFeedbackCoincidences
 
 # https://www.swabianinstruments.com/static/documentation/TimeTagger/tutorials/TimeTaggerRPC.html
 # If the "Time Tagger Lab" software is installed, code example can be found here C:\Program Files\Swabian Instruments\Time Tagger\examples
@@ -313,11 +312,19 @@ class Swabian_TimeTagger_Driver(Connectable):
             EXCLUSIVE_1,
             AUX_OUT_CANNEL_2 = None,
             AUX_IN_CHANNEL_2 = None,
-            OUTPUT_PULS_LENGTH_2 = None,
+            OUTPUT_PULS_LENGTH_2 = 10000,
             ACTIVE_CHANNELS_2 = None,
             COINC_MASK_2 = None,
-            EXCLUSIVE_2 = None,
+            EXCLUSIVE_2 = False,
         ):
+        ACTIVE_CHANNELS_1 = list(ACTIVE_CHANNELS_1)
+        COINC_MASK_1 = list(COINC_MASK_1)
+
+        if ACTIVE_CHANNELS_2 is not None:
+            ACTIVE_CHANNELS_2 = list(ACTIVE_CHANNELS_2)
+        if COINC_MASK_2 is not None:
+            COINC_MASK_2 = list(COINC_MASK_2)
+
         # Enable FF logic
         self.FCC = FastFeedbackCoincidences(
             self.connection,
@@ -336,7 +343,7 @@ class Swabian_TimeTagger_Driver(Connectable):
         )
         
     def stop_FastFeedback(self):
-        self.FCC.disable_outputs()
+        self.FCC.disableOutputs()
 
 
     def getSerial(self) -> str:
