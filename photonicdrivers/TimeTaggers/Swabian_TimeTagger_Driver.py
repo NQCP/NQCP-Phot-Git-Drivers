@@ -305,13 +305,11 @@ class Swabian_TimeTagger_Driver(Connectable):
             TRIGGER_CHANNEL,
             COINC_WINDOW,
             AUX_OUT_CANNEL_1,
-            AUX_IN_CHANNEL_1,
             OUTPUT_PULS_LENGTH_1,
             ACTIVE_CHANNELS_1, # trigger channel not needed here
             COINC_MASK_1,
             EXCLUSIVE_1,
             AUX_OUT_CANNEL_2 = None,
-            AUX_IN_CHANNEL_2 = None,
             OUTPUT_PULS_LENGTH_2 = 10000,
             ACTIVE_CHANNELS_2 = None,
             COINC_MASK_2 = None,
