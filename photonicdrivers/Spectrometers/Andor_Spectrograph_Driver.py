@@ -91,6 +91,7 @@ class Andor_Spectrograph_Driver(Connectable):
             "id": self.get_id(),
             "grating": self.get_grating(),
             "grating_info": self.get_grating_info(self.get_grating()),
+            "grating_offset": self.get_grating_offset(self.get_grating()),
             "center_wavelength": self.get_center_wavelength(),
             "number_gratings": self.get_number_gratings(),
             "focus_mirror_position": self.get_focus_mirror_position(),
@@ -105,6 +106,12 @@ class Andor_Spectrograph_Driver(Connectable):
         (ret, groove_density, blaze_wavelength, grating_home_steps, grating_offset_steps) = self.spectrograph.GetGratingInfo(self.device_index, grating, maxBlazeStrLen=64)
         self.handle_return(ret_value=ret)
         return groove_density, blaze_wavelength
+
+    def get_grating_offset(self, grating):
+        # Offset of the given grating, in motor steps
+        (ret, offset) = self.spectrograph.GetGratingOffset(self.device_index, grating)
+        self.handle_return(ret_value=ret)
+        return offset
 
     def get_number_gratings(self):
         (ret, num_gratings) = self.spectrograph.GetNumberGratings(self.device_index)
@@ -153,6 +160,11 @@ class Andor_Spectrograph_Driver(Connectable):
 
     def set_grating(self, grating):
         ret = self.spectrograph.SetGrating(self.device_index, grating)
+        self.handle_return(ret_value=ret)
+
+    def set_grating_offset(self, grating, offset):
+        # Offset of the given grating, in motor steps
+        ret = self.spectrograph.SetGratingOffset(self.device_index, grating, offset)
         self.handle_return(ret_value=ret)
 
     def set_center_wavelength(self, wavelength):
