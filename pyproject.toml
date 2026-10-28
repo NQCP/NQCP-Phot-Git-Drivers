@@ -227,7 +227,7 @@ required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64
 constraint-dependencies = ["pyqt5-qt5<5.15.18; sys_platform == 'win32' and platform_machine == 'AMD64'"]
 
 [tool.uv.sources]
-atto_device = { path = "N:/SCI-NBI-NQCP/Phot/manualsEtc/attocube/Software/attoDRY800_Software/api_atto-device-python_1.0.12/", editable = false }
+atto_device = { path = "photonicdrivers/AttoDry800/attoDRY800_Software/atto_device-1.12.0-py3-none-any.whl" }
 
 [tool.versioningit.vcs]
 method = "git"
