@@ -29,7 +29,7 @@ class OPX_Driver(Connectable):
     def connect(self) -> None:
         ### Create a QuantumMachinesManager instance for the OPX and set it as the driver
         self.driver = QuantumMachinesManager(host=self.ip_address, port=self.qop_port,
-                                             cluster_name=self.cluster_name, timeout=self.timeout)
+                                             cluster_name=self.cluster_name, timeout=self.timeout, log_level="ERROR")
     
     def disconnect(self) -> None:
         self.driver = None

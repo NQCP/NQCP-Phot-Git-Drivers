@@ -343,6 +343,8 @@ class Swabian_TimeTagger_Driver(Connectable):
     def stop_FastFeedback(self):
         self.FCC.disableOutputs()
 
+    def initialize_TimeDifferences(self, click_channel: int, start_channel: int, next_channel: int, sync_channel: int, bin_width_ps: int, n_bin: int, n_histograms: int) -> TimeTagger.TimeDifferences:
+        return TimeTagger.TimeDifferences(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, next_channel=next_channel, sync_channel=sync_channel, binwidth=bin_width_ps, n_bins=n_bin, n_histograms=n_histograms)
 
     def getSerial(self) -> str:
         return self.connection.getSerial()
