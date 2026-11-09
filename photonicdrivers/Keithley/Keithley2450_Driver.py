@@ -77,12 +77,40 @@ class Keithley2450_Driver(Connectable):
             raise RuntimeError("Not connected to the device.")
         
         try:
+            # A stale reply left in the socket (an earlier query whose answer was never read) shifted every later
+            # answer by one (2026-11-09: :OUTP:STAT? returned the *IDN? string). Drop it, then read one whole line.
+            self._drain()
             self.socket.sendall(command.encode('ascii') + b'\n')
-            response = self.socket.recv(4096)  # Adjust buffer size if needed
-            return response.decode('ascii').strip()
+            return self._read_line().decode('ascii').strip()
         except socket.error as e:
             print(f"Socket error on query '{command}': {e}")
             return None
+
+    def _drain(self):
+        """Discard any bytes already waiting in the socket (non-blocking)."""
+        timeout = self.socket.gettimeout()
+        self.socket.settimeout(0.0)
+        try:
+            while True:
+                try:
+                    chunk = self.socket.recv(4096)
+                except (BlockingIOError, socket.timeout):
+                    break
+                if not chunk:
+                    break
+                print(f"Keithley2450: discarded a stale reply {chunk[:80]!r}")
+        finally:
+            self.socket.settimeout(timeout)
+
+    def _read_line(self) -> bytes:
+        """Read until the newline that ends an SCPI reply (a reply can arrive in several pieces)."""
+        data = b""
+        while not data.endswith(b"\n"):
+            chunk = self.socket.recv(4096)
+            if not chunk:
+                break
+            data += chunk
+        return data
     
     def read(self):
         """
