@@ -93,6 +93,19 @@ class WS7_Driver(Connectable):
         frequency_THz = self.get_frequency_THz(channel)
         return frequency_THz * 1e12 if frequency_THz is not None else None
 
+    def get_power_uW(self, channel: int) -> float:
+        """
+        Power [uW] of the last measured cw signal on the given channel (the DLL's GetPowerNum).
+
+        Relative unless the wavemeter has been power calibrated: the WS7 "basically cannot measure
+        the absolute power" (manual, GetPowerNum remarks); calibrate in the WLM program, menu
+        Operation | Calibration | Power calibration.
+
+        @return: power [uW], or None if the wavemeter is not measuring. Raises on a DLL error code
+                 (e.g. -3 under-exposed, -4 over-exposed, -6 channel not available).
+        """
+        return error_checked(self._GetPowerNum(channel, 0.0)) if self.is_measuring() else None
+
     def set_exposure(self, channel: int, exposure_ms: int, arrays: tuple[int, ...] = (1, 2)):
         """
         Set exposure for the given channel.
@@ -154,6 +167,10 @@ class WS7_Driver(Connectable):
         self._GetFrequencyNum = self._dll.GetFrequencyNum
         self._GetFrequencyNum.argtypes = [c_int32, c_double]
         self._GetFrequencyNum.restype  = c_double
+
+        self._GetPowerNum = self._dll.GetPowerNum
+        self._GetPowerNum.argtypes = [c_int32, c_double]
+        self._GetPowerNum.restype  = c_double
 
         self._SetExposureModeNum = self._dll.SetExposureModeNum
         self._SetExposureModeNum.argtypes = [c_int32, c_bool]
