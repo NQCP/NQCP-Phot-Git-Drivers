@@ -86,6 +86,10 @@ class SNSPD_SQ_Driver(Connectable):
     def get_bias_currents(self):
         # in A
         return self.websq.get_bias_current()
+
+    def set_bias_currents(self, currents_in_uA: list):
+        # currents_in_uA: list of bias currents in uA for each channel
+        self.websq.set_bias_current(current_in_uA=currents_in_uA)
     
     def get_integration_time(self):
         # in ms
