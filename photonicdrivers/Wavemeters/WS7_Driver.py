@@ -1,6 +1,6 @@
 from __future__ import annotations
 import ctypes
-from ctypes import c_int32, c_double, c_bool, c_uint16
+from ctypes import c_int32, c_double, c_bool, c_uint16, POINTER, byref
 from dataclasses import dataclass
 from typing import Optional
 from photonicdrivers.Abstract.Connectable import Connectable 
@@ -149,6 +149,68 @@ class WS7_Driver(Connectable):
         val = int(enabled)
         return error_checked(self._SetSwitcherMode(val))
     
+    def get_switch_mode(self) -> bool:
+        """
+        True if the multichannel switch mode is on (GetSwitcherMode). Devices without a switch
+        always return False.
+        """
+        return bool(error_checked(self._GetSwitcherMode(0)))
+
+    def get_switch_channel(self) -> int:
+        """
+        The switch channel the wavemeter last switched to (GetSwitcherChannel). In switch mode this
+        runs 1-2 measurement cycles ahead of the channel being measured (manual, remarks).
+        """
+        return error_checked(self._GetSwitcherChannel(0))
+
+    def set_switch_channel(self, channel: int):
+        """
+        Selects the active switch channel (SetSwitcherChannel). Has an effect in non-switch mode only.
+        """
+        return error_checked(self._SetSwitcherChannel(channel))
+
+    def get_switch_channel_states(self, channel: int) -> tuple[bool, bool]:
+        """
+        (use, show) of a switch channel (GetSwitcherSignalStates): use = the channel is measured in
+        switch mode; show = its interferometer pattern is displayed. Defined in switch mode only.
+        """
+        use, show = c_int32(0), c_int32(0)
+        error_checked(self._GetSwitcherSignalStates(channel, byref(use), byref(show)))
+        return bool(use.value), bool(show.value)
+
+    def set_switch_channel_states(self, channel: int, use: bool, show: bool):
+        """
+        Sets whether a switch channel is measured (use) and displayed (show) in switch mode
+        (SetSwitcherSignalStates).
+        """
+        return error_checked(self._SetSwitcherSignalStates(channel, int(use), int(show)))
+
+    def get_channels_count(self) -> int:
+        """
+        The number of channels that can measure a wavelength (GetChannelsCount), e.g. the switch
+        channels.
+        """
+        return error_checked(self._GetChannelsCount(0))
+
+    def get_exposure_ms(self, channel: int, array: int = 1) -> int:
+        """
+        The exposure [ms] currently in use on a channel's CCD array (GetExposureNum; array 1 = the
+        Fizeau interferometers, 2 = the wide interferometer(s)). Also valid in automatic exposure.
+        """
+        return error_checked(self._GetExposureNum(channel, array, 0))
+
+    def get_exposure_mode_auto(self, channel: int) -> bool:
+        """
+        True if the channel uses automatic exposure control (GetExposureModeNum).
+        """
+        return bool(error_checked(self._GetExposureModeNum(channel, False)))
+
+    def set_exposure_mode_auto(self, channel: int, auto: bool):
+        """
+        Automatic (True) or manual (False) exposure control for a channel (SetExposureModeNum).
+        """
+        return error_checked(self._SetExposureModeNum(channel, c_bool(auto)))
+
     def start_measurement(self):
         return error_checked(self._Operation(consts.cCtrlStartMeasurement))
     
@@ -171,6 +233,38 @@ class WS7_Driver(Connectable):
         self._GetPowerNum = self._dll.GetPowerNum
         self._GetPowerNum.argtypes = [c_int32, c_double]
         self._GetPowerNum.restype  = c_double
+
+        self._GetSwitcherMode = self._dll.GetSwitcherMode
+        self._GetSwitcherMode.argtypes = [c_int32]
+        self._GetSwitcherMode.restype  = c_int32
+
+        self._GetSwitcherChannel = self._dll.GetSwitcherChannel
+        self._GetSwitcherChannel.argtypes = [c_int32]
+        self._GetSwitcherChannel.restype  = c_int32
+
+        self._SetSwitcherChannel = self._dll.SetSwitcherChannel
+        self._SetSwitcherChannel.argtypes = [c_int32]
+        self._SetSwitcherChannel.restype  = c_int32
+
+        self._GetSwitcherSignalStates = self._dll.GetSwitcherSignalStates
+        self._GetSwitcherSignalStates.argtypes = [c_int32, POINTER(c_int32), POINTER(c_int32)]
+        self._GetSwitcherSignalStates.restype  = c_int32
+
+        self._SetSwitcherSignalStates = self._dll.SetSwitcherSignalStates
+        self._SetSwitcherSignalStates.argtypes = [c_int32, c_int32, c_int32]
+        self._SetSwitcherSignalStates.restype  = c_int32
+
+        self._GetChannelsCount = self._dll.GetChannelsCount
+        self._GetChannelsCount.argtypes = [c_int32]
+        self._GetChannelsCount.restype  = c_int32
+
+        self._GetExposureNum = self._dll.GetExposureNum
+        self._GetExposureNum.argtypes = [c_int32, c_int32, c_int32]
+        self._GetExposureNum.restype  = c_int32
+
+        self._GetExposureModeNum = self._dll.GetExposureModeNum
+        self._GetExposureModeNum.argtypes = [c_int32, c_bool]
+        self._GetExposureModeNum.restype  = c_int32
 
         self._SetExposureModeNum = self._dll.SetExposureModeNum
         self._SetExposureModeNum.argtypes = [c_int32, c_bool]

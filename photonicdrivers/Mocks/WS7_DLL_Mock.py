@@ -26,14 +26,18 @@ class WS7_DLL_Mock:
         self.frequency_THz = {ch: 226.130 for ch in range(1, channels + 1)}
         self.power_uW = {ch: 10.0 for ch in range(1, channels + 1)}
         self.errors = {}                          # channel -> error code returned by every getter
-        self.exposure_mode_auto = {}
-        self.exposure_ms = {}
-        self.switch_mode = None
+        self.switch_mode = 1
+        self.switch_channel = 1
+        self.channel_states = {ch: [1, 1] for ch in range(1, channels + 1)}     # channel -> [use, show]
+        self.exposure_mode_auto = {ch: True for ch in range(1, channels + 1)}
+        self.exposure_ms = {(ch, arr): 5 for ch in range(1, channels + 1) for arr in (1, 2)}
         self.calls = []
 
         for name in ("GetWLMCount", "GetWavelengthNum", "GetFrequencyNum", "GetPowerNum", "SetExposureModeNum",
                      "SetExposureNum", "GetExposureRange", "SetSwitcherMode", "Operation", "ControlWLMEx",
-                     "GetWLMVersion", "GetOperationState"):
+                     "GetWLMVersion", "GetOperationState", "GetSwitcherMode", "GetSwitcherChannel",
+                     "SetSwitcherChannel", "GetSwitcherSignalStates", "SetSwitcherSignalStates", "GetChannelsCount",
+                     "GetExposureNum", "GetExposureModeNum"):
             setattr(self, name, _Function(getattr(self, "_" + name)))
 
     def _value(self, channel, value):
@@ -64,6 +68,42 @@ class WS7_DLL_Mock:
     def _SetExposureNum(self, channel, array, exposure_ms):
         self.exposure_ms[(channel, array)] = exposure_ms
         return 0
+
+    def _GetSwitcherMode(self, _):
+        return self.switch_mode
+
+    def _GetSwitcherChannel(self, _):
+        return self.switch_channel
+
+    def _SetSwitcherChannel(self, channel):
+        if channel not in self.channel_states:
+            return consts.ResERR_ParmOutOfRange
+        if not self.switch_mode:                  # effect in non-switch mode only (manual)
+            self.switch_channel = channel
+        return 0
+
+    def _GetSwitcherSignalStates(self, channel, use_ref, show_ref):
+        if channel not in self.channel_states:
+            return consts.ResERR_ParmOutOfRange
+        use_ref._obj.value, show_ref._obj.value = self.channel_states[channel]
+        return 0
+
+    def _SetSwitcherSignalStates(self, channel, use, show):
+        if channel not in self.channel_states:
+            return consts.ResERR_ParmOutOfRange
+        self.channel_states[channel] = [int(use), int(show)]
+        return 0
+
+    def _GetChannelsCount(self, _):
+        return self.channels
+
+    def _GetExposureNum(self, channel, array, _):
+        return self.exposure_ms.get((channel, array), consts.ErrNotAvailable)
+
+    def _GetExposureModeNum(self, channel, _):
+        if channel not in self.channel_states:
+            return consts.ErrNotAvailable
+        return int(self.exposure_mode_auto.get(channel, False))
 
     def _GetExposureRange(self, which):
         return 1 if which in (consts.cExpoMin, consts.cExpo2Min) else 9999

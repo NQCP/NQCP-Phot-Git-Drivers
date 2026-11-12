@@ -45,3 +45,47 @@ def test_frequency_and_wavelength_unchanged():
     assert driver.get_frequency_THz(1) == pytest.approx(226.130)
     assert driver.get_frequency_GHz(1) == pytest.approx(226130.0)
     assert driver.get_wavelength_nm(1) == pytest.approx(299792458.0 / 226.130e12 * 1e9)
+
+
+def test_switch_mode_channel_and_count():
+    driver = make_driver(channels=4)
+    assert driver.get_switch_mode() is True
+    assert driver.get_channels_count() == 4
+    driver._dll.switch_channel = 3
+    assert driver.get_switch_channel() == 3
+
+
+def test_set_switch_channel_only_in_non_switch_mode():
+    driver = make_driver()
+    driver.set_switch_channel(2)
+    assert driver.get_switch_channel() == 1           # switch mode on: no effect
+    driver._dll.switch_mode = 0
+    driver.set_switch_channel(2)
+    assert driver.get_switch_channel() == 2
+
+
+def test_channel_states_round_trip():
+    driver = make_driver()
+    assert driver.get_switch_channel_states(3) == (True, True)
+    driver.set_switch_channel_states(3, use=False, show=True)
+    assert driver.get_switch_channel_states(3) == (False, True)
+    assert driver._dll.channel_states[3] == [0, 1]
+
+
+def test_channel_states_bad_channel_raises():
+    driver = make_driver(channels=4)
+    with pytest.raises(RuntimeError):
+        driver.get_switch_channel_states(5)
+
+
+def test_exposure_value_and_mode():
+    driver = make_driver()
+    driver._dll.exposure_ms[(2, 1)] = 12
+    driver._dll.exposure_ms[(2, 2)] = 40
+    assert driver.get_exposure_ms(2) == 12
+    assert driver.get_exposure_ms(2, array=2) == 40
+    assert driver.get_exposure_mode_auto(2) is True
+    driver.set_exposure_mode_auto(2, False)
+    assert driver.get_exposure_mode_auto(2) is False
+    driver.set_exposure(2, 30)                         # unchanged: manual + both arrays
+    assert driver.get_exposure_mode_auto(2) is False and driver.get_exposure_ms(2, 2) == 30
