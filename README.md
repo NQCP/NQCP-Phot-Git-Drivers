@@ -5,7 +5,7 @@ This repository contains drivers for hardware used in photonic quantum computing
 
 # Equipment documentation
 
-Manuals, datasheets and API guides live next to their driver: `photonicdrivers/<Driver>/docs/<Manufacturer> <Model> <Document type>.pdf`, with a Markdown copy of the same name beside it (`.md`, converted with markitdown) so it can be searched and read as text. Keep the original PDF unchanged. Vendor SDK folders stay intact; copy their manuals into `docs/`. Calibration data stays in the Analysis repo. (The user, 2026-11-12.)
+Manuals, datasheets and API guides live next to their driver: `photonicdrivers/<Driver>/docs/<Manufacturer> <Model> <Document type>.pdf`, with a Markdown copy of the same name beside it (`.md`, converted with markitdown) so it can be searched and read as text. Keep the original PDF unchanged. Vendor SDK folders stay intact; copy their manuals into `docs/`. Calibration data stays in the Analysis repo. (The user, 2026-11-12.) Passive optics without a driver (waveplates, beamsplitters, filters, ...): `photonicdrivers/Optics/docs/` (the user, 2026-11-15).
 
 # Installation
 
