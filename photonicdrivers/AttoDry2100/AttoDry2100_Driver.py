@@ -1,3 +1,5 @@
+import time
+
 from ..Abstract.Connectable import Connectable
 from atto_device.CRYO2100.attoDry2100 import Device
 
@@ -9,15 +11,29 @@ class AttoDry2100_Driver(Connectable):
         Connectable (Abstract): abstract class for devices that can be connected to and disconnected from.
         Device (Device): device class from the atto_device library that provides methods for communicating with the AttoDry2100.
     """
-    def __init__(self, ip_address: str):
+    def __init__(self, ip_address: str, timeout: float = 30.0, max_retries: int = 3, retry_delay: float = 1.0):
+        """
+        Args:
+            ip_address (str): The IP address of the AttoDry2100.
+            timeout (float): Socket read timeout in seconds. The underlying atto_device library
+                hardcodes a 10s timeout; this overrides it after each (re)connect to tolerate a slow server.
+            max_retries (int): Number of reconnect-and-retry attempts on a timeout before giving up.
+            retry_delay (float): Seconds to wait between retry attempts.
+        """
         self.ip_address = ip_address
+        self.timeout = timeout
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
 
         self.device = Device(address=self.ip_address)
+        self._patch_device_request()
 
     # Connectable interface methods
     def connect(self) -> None:
         """Connects to the AttoDry2100 using the connect method from the Device class."""
         self.device.connect()
+        # atto_device hardcodes a 10s socket timeout on connect(); extend it here.
+        self.device.tcp.settimeout(self.timeout)
 
     def disconnect(self) -> None:
         """Disconnects from the AttoDry2100 using the close method from the Device class."""
@@ -30,7 +46,36 @@ class AttoDry2100_Driver(Connectable):
             bool: True if the AttoDry2100 is connected, False otherwise.
         """
         return self.device.is_open
-    
+
+    def _patch_device_request(self) -> None:
+        """Wraps the shared Device.request with retry/reconnect logic.
+
+        All service submodules (self.device.sample, self.device.vti, ...) call back into
+        this same Device.request, so patching it here makes every getter/setter resilient
+        to transient read timeouts caused by a slow server, without touching the 3rd-party package.
+        """
+        original_request = self.device.request
+
+        def resilient_request(method, params=False):
+            for attempt in range(self.max_retries + 1):
+                try:
+                    return original_request(method, params)
+                except (OSError, TimeoutError):
+                    self._reconnect()
+                    if attempt >= self.max_retries:
+                        raise
+                    time.sleep(self.retry_delay)
+
+        setattr(self.device, "request", resilient_request)
+
+    def _reconnect(self) -> None:
+        """Closes and re-establishes the connection, swallowing errors from an already-broken socket."""
+        try:
+            self.device.close()
+        except Exception:
+            pass
+        self.connect()
+
     # Device interface methods
 
     def _request(self, method: str, params: dict | None = None) -> dict:
@@ -63,7 +108,7 @@ class AttoDry2100_Driver(Connectable):
             list: A list containing the error code, error message, error source, and error timestamp.
         """
         return self.device.system.getLastError()
-    
+
     def get_features(self) -> list[str]:
         """Gets the features of the AttoDry2100.
 
@@ -108,7 +153,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.system_service.getMacAddress()
 
-    
+
     # Action methods
 
     def get_current_command(self) -> str:
@@ -150,8 +195,8 @@ class AttoDry2100_Driver(Connectable):
             str: The event that the AttoDry2100 is waiting for.
         """
         return self.device.action.getWaitForEvent()
-    
-    
+
+
     # Pressure methods
 
     def get_cryo_in_pressure(self) -> float:
@@ -161,7 +206,7 @@ class AttoDry2100_Driver(Connectable):
             float: The cryo-in pressure in mbar.
         """
         return self.device.pressures.getCryoInPressure()
-    
+
     def get_cryo_out_pressure(self) -> float:
         """Gets the cryo-out pressure from the AttoDry2100.
 
@@ -178,7 +223,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.pressures.getDumpPressure()
 
-    
+
     # VTI methods
 
     def get_vti_temperature(self) -> float:
@@ -237,7 +282,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.vti.getTempControlStatus()
 
-    
+
     # Condenser methods
 
     def get_condenser_temperature(self) -> float:
@@ -301,7 +346,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.dumpOutValve.getStatus()
 
-    
+
     # Scroll pump methods
 
     def get_scroll_pump_status(self) -> bool:
@@ -320,7 +365,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.scrollPump.getFrequency()
 
-    
+
     # Cryo in valve methods
 
     def get_cryo_in_valve_status(self) -> bool:
@@ -341,7 +386,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.cryoOutValve.getStatus()
 
-    
+
     # Sample information methods
 
     def get_heater_heating_mode(self) -> int:
@@ -446,7 +491,7 @@ class AttoDry2100_Driver(Connectable):
         """
         return self.device.tboard.getTemperature(channelNumber=channel_number)
 
-    
+
     # Stage 40K methods
 
     def get_stage_40k_temp_control_status(self) -> bool:
@@ -589,7 +634,7 @@ class AttoDry2100_Driver(Connectable):
             status: True to turn on driven mode, False to turn off
 
         """
-        
+
         return self.device.magnet.setDrivenMode(channel=channel_number, onOrOff=status)
 
     def start_field_control(self, channel_number: int) -> None:
@@ -598,12 +643,12 @@ class AttoDry2100_Driver(Connectable):
         Starts the magnetic field control
 
         Parameters:
-            channel: 
-                    
+            channel:
+
         """
-        
+
         return self.device.magnet.startFieldControl(channel=channel_number)
-        self.device.handleError(response)          
+        self.device.handleError(response)
 
     def stop_field_control(self, channel_number: int) -> None:
         # type: (int) -> ()
@@ -611,9 +656,8 @@ class AttoDry2100_Driver(Connectable):
         Stops the magnetic field control
 
         Parameters:
-            channel: 
-                    
+            channel:
+
         """
-        
+
         return self.device.magnet.stopFieldControl(channel=channel_number)
-  

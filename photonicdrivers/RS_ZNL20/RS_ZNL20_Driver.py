@@ -49,7 +49,7 @@ class RS_ZNL20_Driver(Connectable):
     
     def status(self) -> int:
         return int(self.query("*STB?"))
-    
+
     def wait(self) -> None:
         """Issue SCPI ``*WAI`` to enforce instrument-side command ordering.
 
@@ -90,7 +90,10 @@ class RS_ZNL20_Driver(Connectable):
         return float(self.query(f"SENS:BAND:RES?"))
 
     def set_power(self, power_dBm: float) -> None:
-        self.write(f"SOUR:POW {power_dBm}dBm")
+        if power_dBm >= -10 and power_dBm <= 0:
+            self.write(f"SOUR:POW {power_dBm}dBm")
+        else:
+            raise ValueError("Power must be between -10 dBm and 0 dBm")
 
     def set_power_state(self, enable: bool) -> None:
         self.write(f"OUTP {boolean_str(enable)}")
@@ -125,8 +128,12 @@ class RS_ZNL20_Driver(Connectable):
     def stop_continuous_sweep(self) -> None:
         self.write("INIT:CONT False")
     
-    def set_data_format(self) -> None:
-        self.write(f"CALC:FORM {format}")
+    def set_data_format(self, data_format: str) -> None:
+        """Set the trace format, e.g. "MLOG" (dB magnitude), "PHAS", "MLIN".
+
+        Applies to the trace currently selected by ``select_trace()``, so select first.
+        """
+        self.write(f"CALC:FORM {data_format}")
 
     def sw_channel(self, channel_name: str) -> None:
         self.write(f"INST:SEL '{channel_name}'")
@@ -139,11 +146,17 @@ class RS_ZNL20_Driver(Connectable):
             self.write(f"CALC:PAR:SDEF 'Trc{i+1}', '{s_param}'")
         # print('VNA traces: ' + self.query("CALC:PAR:CAT?"))
     
-    def read_formatted_data(self) -> str:
-        return self.query("CALC:DATA? FDAT")
-    
-    def read_formatted_data_complex(self, trace_index: int = 1) -> str:
+    def select_trace(self, trace_index: int = 1) -> None:
+        """Make TrcN the active trace for subsequent CALC commands."""
         self.write(f"CALC:PAR:SEL 'Trc{trace_index}'")
+
+    def read_formatted_data(self, trace_index: int = 1) -> str:
+        """Read the trace as displayed, i.e. already converted by the current CALC:FORM."""
+        self.select_trace(trace_index)
+        return self.query("CALC:DATA? FDAT")
+
+    def read_formatted_data_complex(self, trace_index: int = 1) -> str:
+        self.select_trace(trace_index)
         return self.query("CALC:DATA? SDAT")
     
     def create_channel(self, channel_type: str, channel_name: str) -> None:

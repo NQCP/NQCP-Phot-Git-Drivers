@@ -7,6 +7,10 @@ from enum import Enum
 LAN_PORT = 49099
 TC_PORT = 5001
 
+# The sample holder sensor is not part of mapper.bf.temperatures and must be read
+# from the temperature controller's value tree branch directly.
+SAMPLE_TEMPERATURE_PATH = "driver.bftc2.data.channels.channel_5.temperature"
+
 class OnOffError(Enum):
     Off = 0
     On = 1
@@ -47,8 +51,39 @@ def strip_prefix(s: str):
     return s.split('.')[-1]
 
 
+def extract_value_node(data: dict, path: str) -> dict | None:
+    """Return the single value node addressed by path from a /values GET response.
+
+    The API returns a single node either keyed by its full dotted path (flat style,
+    which flatten_value_nodes relies on) or as the bare node itself. Both shapes are
+    accepted here. Returns None if no value node is found.
+    """
+    node = data.get(path)
+    if isinstance(node, dict) and "content" in node and "type" in node:
+        return node
+    if "content" in data and "type" in data:
+        return data
+    return None
+
+
+def value_from_node(node: dict):
+    """Convert the latest sample of a single value node to its python type.
+
+    Returns None if the node currently holds no value.
+    """
+    latest_value = node["content"]["latest_value"]
+    if latest_value is None or latest_value["value"] is None or latest_value["value"] == "":
+        return None
+    return convert_to_python_type(latest_value["value"], node["type"])
+
+
 def filter_type(data: dict, filter_types: list[type] | None = None):
     return {k: v for k, v in data.items() if filter_types is None or type(v) in filter_types}
+
+
+def names_of_enums(data: dict):
+    """Replace OnOffError members with their names so the dict can be serialized."""
+    return {k: v.name if isinstance(v, OnOffError) else v for k, v in data.items()}
 
 class BlueForsFridge_Driver(Connectable):
     """Driver for interacting with the BlueFors Control Software application programmatically"""
@@ -113,10 +148,31 @@ class BlueForsFridge_Driver(Connectable):
         return flatten_value_nodes(data) if flatten else data
 
     ### Convenience methods that return normalized data ###
+    def _get_sample_temperature(self) -> float | None:
+        """Return the sample holder temperature in K, or None if it is unavailable.
+
+        The sample holder is not exposed through mapper.bf.temperatures, so it needs
+        its own read of the temperature controller node.
+        """
+        data = self.get_from_root(f"values/{SAMPLE_TEMPERATURE_PATH}")["data"]
+        node = extract_value_node(data, SAMPLE_TEMPERATURE_PATH)
+        return None if node is None else value_from_node(node)
+
     def get_temperatures(self) -> dict[str, float]:
         node_values = self.get_values("temperatures")
-        return filter_type(node_values, [float])
-    
+        temperatures = filter_type(node_values, [float])
+
+        try:
+            sample_temperature = self._get_sample_temperature()
+        except Exception:
+            # The mapper temperatures are what the condensing and stabilisation logic
+            # depends on, so the extra read must never break them.
+            sample_temperature = None
+        if isinstance(sample_temperature, float):
+            temperatures["tsample"] = sample_temperature
+
+        return temperatures
+
     def get_pressures(self) -> dict[str, float]:
         node_values = self.get_values("pressures")
         return filter_type(node_values, [float])
@@ -152,7 +208,24 @@ class BlueForsFridge_Driver(Connectable):
     def get_pid_settings(self) -> dict[str, Any]:
         """Return PID-related settings for the FSE heater from the TC API."""
         return self._tc_post("heater", {"heater_nr": self._FSE_HEATER_NR})
-    
+
+    def get_settings(self) -> dict[str, Any]:
+        """Return the state of the fridge as a JSON serializable dictionary.
+
+        The PID settings come from the temperature controller API, which is only
+        available if the driver was constructed with a tc_host. They are None if it
+        was not.
+        """
+        return {
+            "pid": self.get_pid_settings() if self.tc_session is not None else None,
+            "valves": names_of_enums(self.get_valves()),
+            "temperatures": self.get_temperatures(),
+            "pressures": self.get_pressures(),
+            "heaters": names_of_enums(self.get_heaters()),
+            "pumps": names_of_enums(self.get_pumps())
+        }
+
+
     def set_heater(self, heater_name: Literal['hs-still', 'hs-mc', 'ext', 'heater'], state: bool):
         payload = {"data": {f"mapper.bf.heaters.{heater_name}": {"content": {"value": int(state)}}}}
         response = self._post_values(payload)
@@ -202,11 +275,11 @@ class BlueForsFridge_Driver(Connectable):
 
         return f"v{valve_number}"
 
-    def configure_fse_temperature_pid_loop(
+    def configure_pid_loop(
         self,
         setpoint: float,
     ) -> dict[str, Any]:
-        """Configure PID control parameters from the lookup table based on setpoint."""
+        """Configure PID control parameters for the FSE heater from the lookup table based on setpoint."""
         import json
         import os
         
@@ -268,7 +341,7 @@ class BlueForsFridge_Driver(Connectable):
 
         return self._tc_post("heater/update", payload)
 
-    def enable_fse_temperature_pid_loop(self) -> dict[str, Any]:
+    def enable_pid_loop(self) -> dict[str, Any]:
         """Enable PID mode on the FSE heater."""
         return self._tc_post("heater/update", {
             "heater_nr": self._FSE_HEATER_NR,
@@ -276,7 +349,7 @@ class BlueForsFridge_Driver(Connectable):
             "active": True,
         })
 
-    def disable_fse_temperature_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
+    def disable_pid_loop(self, keep_heater_active: bool = False) -> dict[str, Any]:
         """Disable PID mode for the FSE heater."""
         return self._tc_post("heater/update", {
             "heater_nr": self._FSE_HEATER_NR,

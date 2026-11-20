@@ -16,15 +16,20 @@ HIGH = 1
 LOW = 0
 
 class OPX_Driver(Connectable):
-    def __init__(self, ip_address='10.209.64.242', cluster_name="Cluster_1", qop_port=None):
+    def __init__(self, ip_address='10.209.64.242', cluster_name="Cluster_1", qop_port=None,
+                 timeout=None):
         self.ip_address = ip_address
         self.cluster_name = cluster_name
         self.qop_port = qop_port
+        # Seconds the gateway calls may take - including adding a program to the queue, which
+        # compiles it. None: qm's default (60 s); a large unrolled program needs longer.
+        self.timeout = timeout
         self.sequence_stack = []
 
     def connect(self) -> None:
         ### Create a QuantumMachinesManager instance for the OPX and set it as the driver
-        self.driver = QuantumMachinesManager(host=self.ip_address, port=self.qop_port, cluster_name=self.cluster_name)
+        self.driver = QuantumMachinesManager(host=self.ip_address, port=self.qop_port,
+                                             cluster_name=self.cluster_name, timeout=self.timeout, log_level="ERROR")
     
     def disconnect(self) -> None:
         self.driver = None
@@ -37,7 +42,7 @@ class OPX_Driver(Connectable):
             return False
     
     def open_quantum_machine(self, config):
-        return self.driver.open_qm(config=config)
+        return self.driver.open_qm(config=config, close_other_machines=True)
     
     def is_quantum_machine_open(self):
         if len(self.driver.list_open_qms()) > 0:
@@ -71,7 +76,7 @@ class OPX_Driver(Connectable):
             program_step["duration"] = duration
         self.sequence_stack.append(program_step)
 
-    def execute_program(self):
+    def execute_sequence(self):
         with program() as sequence_program:
             for step in self.sequence_stack:
                 if "pulse" in step and "element" in step and "duration" in step:
@@ -88,6 +93,8 @@ class OPX_Driver(Connectable):
                     play(element=step["element"])
                 elif "duration" in step:
                     play(duration=step["duration"])
+                elif "readout" in step:
+                    measure(readout=step["readout"])
 
         job = self.get_quantum_machine().execute(sequence_program)
         print(job.get_status())
@@ -103,4 +110,3 @@ class OPX_Driver(Connectable):
     
     def get_devices(self):
         return self.driver.get_devices()
-        

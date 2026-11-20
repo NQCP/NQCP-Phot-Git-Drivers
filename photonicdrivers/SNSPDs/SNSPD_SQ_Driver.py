@@ -50,6 +50,29 @@ class SNSPD_SQ_Driver(Connectable):
         data = self.websq.acquire_cnts(numberOfMeasurements)
         print(data)
         return data
+
+    def _counts_thread(self):
+        if not getattr(self.websq, "connected", False) or getattr(self.websq, "cnts", None) is None:
+            raise RuntimeError("SNSPD_SQ_Driver is not connected (call connect() first).")
+        return self.websq.cnts
+
+    def get_latest_counts(self, number_of_measurements: int = 1) -> list:
+        """The newest number_of_measurements count rows already received, oldest first, each
+        [timestamp, counts channel 1, ..., counts channel N] (counts per measurement period) -
+        WITHOUT waiting: unlike getCounts it never blocks (getCounts waits for new samples with no
+        timeout and hangs if the counts stream stops). Read only; fewer rows if fewer arrived (the
+        manufacturer keeps the last 100). Copies, so the caller may modify them."""
+        thread = self._counts_thread()
+        with thread.lock:
+            rows = thread.cnts[-int(number_of_measurements):] if number_of_measurements > 0 else []
+            return [list(row) for row in rows]
+
+    def get_counts_sample_number(self) -> int:
+        """How many count rows have been received since connect() - if it stops growing between
+        two calls one measurement period apart, the counts stream has stopped. Read only."""
+        thread = self._counts_thread()
+        with thread.lock:
+            return int(thread.n)
     
     def set_measurement_period(self, integrationtime_ms:int) -> None:
         self.websq.set_measurement_periode(integrationtime_ms)
@@ -63,10 +86,32 @@ class SNSPD_SQ_Driver(Connectable):
     def get_bias_currents(self):
         # in A
         return self.websq.get_bias_current()
+
+    def set_bias_currents(self, currents_in_uA: list):
+        # currents_in_uA: list of bias currents in uA for each channel
+        self.websq.set_bias_current(current_in_uA=currents_in_uA)
     
     def get_integration_time(self):
         # in ms
         return self.websq.get_measurement_periode()
+
+    def run_iv_scan(self, state):
+        # runs the IV scan 
+        return self.websq.iv_scan_run(state)
+
+    def change_iv_scan_settings(self, start, stop, step):
+     '''
+     Sets up the settings for an IV scan to record the IV curves and the I vs Counts curves for current integration time.
+        start: starting bias current value for the IV curve in uA (-90.9 < I < 90.9)
+        stop: stopping bias current value for the IV curve in uA (-90.9 < I < 90.9)
+        step: bias current steps used for the IV scan
+     '''
+     return self.websq.iv_scan_setup(start, stop, step)
+
+    def get_ic_scan_history(self):
+        # returns the last IV scan measurement and returns a matrix where the first column contains the current and the rest the counts for each detector.
+        return self.websq.ic_scan_history()
+    
 
 
 

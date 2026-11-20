@@ -1,6 +1,6 @@
 from __future__ import annotations
 import ctypes
-from ctypes import c_int32, c_double, c_bool, c_uint16
+from ctypes import c_int32, c_double, c_bool, c_uint16, POINTER, byref
 from dataclasses import dataclass
 from typing import Optional
 from photonicdrivers.Abstract.Connectable import Connectable 
@@ -22,7 +22,7 @@ class WS7_Driver(Connectable):
     """
     WS7 Wavelength Meter Driver. Channels are 1-indexed
     """
-    def __init__(self, dll_path: str="C:\Windows\System32\wlmData.dll"):
+    def __init__(self, dll_path: str=r"C:\Windows\System32\wlmData.dll"):
         self._dll = ctypes.WinDLL(dll_path)
         self._bind_functions()
         self.exposure_limits = None
@@ -54,6 +54,57 @@ class WS7_Driver(Connectable):
 
     def get_wavelength_nm(self, channel: int) -> float:
         return error_checked(self._GetWavelengthNum(channel, 0.0)) if self.is_measuring() else None
+
+    def get_frequency_THz(self, channel: int) -> float:
+        """
+        Optical frequency [THz] of the given channel, as computed by the wavemeter itself.
+
+        Preferred over converting get_wavelength_nm() by hand: the DLL applies the same
+        air/vacuum refractive index correction it uses for the wavelength reading.
+
+        @return: frequency [THz], or None if the wavemeter is not measuring
+        """
+        return error_checked(self._GetFrequencyNum(channel, 0.0)) if self.is_measuring() else None
+
+    def get_frequency_GHz(self, channel: int) -> float:
+        """
+        Optical frequency [GHz] of the given channel.
+
+        @return: frequency [GHz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e3 if frequency_THz is not None else None
+
+    def get_frequency_MHz(self, channel: int) -> float:
+        """
+        Optical frequency [MHz] of the given channel.
+
+        @return: frequency [MHz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e6 if frequency_THz is not None else None
+
+    def get_frequency_Hz(self, channel: int) -> float:
+        """
+        Optical frequency [Hz] of the given channel.
+
+        @return: frequency [Hz], or None if the wavemeter is not measuring
+        """
+        frequency_THz = self.get_frequency_THz(channel)
+        return frequency_THz * 1e12 if frequency_THz is not None else None
+
+    def get_power_uW(self, channel: int) -> float:
+        """
+        Power [uW] of the last measured cw signal on the given channel (the DLL's GetPowerNum).
+
+        Relative unless the wavemeter has been power calibrated: the WS7 "basically cannot measure
+        the absolute power" (manual, GetPowerNum remarks); calibrate in the WLM program, menu
+        Operation | Calibration | Power calibration.
+
+        @return: power [uW], or None if the wavemeter is not measuring. Raises on a DLL error code
+                 (e.g. -3 under-exposed, -4 over-exposed, -6 channel not available).
+        """
+        return error_checked(self._GetPowerNum(channel, 0.0)) if self.is_measuring() else None
 
     def set_exposure(self, channel: int, exposure_ms: int, arrays: tuple[int, ...] = (1, 2)):
         """
@@ -98,6 +149,68 @@ class WS7_Driver(Connectable):
         val = int(enabled)
         return error_checked(self._SetSwitcherMode(val))
     
+    def get_switch_mode(self) -> bool:
+        """
+        True if the multichannel switch mode is on (GetSwitcherMode). Devices without a switch
+        always return False.
+        """
+        return bool(error_checked(self._GetSwitcherMode(0)))
+
+    def get_switch_channel(self) -> int:
+        """
+        The switch channel the wavemeter last switched to (GetSwitcherChannel). In switch mode this
+        runs 1-2 measurement cycles ahead of the channel being measured (manual, remarks).
+        """
+        return error_checked(self._GetSwitcherChannel(0))
+
+    def set_switch_channel(self, channel: int):
+        """
+        Selects the active switch channel (SetSwitcherChannel). Has an effect in non-switch mode only.
+        """
+        return error_checked(self._SetSwitcherChannel(channel))
+
+    def get_switch_channel_states(self, channel: int) -> tuple[bool, bool]:
+        """
+        (use, show) of a switch channel (GetSwitcherSignalStates): use = the channel is measured in
+        switch mode; show = its interferometer pattern is displayed. Defined in switch mode only.
+        """
+        use, show = c_int32(0), c_int32(0)
+        error_checked(self._GetSwitcherSignalStates(channel, byref(use), byref(show)))
+        return bool(use.value), bool(show.value)
+
+    def set_switch_channel_states(self, channel: int, use: bool, show: bool):
+        """
+        Sets whether a switch channel is measured (use) and displayed (show) in switch mode
+        (SetSwitcherSignalStates).
+        """
+        return error_checked(self._SetSwitcherSignalStates(channel, int(use), int(show)))
+
+    def get_channels_count(self) -> int:
+        """
+        The number of channels that can measure a wavelength (GetChannelsCount), e.g. the switch
+        channels.
+        """
+        return error_checked(self._GetChannelsCount(0))
+
+    def get_exposure_ms(self, channel: int, array: int = 1) -> int:
+        """
+        The exposure [ms] currently in use on a channel's CCD array (GetExposureNum; array 1 = the
+        Fizeau interferometers, 2 = the wide interferometer(s)). Also valid in automatic exposure.
+        """
+        return error_checked(self._GetExposureNum(channel, array, 0))
+
+    def get_exposure_mode_auto(self, channel: int) -> bool:
+        """
+        True if the channel uses automatic exposure control (GetExposureModeNum).
+        """
+        return bool(error_checked(self._GetExposureModeNum(channel, False)))
+
+    def set_exposure_mode_auto(self, channel: int, auto: bool):
+        """
+        Automatic (True) or manual (False) exposure control for a channel (SetExposureModeNum).
+        """
+        return error_checked(self._SetExposureModeNum(channel, c_bool(auto)))
+
     def start_measurement(self):
         return error_checked(self._Operation(consts.cCtrlStartMeasurement))
     
@@ -112,6 +225,46 @@ class WS7_Driver(Connectable):
         self._GetWavelengthNum = self._dll.GetWavelengthNum
         self._GetWavelengthNum.argtypes = [c_int32, c_double]
         self._GetWavelengthNum.restype  = c_double
+
+        self._GetFrequencyNum = self._dll.GetFrequencyNum
+        self._GetFrequencyNum.argtypes = [c_int32, c_double]
+        self._GetFrequencyNum.restype  = c_double
+
+        self._GetPowerNum = self._dll.GetPowerNum
+        self._GetPowerNum.argtypes = [c_int32, c_double]
+        self._GetPowerNum.restype  = c_double
+
+        self._GetSwitcherMode = self._dll.GetSwitcherMode
+        self._GetSwitcherMode.argtypes = [c_int32]
+        self._GetSwitcherMode.restype  = c_int32
+
+        self._GetSwitcherChannel = self._dll.GetSwitcherChannel
+        self._GetSwitcherChannel.argtypes = [c_int32]
+        self._GetSwitcherChannel.restype  = c_int32
+
+        self._SetSwitcherChannel = self._dll.SetSwitcherChannel
+        self._SetSwitcherChannel.argtypes = [c_int32]
+        self._SetSwitcherChannel.restype  = c_int32
+
+        self._GetSwitcherSignalStates = self._dll.GetSwitcherSignalStates
+        self._GetSwitcherSignalStates.argtypes = [c_int32, POINTER(c_int32), POINTER(c_int32)]
+        self._GetSwitcherSignalStates.restype  = c_int32
+
+        self._SetSwitcherSignalStates = self._dll.SetSwitcherSignalStates
+        self._SetSwitcherSignalStates.argtypes = [c_int32, c_int32, c_int32]
+        self._SetSwitcherSignalStates.restype  = c_int32
+
+        self._GetChannelsCount = self._dll.GetChannelsCount
+        self._GetChannelsCount.argtypes = [c_int32]
+        self._GetChannelsCount.restype  = c_int32
+
+        self._GetExposureNum = self._dll.GetExposureNum
+        self._GetExposureNum.argtypes = [c_int32, c_int32, c_int32]
+        self._GetExposureNum.restype  = c_int32
+
+        self._GetExposureModeNum = self._dll.GetExposureModeNum
+        self._GetExposureModeNum.argtypes = [c_int32, c_bool]
+        self._GetExposureModeNum.restype  = c_int32
 
         self._SetExposureModeNum = self._dll.SetExposureModeNum
         self._SetExposureModeNum.argtypes = [c_int32, c_bool]

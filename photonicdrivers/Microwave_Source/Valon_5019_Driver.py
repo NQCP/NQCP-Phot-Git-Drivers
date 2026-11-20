@@ -63,7 +63,7 @@ import serial
 import time
 class Valon_5019_Driver():
     # def __init__(self, port: str = "COM3", baud_rate: int = 115200, delay: float = 0.1, data_saver=None):
-    def __init__(self, port: str = "COM3", baud_rate: int = 9600, delay: float = 0.1, data_saver=None):
+    def __init__(self, port: str = "COM10", baud_rate: int = 9600, delay: float = 0.1, data_saver=None):
         self.port = port
         self.baud_rate = baud_rate # The Valon 5019 requires a baud rate of 115200
         self.delay = delay
@@ -82,22 +82,16 @@ class Valon_5019_Driver():
         if self.connection and self.connection.is_open:
             self.connection.close()
 
-    def connect(self, port_name='COM3', baud_rate=None, timeout=1): # Has to baud rate of 115200 for the Valon 5019
-        # if baud_rate is None:
-        #     self.baud_rate = 115200
-        #     baud_rate = self.baud_rate
+    def connect(self, port_name=None, baud_rate=None, timeout=1):
+        if port_name is None:
+            port_name = self.port
+        if baud_rate is None:
+            baud_rate = self.baud_rate
 
-        self.connection = serial.Serial(port_name, 9600, timeout=timeout)
-    #     self.connection.setDTR(False)
-    #     self.connection.flushInput()
-    #     self.connection.setDTR(True) # don't know why this was here. Worked when removed.
-        print(f"Serial port {port_name} opened successfully.")
-
-        # if self.is_connected():
-        #     self.set_baud_rate(baud_rate)
-        # self.connection.close()
-
-        # self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
+        self.port = port_name
+        self.baud_rate = baud_rate
+        self.connection = serial.Serial(port_name, baud_rate, timeout=timeout)
+        print(f"Serial port {port_name} opened successfully at {baud_rate} baud.")
 
     def set_baud_rate(self, baud_rate):
         self._write(f"BAUD {baud_rate}")
@@ -124,13 +118,14 @@ class Valon_5019_Driver():
             response_bytes = self.connection.read(1024)  # Adjust the buffer size as needed
 
             # Decode and print the response
-            response = response_bytes.decode().strip()
+            response = response_bytes.decode(errors="replace").strip()
             print(f"Response from device: {response}")
         except serial.SerialException as e:
             print(f"Error communicating with the device: {e}")
 
     def _write(self, command):
         if self.connection and self.connection.is_open:
+            self.connection.reset_input_buffer()
             command_with_cr = f"{command}\r"
             self.connection.write(command_with_cr.encode())
 
@@ -140,7 +135,7 @@ class Valon_5019_Driver():
                 delay = self.delay
             time.sleep(delay)
             response_bytes = self.connection.read(num_bytes)
-            response = response_bytes.decode().strip()
+            response = response_bytes.decode(errors="replace").strip()
             return response
         return None
     
@@ -167,7 +162,6 @@ class Valon_5019_Driver():
         response = self._query("LOCK?")
         return response
 
-        raise RuntimeError(f"No valid LOCK response found: {response}")
     def set_lock(self, lock_state):
         self._query(f"PDN {1 if lock_state else 0}")
 
@@ -418,3 +412,43 @@ class Valon_5019_Driver():
 
     def set_trigger_mode(self, trigger_mode = "AUTO"):
         self._query(f"TMODe {trigger_mode}") # AUTO, MANual, EXTernal, or EXTStep
+
+    def get_reference_source(self):
+        response = self._query("REFS?")
+
+        for line in response.splitlines():
+            line = line.strip()
+
+            if line.startswith("REFS"):
+                parts = line.replace(";", "").split()
+                if len(parts) >= 2:
+                    return "internal" if parts[1] == "0" else "external"
+
+        raise RuntimeError(f"No valid reference source response found: {response}")
+
+    def set_reference_source(self, source: str):
+        if source.lower() == "internal":
+            self._query("REFS 0")
+        elif source.lower() == "external":
+            self._query("REFS 1")
+        else:
+            raise ValueError("Invalid reference source. Use 'internal' or 'external'.")
+
+    def get_reference_frequency_MHz(self):
+        response = self._query("REF?")
+
+        for line in response.splitlines():
+            line = line.strip()
+
+            if line.startswith("REF"):
+                parts = line.replace(";", "").split()
+                if len(parts) >= 2:
+                    try:
+                        return float(parts[1])
+                    except ValueError:
+                        pass
+
+        raise RuntimeError(f"No valid reference frequency response found: {response}")
+    
+    def set_reference_frequency_MHz(self, frequency_MHz):
+        self._query(f"REF {frequency_MHz}")
