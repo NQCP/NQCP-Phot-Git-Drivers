@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git pull)",
+      "Bash(git pull *)",
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(git -C * add *)",
+      "Bash(git -C * commit *)",
+      "Bash(git -C * pull*)",
+      "Bash(git -C * push*)",
+      "Bash(*wait_inbox.py --agent *)",
+      "Bash(*agent_mailbox.py *)",
+      "Bash(*-m labserver.messaging.send *)"
+    ]
+  }
+}

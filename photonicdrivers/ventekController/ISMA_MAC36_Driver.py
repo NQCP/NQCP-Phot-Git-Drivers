@@ -1,19 +1,24 @@
 # class to communicate with the iSMA_MAC36 controller that control the Ventek cooling system
 from photonicdrivers.Abstract.Connectable import Connectable
 
-from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodbus 
+from pymodbus.client import ModbusTcpClient #  conda install conda-forge::pymodbus
 from pymodbus import pymodbus_apply_logging_config # to enable debug mode
 import struct
 
 class ISMA_MAC36_Driver(Connectable):
     def __init__(self, _ip_address, _port=502, _slave_id=1, _debug=False) -> None:
-        # _ip_address: IP of the Modbus TCP server
-        # _port: port of the Modbus TCP server. Default is 502
-        # _slave_ID: slave ID of the device
-        
+        """
+        Class to communicate with the iSMA_MAC36 controller that controls the Ventek cooling system.
+
+        Arguments:
+            _ip_address: IP of the Modbus TCP server
+            _port: port of the Modbus TCP server. Default is 502
+            _slave_id: slave ID of the device
+            _debug: whether to enable debug mode
+        """
         print('Inilialisting iSMA_MAC36 class')
-        
-        if _debug == True:
+
+        if _debug:
             print('Enabling debugging mode')
             pymodbus_apply_logging_config("DEBUG")
 
@@ -21,13 +26,11 @@ class ISMA_MAC36_Driver(Connectable):
         self.port = _port
         self.slave_id = _slave_id
 
-        # Connect to the Modbus TCP server
-        self.client = ModbusTcpClient(self.ip_address, self.port)
-
         # Open the connection
-        self.client.connect()
+        self.connect()
 
     def connect(self):
+        # Connect to the Modbus TCP server
         self.client = ModbusTcpClient(self.ip_address, self.port)
 
         self.client.connect()
@@ -38,7 +41,8 @@ class ISMA_MAC36_Driver(Connectable):
     def is_connected(self):
         try:
             return self.queryKK4Info() is not None
-        except:
+        except Exception as e:
+            print(f"Error occurred while querying: {e}")
             return False
 
     def queryKK4Info(self):
@@ -48,16 +52,28 @@ class ISMA_MAC36_Driver(Connectable):
         floatArray = self.__array_uint16_to_float32(uInt16Array)
         kk4Info = KK4Info(floatArray)
         return kk4Info
-        
+
+    def queryKK2Info(self):
+        # this function is hardcoded to return the registers relevant for the KK2 lab
+        output = self.queryInputRegisters(0,26)
+        try:
+            uInt16Array = output.registers
+        except Exception as e:
+            print(f"Error occurred while querying KK2 info: {e}. Output: {output}.")
+            return None
+        floatArray = self.__array_uint16_to_float32(uInt16Array)
+        kk2Info = KK2Info(floatArray)
+        return kk2Info
+
 
     def queryInputRegisters(self, registerStart, length):
         # for 3xxxx registers
-        return self.client.read_input_registers(registerStart, length, self.slave_id)
+        return self.client.read_input_registers(address=registerStart, count=length, slave=self.slave_id)
 
 
     def queryHoldingRegisters(self, registerStart, length):
         # for 4xxxx registers
-        return self.client.read_holding_registers(registerStart, length, self.slave_id)
+        return self.client.read_holding_registers(address=registerStart, count=length, slave=self.slave_id)
 
     ##################### PRIVATE METHODS ###########################
 
@@ -83,7 +99,7 @@ class ISMA_MAC36_Driver(Connectable):
             float_rounded = float(float_string_rounded)
             float_array.append(float_rounded)
 
-        return float_array    
+        return float_array
 
 
 class KK4Info:
@@ -114,3 +130,24 @@ class KK4Info:
         self.IBI03_P = floatArray[19]
         self.IBI03_I = floatArray[20]
         self.IBI03_D = floatArray[21]
+
+class KK2Info:
+    # a class to make it easy to identify which values correspond to which variables
+    def __init__(self, floatArray):
+        # Lille rum (kælder) --> Kokebs lab
+        self.IBI01_ACT_SP = floatArray[4]   # ACT_Temp_SP
+        self.IBI01_TT001 = floatArray[1]    # DisplayTemp
+        self.IBI01_MK201 = floatArray[2]    # CoolingValve
+        self.IBI01_FC = floatArray[3]       # FancoilSpeed
+
+        # Stort rum (kælder) --> Main lab
+        self.IBI02_ACT_SP = floatArray[8]   # ACT_Temp_SP
+        self.IBI02_TT001 = floatArray[5]    # DisplayTemp
+        self.IBI02_MK201 = floatArray[6]   # CoolingValve
+        self.IBI02_FC = floatArray[7]       # FancoilSpeed
+
+        # Lille rum (stueplan) --> Compressors room
+        self.IBI03_ACT_SP = floatArray[12]  # ACT_Temp_SP
+        self.IBI03_TT001 = floatArray[9]   # DisplayTemp
+        self.IBI03_MK201 = floatArray[10]   # CoolingValve
+        self.IBI03_FC = floatArray[11]      # FancoilSpeed

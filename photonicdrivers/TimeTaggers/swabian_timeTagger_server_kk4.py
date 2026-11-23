@@ -19,7 +19,7 @@ tagger.xtra_setClockOut(False)
 # The server keeps running until the command tagger.stopServer() is called or until the program is terminated
 print("Starts the server")
 tagger.startServer(access_mode = TimeTagger.AccessMode.Control,port=41101)
-tagger.disableLEDs(disabled=False)
+tagger.disableLEDs(disabled=True)
 
 # Keep this process running
 run = True

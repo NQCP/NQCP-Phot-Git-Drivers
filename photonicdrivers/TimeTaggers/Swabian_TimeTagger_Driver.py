@@ -2,6 +2,7 @@ from Swabian import TimeTagger
 from Swabian.TimeTagger import TimeTagStreamBuffer
 import time
 from photonicdrivers.Abstract.Connectable import Connectable
+from photonicdrivers.TimeTaggers.FastForward.FastFeedbackCoincidences import FastFeedbackCoincidences
 
 # https://www.swabianinstruments.com/static/documentation/TimeTagger/tutorials/TimeTaggerRPC.html
 # If the "Time Tagger Lab" software is installed, code example can be found here C:\Program Files\Swabian Instruments\Time Tagger\examples
@@ -18,6 +19,8 @@ class Swabian_TimeTagger_Driver(Connectable):
 
         self.connection_type = connection_type
         self.connection = None
+
+        self.FCC = None  # FastFeedbackCoincidences object
 
     ###################### HIGH LEVEL FUNCTIONS ######################
 
@@ -74,6 +77,17 @@ class Swabian_TimeTagger_Driver(Connectable):
 
     def initialise_histogram(self, start_channel: int, click_channel: int, bin_width_ps: int, num_bins: int) -> None:
         return TimeTagger.Histogram(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, binwidth = bin_width_ps, n_bins=num_bins)
+
+    def initialise_readout_pair_map(self, trigger_channel: int, click_channel: int, window_lo_ps, window_hi_ps,
+                                    window_block, window_u, n_blocks: int, n_u: int, expected_period_ps: float,
+                                    period_tolerance: float = 0.01):
+        """Every click pair between readout time bins of the same block (same period and the next one) -
+        Readout_Pair_Map.py. Runs here, next to the tagger. Pass the window table as tuples (by value
+        over rpyc); getData() returns plain values."""
+        from photonicdrivers.TimeTaggers.Readout_Pair_Map import Readout_Pair_Map
+        return Readout_Pair_Map(self.connection, trigger_channel, click_channel, tuple(window_lo_ps),
+                                tuple(window_hi_ps), tuple(window_block), tuple(window_u), n_blocks, n_u,
+                                expected_period_ps, period_tolerance)
 
     def initialise_frequency_stability(self, channel: int, steps: list[int], average: int = 1000, trace_len: int = 1000):
         return TimeTagger.FrequencyStability(tagger=self.connection, channel=channel, steps=steps, average=average, trace_len=trace_len)
@@ -287,6 +301,50 @@ class Swabian_TimeTagger_Driver(Connectable):
         gated_g2_2D_histogram = TimeTagger.Histogram2D(tagger=self.connection, start_channel=trigger_channel_number, stop_channel_1=gated_channel_1_number, stop_channel_2=gated_channel_2_number, binwidth_1=bin_width_ps, binwidth_2=bin_width_ps, n_bins_1=num_bins, n_bins_2=num_bins)
         return gated_g2_2D_histogram, gate_start_channel, gate_stop_channel, gated_channel_1, gated_channel_2
     
+    def initialize_FastFeedback(self,
+            TRIGGER_CHANNEL,
+            COINC_WINDOW,
+            AUX_OUT_CANNEL_1,
+            OUTPUT_PULS_LENGTH_1,
+            ACTIVE_CHANNELS_1, # trigger channel not needed here
+            COINC_MASK_1,
+            EXCLUSIVE_1,
+            AUX_OUT_CANNEL_2 = None,
+            OUTPUT_PULS_LENGTH_2 = 10000,
+            ACTIVE_CHANNELS_2 = None,
+            COINC_MASK_2 = None,
+            EXCLUSIVE_2 = False,
+        ):
+        ACTIVE_CHANNELS_1 = list(ACTIVE_CHANNELS_1)
+        COINC_MASK_1 = list(COINC_MASK_1)
+
+        if ACTIVE_CHANNELS_2 is not None:
+            ACTIVE_CHANNELS_2 = list(ACTIVE_CHANNELS_2)
+        if COINC_MASK_2 is not None:
+            COINC_MASK_2 = list(COINC_MASK_2)
+
+        # Enable FF logic
+        self.FCC = FastFeedbackCoincidences(
+            self.connection,
+            TRIGGER_CHANNEL,
+            AUX_OUT_CANNEL_1,
+            ACTIVE_CHANNELS_1,
+            COINC_MASK_1,
+            EXCLUSIVE_1,
+            outputChannel2=AUX_OUT_CANNEL_2,
+            activeChannels2=ACTIVE_CHANNELS_2,
+            coincidenceGroup2=COINC_MASK_2,
+            exclusiveCoincidence2=EXCLUSIVE_2,
+            coincidenceWindow=COINC_WINDOW,
+            outputPulseLength1=OUTPUT_PULS_LENGTH_1,
+            outputPulseLength2=OUTPUT_PULS_LENGTH_2,
+        )
+        
+    def stop_FastFeedback(self):
+        self.FCC.disableOutputs()
+
+    def initialize_TimeDifferences(self, click_channel: int, start_channel: int, next_channel: int, sync_channel: int, bin_width_ps: int, n_bin: int, n_histograms: int) -> TimeTagger.TimeDifferences:
+        return TimeTagger.TimeDifferences(tagger=self.connection, click_channel=click_channel, start_channel=start_channel, next_channel=next_channel, sync_channel=sync_channel, binwidth=bin_width_ps, n_bins=n_bin, n_histograms=n_histograms)
 
     def getSerial(self) -> str:
         return self.connection.getSerial()

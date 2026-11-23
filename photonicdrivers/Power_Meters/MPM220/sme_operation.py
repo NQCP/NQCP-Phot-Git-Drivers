@@ -134,29 +134,14 @@ class SME:
 
          # Start timer
         start_time = time.time()
-
+        self.laser.write(':WAV:SWE:CYCL 1')
         # Start TSL scan
         self.laser.write(':WAV:SWE 1')
-        self.laser.write(':WAV:SWE:DEL 1')
-        swe_count_in = int(self.laser.query(':WAV:SWE:COUN?'))
-        swe_count = swe_count_in
-        while swe_count-swe_count_in == 0:
-            swe_count = int(self.laser.query(':WAV:SWE:COUN?'))
-            time.sleep(0.1)
-        self.laser.write(':WAV:SWE 0')
-        # # Check TSL status and force set TSL to start scan if not started
-        # scan_status = int(self.laser.query(':WAV:SWE?'))
-        # time.sleep(0.2)
-        # while scan_status != 4:
-        #     scan_status = int(self.laser.query(':WAV:SWE?'))
-        #     print(scan_status)
-        #     time.sleep(0.2)
-        # self.laser.write(':WAV:SWE 0')
-        # # Issue software trigger to the TSL
-        # print("siamo oltre")
-
-       
-
+        scan_status = int(self.laser.query(':WAV:SWE?'))
+        time.sleep(0.2)
+        while scan_status != 0:
+            scan_status = int(self.laser.query(':WAV:SWE?'))
+            time.sleep(0.2)
         # # Wait for measurements to complete
         # while (
         #         int(self.power_meter.query("STAT?").split(',')[0]) == 0

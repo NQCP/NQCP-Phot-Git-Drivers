@@ -9,6 +9,9 @@
 import socket
 from photonicdrivers.Abstract.Connectable import Connectable
 
+LOW_VOLTAGE_LASER_TUNE_OUTPUTS = ["21", "22", "23", "24"]
+LOW_VOLTAGE_LASER_TUNE_MAX_V   = "1.1"
+
 class QDAC2_Driver(Connectable):
     def __init__(self,_ip_string: str,_port_number: int) -> None:
         self.ipAddress = _ip_string
@@ -140,6 +143,14 @@ class QDAC2_Driver(Connectable):
             print("The modeString must be either FIX, SWE, or LIST")
 
     def set_voltage(self,chNumberString: str,voltageString: str) -> None:
+        if chNumberString in LOW_VOLTAGE_LASER_TUNE_OUTPUTS:
+            if (float(voltageString) < -float(LOW_VOLTAGE_LASER_TUNE_MAX_V)) or (float(voltageString) > float(LOW_VOLTAGE_LASER_TUNE_MAX_V)):
+                raise ValueError(f"Voltage {voltageString} is out of range for channel {chNumberString}. Must be between -{LOW_VOLTAGE_LASER_TUNE_MAX_V} and {LOW_VOLTAGE_LASER_TUNE_MAX_V}.")
+                return
+            else:
+                if self.get_voltage_range(chNumberString, "") == "HIGH":
+                    self.set_voltage_range(chNumberString, "LOW")
+        
         command = "sour" + chNumberString + ":volt " + voltageString
         self._write(command) # returns the current output voltage
         self._checkForErrors(command)
